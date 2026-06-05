@@ -26,13 +26,16 @@ export default function MasterBarang() {
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
+  const [bottomSheetType, setBottomSheetType] = useState<'detail' | 'edit' | 'qr' | null>(null);
   const [formData, setFormData] = useState<Partial<Item>>({});
 
-  const openBottomSheet = (item: Item) => {
+  const openMobileSheet = (item: Item, type: 'detail' | 'edit' | 'qr') => {
     setSelectedItem(item);
-    setBottomSheetOpen(true);
+    if (type === 'edit') setFormData(item);
+    setBottomSheetType(type);
   };
+
+  const closeMobileSheet = () => setBottomSheetType(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 500);
@@ -131,38 +134,32 @@ export default function MasterBarang() {
             </div>
           ) : (
             filteredItems.map((item) => (
-              <button
-                key={item.tsCode}
-                onClick={() => openBottomSheet(item)}
-                className={`w-full text-left rounded-xl border shadow-sm active:scale-[0.98] transition-transform ${
-                  item.stok === 0 ? 'border-l-4 border-red-400 bg-red-50/40' :
-                  item.stok <= item.safetyStok ? 'border-l-4 border-amber-400 bg-amber-50/30' :
-                  'border-slate-200 bg-white'
-                }`}
-              >
-                <div className="p-4">
+              <Card key={item.tsCode} className={`border shadow-sm ${cardBg(item)}`}>
+                <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="min-w-0">
-                      <p className="font-semibold text-sm text-slate-800 leading-snug line-clamp-2">{item.nama}</p>
-                      <p className="text-xs font-mono text-slate-400 mt-0.5">{item.tsCode}</p>
+                      <p className="font-semibold text-sm text-slate-800 leading-tight">{item.nama}</p>
+                      <p className="text-xs font-mono text-muted-foreground mt-0.5">{item.tsCode}</p>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <StatusBadge status={item.status} />
-                      <ChevronRight className="h-4 w-4 text-slate-300" />
-                    </div>
+                    <StatusBadge status={item.status} />
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mb-3">
+                    <span className="flex items-center gap-1"><Tag className="h-3 w-3" />{item.kategori}</span>
+                    <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{item.binLoc || '-'}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="flex gap-3 text-xs text-slate-500">
-                      <span className="flex items-center gap-1"><Tag className="h-3 w-3" />{item.kategori}</span>
-                      <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{item.binLoc || '-'}</span>
+                    <div className="flex gap-3 text-sm">
+                      <span>Stok: <strong className={stockColor(item)}>{item.stok}</strong> <span className="text-muted-foreground text-xs">{item.uom}</span></span>
+                      <span className="text-muted-foreground">Min: {item.safetyStok}</span>
                     </div>
-                    <span className="text-sm font-bold">
-                      <span className={stockColor(item)}>{item.stok}</span>
-                      <span className="text-xs font-normal text-slate-400 ml-1">{item.uom}</span>
-                    </span>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => openMobileSheet(item, 'detail')}><Eye className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50" onClick={() => openMobileSheet(item, 'edit')}><Pencil className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600 hover:bg-slate-100" onClick={() => openMobileSheet(item, 'qr')}><QrCode className="h-4 w-4" /></Button>
+                    </div>
                   </div>
-                </div>
-              </button>
+                </CardContent>
+              </Card>
             ))
           )}
         </div>
@@ -324,86 +321,140 @@ export default function MasterBarang() {
         </DialogContent>
       </Dialog>
 
-      {/* MOBILE: Bottom Sheet */}
-      {bottomSheetOpen && (
+      {/* MOBILE: Bottom Sheets (Detail / Edit / QR) */}
+      {bottomSheetType !== null && selectedItem && (
         <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setBottomSheetOpen(false)}
-          />
-          {/* Sheet */}
-          <div className="relative bg-white rounded-t-2xl shadow-2xl animate-in slide-in-from-bottom duration-300">
-            {/* Handle bar */}
-            <div className="flex justify-center pt-3 pb-1">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeMobileSheet} />
+          <div className="relative bg-white rounded-t-2xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[90vh] flex flex-col">
+            {/* Handle + header */}
+            <div className="flex justify-center pt-3 pb-0 shrink-0">
               <div className="w-10 h-1 rounded-full bg-slate-200" />
             </div>
-            {/* Item info header */}
-            {selectedItem && (
-              <div className="px-5 pt-3 pb-4 border-b border-slate-100">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-bold text-base text-slate-800 leading-snug">{selectedItem.nama}</p>
-                    <p className="text-xs font-mono text-slate-400 mt-0.5">{selectedItem.tsCode} · {selectedItem.kategori}</p>
-                  </div>
-                  <button onClick={() => setBottomSheetOpen(false)} className="p-1 rounded-full hover:bg-slate-100 text-slate-400 shrink-0">
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-                <div className="mt-3 flex items-center gap-3">
-                  <StatusBadge status={selectedItem.status} />
-                  <span className="text-sm text-slate-500">
-                    Stok: <span className={`font-bold ${stockColor(selectedItem)}`}>{selectedItem.stok}</span> {selectedItem.uom}
-                  </span>
-                </div>
+            <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-100 shrink-0">
+              <div>
+                <p className="font-bold text-base text-slate-800 leading-tight">
+                  {bottomSheetType === 'detail' && 'Detail Barang'}
+                  {bottomSheetType === 'edit' && 'Edit Data Barang'}
+                  {bottomSheetType === 'qr' && 'Label QR Code'}
+                </p>
+                <p className="text-xs font-mono text-slate-400 mt-0.5">{selectedItem.tsCode}</p>
               </div>
-            )}
-            {/* Action buttons */}
-            <div className="px-4 py-3 flex flex-col gap-1">
-              <button
-                onClick={() => { setBottomSheetOpen(false); setDetailModalOpen(true); }}
-                className="flex items-center gap-4 w-full px-4 py-3.5 rounded-xl hover:bg-blue-50 active:bg-blue-100 transition-colors text-left"
-              >
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                  <Eye className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-800 text-sm">Lihat Detail</p>
-                  <p className="text-xs text-slate-400">Info lengkap & riwayat transaksi</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-300 ml-auto" />
-              </button>
-
-              <button
-                onClick={() => { setBottomSheetOpen(false); if (selectedItem) handleOpenEdit(selectedItem); }}
-                className="flex items-center gap-4 w-full px-4 py-3.5 rounded-xl hover:bg-amber-50 active:bg-amber-100 transition-colors text-left"
-              >
-                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                  <Pencil className="h-5 w-5 text-amber-600" />
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-800 text-sm">Edit Data</p>
-                  <p className="text-xs text-slate-400">Ubah informasi barang</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-300 ml-auto" />
-              </button>
-
-              <button
-                onClick={() => { setBottomSheetOpen(false); setQrModalOpen(true); }}
-                className="flex items-center gap-4 w-full px-4 py-3.5 rounded-xl hover:bg-slate-50 active:bg-slate-100 transition-colors text-left"
-              >
-                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-                  <QrCode className="h-5 w-5 text-slate-600" />
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-800 text-sm">Cetak Label QR</p>
-                  <p className="text-xs text-slate-400">Generate & cetak QR code barang</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-300 ml-auto" />
+              <button onClick={closeMobileSheet} className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400">
+                <X className="h-5 w-5" />
               </button>
             </div>
-            {/* Safe area bottom */}
-            <div className="pb-6" />
+
+            {/* Scrollable content */}
+            <div className="overflow-y-auto flex-1">
+
+              {/* ── DETAIL ── */}
+              {bottomSheetType === 'detail' && (
+                <div className="px-5 py-4 space-y-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-semibold text-slate-800 text-sm leading-snug flex-1">{selectedItem.nama}</p>
+                    <StatusBadge status={selectedItem.status} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: 'Kategori', value: selectedItem.kategori },
+                      { label: 'BIN LOC', value: selectedItem.binLoc || '-' },
+                      { label: 'UOM', value: selectedItem.uom },
+                      { label: 'MS Code', value: selectedItem.msCode || '-' },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="bg-slate-50 rounded-lg p-3">
+                        <p className="text-xs text-slate-400 mb-0.5">{label}</p>
+                        <p className="text-sm font-semibold text-slate-700 font-mono">{value}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="flex-1 bg-slate-50 rounded-lg p-3">
+                      <p className="text-xs text-slate-400 mb-0.5">Stok Saat Ini</p>
+                      <p className={`text-2xl font-bold ${stockColor(selectedItem)}`}>{selectedItem.stok} <span className="text-sm font-normal text-slate-400">{selectedItem.uom}</span></p>
+                    </div>
+                    <div className="flex-1 bg-slate-50 rounded-lg p-3">
+                      <p className="text-xs text-slate-400 mb-0.5">Batas Aman</p>
+                      <p className="text-2xl font-bold text-slate-600">{selectedItem.safetyStok} <span className="text-sm font-normal text-slate-400">{selectedItem.uom}</span></p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Riwayat Transaksi</p>
+                    <div className="rounded-xl border border-slate-100 overflow-hidden text-sm divide-y divide-slate-100">
+                      {[
+                        { tgl: '14 Jan 2025, 10:30', jenis: 'Masuk', jml: '+20', pet: 'Budi Santoso' },
+                        { tgl: '10 Jan 2025, 14:15', jenis: 'Keluar', jml: '-5', pet: 'Andi Rahman' },
+                        { tgl: '05 Jan 2025, 09:00', jenis: 'Keluar', jml: '-12', pet: 'Siti Rahayu' },
+                      ].map((r, i) => (
+                        <div key={i} className="flex items-center justify-between px-3 py-2.5">
+                          <div>
+                            <p className="text-xs text-slate-500">{r.tgl}</p>
+                            <p className={`text-xs font-semibold mt-0.5 ${r.jenis === 'Masuk' ? 'text-green-600' : 'text-orange-500'}`}>{r.jenis}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className={`font-bold ${r.jenis === 'Masuk' ? 'text-green-600' : 'text-orange-500'}`}>{r.jml}</p>
+                            <p className="text-xs text-slate-400">{r.pet}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="pb-2">
+                    <Button variant="outline" className="w-full" onClick={closeMobileSheet}>Tutup</Button>
+                  </div>
+                </div>
+              )}
+
+              {/* ── EDIT ── */}
+              {bottomSheetType === 'edit' && (
+                <div className="px-5 py-4 space-y-3">
+                  <div className="space-y-1.5"><Label className="text-xs">TS Code</Label><Input value={formData.tsCode || ''} disabled className="bg-slate-50" /></div>
+                  <div className="space-y-1.5"><Label className="text-xs">MS Code</Label><Input value={formData.msCode || ''} onChange={(e) => setFormData({ ...formData, msCode: e.target.value })} /></div>
+                  <div className="space-y-1.5"><Label className="text-xs">Nama Barang <span className="text-red-500">*</span></Label><Input value={formData.nama || ''} onChange={(e) => setFormData({ ...formData, nama: e.target.value })} /></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Kategori</Label>
+                      <Select value={formData.kategori} onValueChange={(val: any) => setFormData({ ...formData, kategori: val })}>
+                        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {['Civil','Electrical','Mechanical','Furniture','Consumables','GH Consumable'].map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5"><Label className="text-xs">BIN LOC</Label><Input value={formData.binLoc || ''} onChange={(e) => setFormData({ ...formData, binLoc: e.target.value })} /></div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1.5"><Label className="text-xs">UOM</Label><Input value={formData.uom || ''} onChange={(e) => setFormData({ ...formData, uom: e.target.value })} /></div>
+                    <div className="space-y-1.5"><Label className="text-xs">Stok</Label><Input type="number" min="0" value={formData.stok ?? ''} onChange={(e) => setFormData({ ...formData, stok: parseInt(e.target.value) || 0 })} /></div>
+                    <div className="space-y-1.5"><Label className="text-xs">Min. Stok</Label><Input type="number" min="0" value={formData.safetyStok ?? ''} onChange={(e) => setFormData({ ...formData, safetyStok: parseInt(e.target.value) || 0 })} /></div>
+                  </div>
+                  <div className="flex gap-2 pt-2 pb-2">
+                    <Button variant="outline" className="flex-1" onClick={closeMobileSheet}>Batal</Button>
+                    <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={() => { handleSaveEdit(); closeMobileSheet(); }}>Simpan</Button>
+                  </div>
+                </div>
+              )}
+
+              {/* ── QR ── */}
+              {bottomSheetType === 'qr' && (
+                <div className="px-5 py-4 flex flex-col items-center gap-4">
+                  <div className="bg-white border rounded-xl shadow-sm p-6 flex flex-col items-center w-full max-w-[280px]">
+                    <QRCodeSVG value={selectedItem.tsCode} size={180} />
+                    <div className="mt-5 w-full text-center space-y-1">
+                      <p className="font-mono font-bold text-lg tracking-widest">{selectedItem.tsCode}</p>
+                      <p className="text-sm font-semibold text-slate-700 truncate">{selectedItem.nama}</p>
+                      <div className="flex justify-between border-t mt-3 pt-3 text-xs text-slate-500">
+                        <span>Lokasi:</span>
+                        <span className="font-mono font-semibold text-slate-700">{selectedItem.binLoc || '-'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 w-full pb-2">
+                    <Button variant="outline" className="flex-1" onClick={closeMobileSheet}>Batal</Button>
+                    <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={() => { toast.success('Mencetak label...'); closeMobileSheet(); }}>Cetak Label</Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
