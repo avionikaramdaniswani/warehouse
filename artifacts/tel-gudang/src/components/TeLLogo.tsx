@@ -14,7 +14,7 @@ export function TeLLogo({ size = 'md', className }: TeLLogoProps) {
 
   return (
     <img
-      src="/tel-logo.png"
+      src="/tel-logo-transparent.png"
       alt="PT Tanjungenim Lestari Pulp & Paper"
       className={cn(dims, 'object-contain select-none', className)}
       draggable={false}
