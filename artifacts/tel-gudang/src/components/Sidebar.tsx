@@ -26,9 +26,9 @@ export function Sidebar({ className }: { className?: string }) {
 
   return (
     <div className={cn("flex flex-col h-full bg-sidebar text-sidebar-foreground w-60 shrink-0", className)}>
-      <div className="px-4 py-5 flex flex-col items-center gap-2 border-b border-sidebar-border">
-        <div className="bg-white rounded-lg px-3 py-2 w-full flex items-center justify-center">
-          <TeLLogo size="md" />
+      <div className="px-4 py-4 flex flex-col items-center gap-2 border-b border-sidebar-border">
+        <div className="bg-white rounded-md px-2 py-1.5 inline-flex items-center justify-center">
+          <TeLLogo size="sm" />
         </div>
         <div className="text-center leading-tight">
           <p className="font-bold text-sm tracking-tight">Townsite Warehouse</p>
