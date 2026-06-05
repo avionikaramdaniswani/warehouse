@@ -1,17 +1,22 @@
 import { useState } from 'react';
 import { Sidebar } from './Sidebar';
-import { Menu, X, Bell, Search } from 'lucide-react';
-import { useLocation } from 'wouter';
+import { Menu, X, Bell, Search, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 export function Layout({ children, title }: { children: React.ReactNode, title: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden">
       {/* Desktop Sidebar */}
-      <div className="hidden md:block">
-        <Sidebar />
+      <div
+        className={[
+          'hidden md:block flex-shrink-0 transition-all duration-300 ease-in-out',
+          sidebarCollapsed ? 'w-16' : 'w-60',
+        ].join(' ')}
+      >
+        <Sidebar collapsed={sidebarCollapsed} />
       </div>
 
       {/* Mobile Sidebar Overlay */}
@@ -19,8 +24,8 @@ export function Layout({ children, title }: { children: React.ReactNode, title: 
         <div className="md:hidden fixed inset-0 z-50 flex">
           <div className="fixed inset-0 bg-black/50" onClick={() => setMobileMenuOpen(false)} />
           <div className="relative z-50 w-60 h-full">
-            <Sidebar />
-            <button 
+            <Sidebar collapsed={false} />
+            <button
               className="absolute top-4 -right-12 p-2 bg-sidebar rounded-full text-white"
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -31,25 +36,39 @@ export function Layout({ children, title }: { children: React.ReactNode, title: 
       )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
+      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         {/* Top Header */}
         <header className="h-16 flex-shrink-0 bg-white border-b border-border flex items-center justify-between px-4 sm:px-6 z-10">
-          <div className="flex items-center gap-4">
-            <button 
+          <div className="flex items-center gap-3">
+            {/* Mobile hamburger */}
+            <button
               className="md:hidden text-foreground p-1 hover:bg-accent rounded-md"
               onClick={() => setMobileMenuOpen(true)}
             >
               <Menu className="h-6 w-6" />
             </button>
+
+            {/* Desktop collapse toggle */}
+            <button
+              className="hidden md:flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent p-1.5 rounded-md transition-colors"
+              onClick={() => setSidebarCollapsed((v) => !v)}
+              title={sidebarCollapsed ? 'Buka sidebar' : 'Tutup sidebar'}
+            >
+              {sidebarCollapsed
+                ? <PanelLeftOpen className="h-5 w-5" />
+                : <PanelLeftClose className="h-5 w-5" />
+              }
+            </button>
+
             <h1 className="text-xl font-semibold tracking-tight text-foreground hidden sm:block">{title}</h1>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="relative hidden md:block">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input 
-                type="search" 
-                placeholder="Cari..." 
+              <Input
+                type="search"
+                placeholder="Cari..."
                 className="w-64 pl-9 bg-secondary border-none"
               />
             </div>
