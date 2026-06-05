@@ -174,37 +174,56 @@ export default function Dashboard() {
       <Card className="border-red-200">
         <CardHeader className="bg-red-50/50 border-b border-red-100">
           <CardTitle className="text-red-700 flex items-center gap-2">
-            <PackageMinus className="h-5 w-5" /> 
-            ⚠ Barang Stok Menipis
+            <PackageMinus className="h-5 w-5" />
+            Barang Stok Menipis
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead className="font-semibold">TS Code</TableHead>
-                <TableHead className="font-semibold">Nama Barang</TableHead>
-                <TableHead className="font-semibold">Kategori</TableHead>
-                <TableHead className="text-right font-semibold">Stok Saat Ini</TableHead>
-                <TableHead className="text-right font-semibold">Safety Stok</TableHead>
-                <TableHead className="text-center font-semibold">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {lowStockItems.slice(0, 5).map((item) => (
-                <TableRow key={item.tsCode}>
-                  <TableCell className="font-mono text-sm">{item.tsCode}</TableCell>
-                  <TableCell className="font-medium">{item.nama}</TableCell>
-                  <TableCell>{item.kategori}</TableCell>
-                  <TableCell className="text-right font-bold text-red-600">{item.stok}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{item.safetyStok}</TableCell>
-                  <TableCell className="text-center">
-                    <StatusBadge status={item.status} />
-                  </TableCell>
+          {/* MOBILE: Card View */}
+          <div className="md:hidden divide-y divide-red-100">
+            {lowStockItems.slice(0, 5).map((item) => (
+              <div key={item.tsCode} className="p-4 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm text-slate-800 leading-tight truncate">{item.nama}</p>
+                  <p className="text-xs font-mono text-muted-foreground mt-0.5">{item.tsCode} · {item.kategori}</p>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="text-right">
+                    <p className="text-xl font-bold text-red-600">{item.stok}</p>
+                    <p className="text-xs text-muted-foreground">min {item.safetyStok}</p>
+                  </div>
+                  <StatusBadge status={item.status} />
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* DESKTOP: Table View */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader className="bg-muted/50">
+                <TableRow>
+                  <TableHead className="font-semibold">TS Code</TableHead>
+                  <TableHead className="font-semibold">Nama Barang</TableHead>
+                  <TableHead className="font-semibold">Kategori</TableHead>
+                  <TableHead className="text-right font-semibold">Stok Saat Ini</TableHead>
+                  <TableHead className="text-right font-semibold">Safety Stok</TableHead>
+                  <TableHead className="text-center font-semibold">Status</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {lowStockItems.slice(0, 5).map((item) => (
+                  <TableRow key={item.tsCode}>
+                    <TableCell className="font-mono text-sm">{item.tsCode}</TableCell>
+                    <TableCell className="font-medium">{item.nama}</TableCell>
+                    <TableCell>{item.kategori}</TableCell>
+                    <TableCell className="text-right font-bold text-red-600">{item.stok}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{item.safetyStok}</TableCell>
+                    <TableCell className="text-center"><StatusBadge status={item.status} /></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </Layout>

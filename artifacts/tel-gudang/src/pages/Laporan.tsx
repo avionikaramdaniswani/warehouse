@@ -159,14 +159,41 @@ export default function Laporan() {
 
         {/* Details Table */}
         <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <CardTitle className="text-lg">Detail Transaksi</CardTitle>
-            <div className="relative w-64">
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Cari dalam laporan..." className="pl-9 h-9" />
             </div>
           </CardHeader>
-          <div className="overflow-x-auto">
+
+          {/* MOBILE: Card View */}
+          <div className="md:hidden divide-y">
+            {dummyReportData.map((row, idx) => (
+              <div key={idx} className="p-4">
+                <div className="flex items-start justify-between gap-2 mb-1.5">
+                  <p className="font-semibold text-sm text-slate-800 leading-tight">{row.nama}</p>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${row.jenis === 'IN' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                      {row.jenis === 'IN' ? 'Masuk' : 'Keluar'}
+                    </span>
+                    <span className={`font-mono text-sm font-bold ${row.jenis === 'IN' ? 'text-green-600' : 'text-orange-600'}`}>
+                      {row.jenis === 'IN' ? '+' : '-'}{row.jumlah} {row.uom}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs font-mono text-muted-foreground mb-2">{row.tsCode}</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                  <span>{row.tanggal}</span>
+                  <span>{row.ref}</span>
+                  <span>{row.petugas}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* DESKTOP: Table View */}
+          <div className="overflow-x-auto hidden md:block">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>
@@ -200,7 +227,8 @@ export default function Laporan() {
               </TableBody>
             </Table>
           </div>
-          <div className="p-4 border-t flex justify-between items-center text-sm text-slate-500">
+
+          <div className="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-slate-500">
             <span>Menampilkan 1-10 dari 142 baris</span>
             <div className="flex gap-1">
               <Button variant="outline" size="sm" disabled>Sebelumnya</Button>
