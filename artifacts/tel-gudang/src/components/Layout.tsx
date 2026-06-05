@@ -60,7 +60,7 @@ export function Layout({ children, title }: { children: React.ReactNode, title: 
               }
             </button>
 
-            <h1 className="text-xl font-semibold tracking-tight text-foreground hidden sm:block">{title}</h1>
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">{title}</h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -81,9 +81,6 @@ export function Layout({ children, title }: { children: React.ReactNode, title: 
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50/50">
-          <div className="sm:hidden mb-4">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>
-          </div>
           {children}
         </main>
       </div>

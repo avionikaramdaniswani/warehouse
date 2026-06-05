@@ -44,66 +44,75 @@ export default function Dashboard() {
 
   return (
     <Layout title="Dashboard">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">Selamat Datang, {currentUser?.nama}</h2>
-          <p className="text-muted-foreground mt-1">Berikut adalah ringkasan inventaris gudang saat ini.</p>
+      <div className="flex flex-row justify-between items-center mb-6 gap-3">
+        <div className="min-w-0">
+          <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-foreground truncate">
+            Selamat Datang, {currentUser?.nama}
+          </h2>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-0.5 hidden sm:block">
+            Berikut adalah ringkasan inventaris gudang saat ini.
+          </p>
         </div>
-        <div className="bg-white px-4 py-2 rounded-lg border border-border shadow-sm flex flex-col items-end">
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">WAKTU SISTEM</span>
-          <span className="text-lg font-bold text-primary font-mono tracking-tight">
-            {currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-            <span className="ml-2 text-foreground">{currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+        <div className="bg-white px-3 py-2 rounded-lg border border-border shadow-sm flex flex-col items-end shrink-0">
+          <span className="text-[10px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider">WAKTU SISTEM</span>
+          <span className="text-sm sm:text-base font-bold text-primary font-mono tracking-tight whitespace-nowrap">
+            <span className="hidden sm:inline">
+              {currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}{' '}
+            </span>
+            <span className="sm:hidden">
+              {currentTime.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}{' '}
+            </span>
+            <span className="text-foreground">{currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
           </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <Card>
-          <CardContent className="p-6 flex items-center justify-between">
+          <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">Total Item</p>
-              <h3 className="text-3xl font-bold">{totalItems}</h3>
+              <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Total Item</p>
+              <h3 className="text-2xl sm:text-3xl font-bold">{totalItems}</h3>
             </div>
-            <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
-              <Package className="h-6 w-6" />
+            <div className="p-2 sm:p-3 bg-blue-100 text-blue-600 rounded-full shrink-0">
+              <Package className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="border-red-200 shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-2 h-full bg-red-500"></div>
-          <CardContent className="p-6 flex items-center justify-between">
+          <div className="absolute top-0 right-0 w-1.5 h-full bg-red-500"></div>
+          <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-medium text-red-600 mb-1">Stok Menipis</p>
-              <h3 className="text-3xl font-bold text-red-700">{lowStockItems.length}</h3>
+              <p className="text-xs sm:text-sm font-medium text-red-600 mb-1">Stok Menipis</p>
+              <h3 className="text-2xl sm:text-3xl font-bold text-red-700">{lowStockItems.length}</h3>
             </div>
-            <div className="p-3 bg-red-100 text-red-600 rounded-full">
-              <PackageMinus className="h-6 w-6" />
+            <div className="p-2 sm:p-3 bg-red-100 text-red-600 rounded-full shrink-0">
+              <PackageMinus className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
-          <CardContent className="p-6 flex items-center justify-between">
+          <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">Transaksi Hari Ini</p>
-              <h3 className="text-3xl font-bold">{todayTransactions || 12}</h3>
+              <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Transaksi Hari Ini</p>
+              <h3 className="text-2xl sm:text-3xl font-bold">{todayTransactions || 12}</h3>
             </div>
-            <div className="p-3 bg-green-100 text-green-600 rounded-full">
-              <Activity className="h-6 w-6" />
+            <div className="p-2 sm:p-3 bg-green-100 text-green-600 rounded-full shrink-0">
+              <Activity className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
-          <CardContent className="p-6 flex items-center justify-between">
+          <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">Total Kategori</p>
-              <h3 className="text-3xl font-bold">{totalCategories}</h3>
+              <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Total Kategori</p>
+              <h3 className="text-2xl sm:text-3xl font-bold">{totalCategories}</h3>
             </div>
-            <div className="p-3 bg-orange-100 text-orange-600 rounded-full">
-              <Layers className="h-6 w-6" />
+            <div className="p-2 sm:p-3 bg-orange-100 text-orange-600 rounded-full shrink-0">
+              <Layers className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
