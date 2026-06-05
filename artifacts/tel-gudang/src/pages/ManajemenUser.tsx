@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { UserPlus, Pencil, ShieldAlert, CheckCircle, Search } from 'lucide-react';
+import { UserPlus, Pencil, ShieldAlert, CheckCircle, Search, Clock } from 'lucide-react';
 import { useAppContext, User } from '@/context/AppContext';
 import { StatusBadge } from '@/components/StatusBadge';
 import { toast } from 'sonner';
@@ -17,25 +17,15 @@ import { Redirect } from 'wouter';
 export default function ManajemenUser() {
   const { currentUser, users, setUsers } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
-  
   const [modalOpen, setModalOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  
-  const [formData, setFormData] = useState<Partial<User>>({
-    nama: '',
-    username: '',
-    role: 'Staff Gudang',
-    status: 'Aktif'
-  });
+  const [selectedItem, setSelectedItem] = useState<User | null>(null);
+  const [formData, setFormData] = useState<Partial<User>>({ nama: '', username: '', role: 'Staff Gudang', status: 'Aktif' });
 
-  // Role Protection
-  if (currentUser?.role !== 'Admin') {
-    return <Redirect to="/dashboard" />;
-  }
+  if (currentUser?.role !== 'Admin') return <Redirect to="/dashboard" />;
 
-  const filteredUsers = users.filter(user => 
-    user.nama.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filteredUsers = users.filter(user =>
+    user.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -58,60 +48,79 @@ export default function ManajemenUser() {
 
   const confirmToggleStatus = () => {
     if (!selectedItem) return;
-    
     const newStatus = selectedItem.status === 'Aktif' ? 'Nonaktif' : 'Aktif';
     setUsers(users.map(u => u.username === selectedItem.username ? { ...u, status: newStatus } : u));
-    
     toast.success(`Pengguna berhasil di-${newStatus.toLowerCase()}`);
     setAlertOpen(false);
   };
 
   const handleSave = () => {
-    if (!formData.nama || !formData.username) {
-      toast.error('Nama dan Username wajib diisi');
-      return;
-    }
-
+    if (!formData.nama || !formData.username) { toast.error('Nama dan Username wajib diisi'); return; }
     if (selectedItem) {
-      // Edit
       setUsers(users.map(u => u.username === selectedItem.username ? formData as User : u));
       toast.success('Data pengguna berhasil diperbarui');
     } else {
-      // Add
-      if (users.some(u => u.username === formData.username)) {
-        toast.error('Username sudah digunakan');
-        return;
-      }
-      const newUser = { ...formData, lastLogin: '-' } as User;
-      setUsers([...users, newUser]);
+      if (users.some(u => u.username === formData.username)) { toast.error('Username sudah digunakan'); return; }
+      setUsers([...users, { ...formData, lastLogin: '-' } as User]);
       toast.success('Pengguna baru berhasil ditambahkan');
     }
     setModalOpen(false);
   };
 
-  // Helper variable instead of using state for selectedItem across different handlers
-  // to avoid confusion with the selectedItem in context
-  const [selectedItem, setSelectedItem] = useState<User | null>(null);
-
   return (
     <Layout title="Manajemen Pengguna">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="relative w-full md:w-80">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="relative w-full sm:w-80">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Cari nama atau username..." 
-              className="pl-9 bg-white"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <Input placeholder="Cari nama atau username..." className="pl-9 bg-white" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           </div>
-          <Button className="bg-primary hover:bg-primary/90 w-full md:w-auto" onClick={handleOpenAdd}>
+          <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto" onClick={handleOpenAdd}>
             <UserPlus className="w-4 h-4 mr-2" /> Tambah User
           </Button>
         </div>
 
-        <Card className="shadow-sm border-border overflow-hidden">
+        {/* MOBILE: Card View */}
+        <div className="flex flex-col gap-3 md:hidden">
+          {filteredUsers.length === 0 ? (
+            <div className="py-12 text-center text-muted-foreground text-sm">Tidak ada pengguna ditemukan.</div>
+          ) : filteredUsers.map((user) => (
+            <Card key={user.username} className={user.status === 'Nonaktif' ? 'opacity-70' : ''}>
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div>
+                    <p className="font-semibold text-slate-800">{user.nama}</p>
+                    <p className="text-xs font-mono text-muted-foreground">@{user.username}</p>
+                  </div>
+                  <StatusBadge status={user.status} />
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <StatusBadge status={user.role as any} />
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground ml-auto">
+                    <Clock className="h-3 w-3" />{user.lastLogin}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="flex-1 h-8" onClick={() => handleOpenEdit(user)}>
+                    <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
+                  </Button>
+                  <Button
+                    variant={user.status === 'Aktif' ? 'outline' : 'default'}
+                    size="sm"
+                    className={`flex-1 h-8 ${user.status === 'Aktif' ? 'text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200' : 'bg-green-600 hover:bg-green-700'}`}
+                    onClick={() => handleToggleStatus(user)}
+                    disabled={user.username === currentUser?.username}
+                  >
+                    {user.status === 'Aktif' ? <><ShieldAlert className="w-3.5 h-3.5 mr-1" />Nonaktifkan</> : <><CheckCircle className="w-3.5 h-3.5 mr-1" />Aktifkan</>}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* DESKTOP: Table View */}
+        <Card className="shadow-sm border-border overflow-hidden hidden md:block">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-slate-100">
@@ -130,30 +139,22 @@ export default function ManajemenUser() {
                     <TableRow key={user.username}>
                       <TableCell className="font-semibold text-slate-800">{user.nama}</TableCell>
                       <TableCell className="font-mono text-sm text-slate-600">{user.username}</TableCell>
-                      <TableCell>
-                        <StatusBadge status={user.role as any} />
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={user.status} />
-                      </TableCell>
+                      <TableCell><StatusBadge status={user.role as any} /></TableCell>
+                      <TableCell><StatusBadge status={user.status} /></TableCell>
                       <TableCell className="text-sm text-slate-500">{user.lastLogin}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button variant="outline" size="sm" onClick={() => handleOpenEdit(user)} className="h-8">
                             <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
                           </Button>
-                          <Button 
-                            variant={user.status === 'Aktif' ? 'outline' : 'default'} 
-                            size="sm" 
+                          <Button
+                            variant={user.status === 'Aktif' ? 'outline' : 'default'}
+                            size="sm"
                             className={`h-8 ${user.status === 'Aktif' ? 'text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200' : 'bg-green-600 hover:bg-green-700'}`}
                             onClick={() => handleToggleStatus(user)}
-                            disabled={user.username === currentUser?.username} // Cannot disable self
+                            disabled={user.username === currentUser?.username}
                           >
-                            {user.status === 'Aktif' ? (
-                              <><ShieldAlert className="w-3.5 h-3.5 mr-1" /> Nonaktifkan</>
-                            ) : (
-                              <><CheckCircle className="w-3.5 h-3.5 mr-1" /> Aktifkan</>
-                            )}
+                            {user.status === 'Aktif' ? <><ShieldAlert className="w-3.5 h-3.5 mr-1" />Nonaktifkan</> : <><CheckCircle className="w-3.5 h-3.5 mr-1" />Aktifkan</>}
                           </Button>
                         </div>
                       </TableCell>
@@ -161,9 +162,7 @@ export default function ManajemenUser() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                      Tidak ada pengguna ditemukan.
-                    </TableCell>
+                    <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">Tidak ada pengguna ditemukan.</TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -175,31 +174,18 @@ export default function ManajemenUser() {
       {/* Modal Add/Edit */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{selectedItem ? 'Edit Data Pengguna' : 'Tambah Pengguna Baru'}</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>{selectedItem ? 'Edit Data Pengguna' : 'Tambah Pengguna Baru'}</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="nama">Nama Lengkap <span className="text-red-500">*</span></Label>
-              <Input id="nama" value={formData.nama || ''} onChange={(e) => setFormData({...formData, nama: e.target.value})} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="username">Username <span className="text-red-500">*</span></Label>
-              <Input id="username" value={formData.username || ''} onChange={(e) => setFormData({...formData, username: e.target.value})} disabled={!!selectedItem} className={selectedItem ? "bg-slate-100" : ""} />
-            </div>
+            <div className="space-y-2"><Label>Nama Lengkap <span className="text-red-500">*</span></Label><Input value={formData.nama || ''} onChange={(e) => setFormData({...formData, nama: e.target.value})} /></div>
+            <div className="space-y-2"><Label>Username <span className="text-red-500">*</span></Label><Input value={formData.username || ''} onChange={(e) => setFormData({...formData, username: e.target.value})} disabled={!!selectedItem} className={selectedItem ? "bg-slate-100" : ""} /></div>
             {!selectedItem && (
-              <div className="space-y-2">
-                <Label htmlFor="password">Password <span className="text-red-500">*</span></Label>
-                <Input id="password" type="password" placeholder="Minimal 6 karakter" />
-              </div>
+              <div className="space-y-2"><Label>Password <span className="text-red-500">*</span></Label><Input type="password" placeholder="Minimal 6 karakter" /></div>
             )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="role">Role Akses</Label>
+                <Label>Role Akses</Label>
                 <Select value={formData.role} onValueChange={(val) => setFormData({...formData, role: val})}>
-                  <SelectTrigger id="role">
-                    <SelectValue placeholder="Pilih Role" />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Admin">Admin</SelectItem>
                     <SelectItem value="Staff Gudang">Staff Gudang</SelectItem>
@@ -207,11 +193,9 @@ export default function ManajemenUser() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <Label>Status</Label>
                 <Select value={formData.status} onValueChange={(val: any) => setFormData({...formData, status: val})}>
-                  <SelectTrigger id="status">
-                    <SelectValue placeholder="Pilih Status" />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Aktif">Aktif</SelectItem>
                     <SelectItem value="Nonaktif">Nonaktif</SelectItem>
@@ -227,7 +211,7 @@ export default function ManajemenUser() {
         </DialogContent>
       </Dialog>
 
-      {/* Alert Confirm Status Change */}
+      {/* Alert Status */}
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
