@@ -39,21 +39,16 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
           className
         )}
       >
-        {/* Logo area */}
-        <div
-          className={cn(
-            'flex flex-col items-center border-b border-sidebar-border transition-all duration-300',
-            collapsed ? 'py-3 px-2' : 'px-4 py-4 gap-2'
-          )}
-        >
-          <TeLLogo size={collapsed ? 'sm' : 'md'} className={collapsed ? 'w-10 h-10 object-cover rounded' : ''} />
-          {!collapsed && (
+        {/* Logo area — hidden when collapsed */}
+        {!collapsed && (
+          <div className="px-4 py-4 flex flex-col items-center gap-2 border-b border-sidebar-border">
+            <TeLLogo size="md" />
             <div className="text-center leading-tight">
               <p className="font-bold text-sm tracking-tight">Townsite Warehouse</p>
               <p className="text-[10px] text-sidebar-foreground/50 uppercase tracking-wider">Materials Management System</p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Nav items */}
         <div className="flex-1 py-4 overflow-y-auto">
