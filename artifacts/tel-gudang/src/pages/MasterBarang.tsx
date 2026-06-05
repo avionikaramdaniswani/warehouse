@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, ChevronRight, X } from 'lucide-react';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -26,7 +26,13 @@ export default function MasterBarang() {
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<Item>>({});
+
+  const openBottomSheet = (item: Item) => {
+    setSelectedItem(item);
+    setBottomSheetOpen(true);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 500);
@@ -112,7 +118,7 @@ export default function MasterBarang() {
         </div>
 
         {/* MOBILE: Card View */}
-        <div className="flex flex-col gap-3 md:hidden">
+        <div className="flex flex-col gap-2.5 md:hidden">
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <Card key={i}><CardContent className="p-4 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /><Skeleton className="h-3 w-1/3" /></CardContent></Card>
@@ -125,32 +131,38 @@ export default function MasterBarang() {
             </div>
           ) : (
             filteredItems.map((item) => (
-              <Card key={item.tsCode} className={`border ${cardBg(item)}`}>
-                <CardContent className="p-4">
+              <button
+                key={item.tsCode}
+                onClick={() => openBottomSheet(item)}
+                className={`w-full text-left rounded-xl border shadow-sm active:scale-[0.98] transition-transform ${
+                  item.stok === 0 ? 'border-l-4 border-red-400 bg-red-50/40' :
+                  item.stok <= item.safetyStok ? 'border-l-4 border-amber-400 bg-amber-50/30' :
+                  'border-slate-200 bg-white'
+                }`}
+              >
+                <div className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="min-w-0">
-                      <p className="font-semibold text-sm text-slate-800 leading-tight">{item.nama}</p>
-                      <p className="text-xs font-mono text-muted-foreground mt-0.5">{item.tsCode}</p>
+                      <p className="font-semibold text-sm text-slate-800 leading-snug line-clamp-2">{item.nama}</p>
+                      <p className="text-xs font-mono text-slate-400 mt-0.5">{item.tsCode}</p>
                     </div>
-                    <StatusBadge status={item.status} />
-                  </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mb-3">
-                    <span className="flex items-center gap-1"><Tag className="h-3 w-3" />{item.kategori}</span>
-                    <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{item.binLoc || '-'}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <StatusBadge status={item.status} />
+                      <ChevronRight className="h-4 w-4 text-slate-300" />
+                    </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="flex gap-3 text-sm">
-                      <span>Stok: <strong className={stockColor(item)}>{item.stok}</strong> <span className="text-muted-foreground text-xs">{item.uom}</span></span>
-                      <span className="text-muted-foreground">Min: {item.safetyStok}</span>
+                    <div className="flex gap-3 text-xs text-slate-500">
+                      <span className="flex items-center gap-1"><Tag className="h-3 w-3" />{item.kategori}</span>
+                      <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{item.binLoc || '-'}</span>
                     </div>
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => { setSelectedItem(item); setDetailModalOpen(true); }}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50" onClick={() => handleOpenEdit(item)}><Pencil className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600 hover:bg-slate-100" onClick={() => { setSelectedItem(item); setQrModalOpen(true); }}><QrCode className="h-4 w-4" /></Button>
-                    </div>
+                    <span className="text-sm font-bold">
+                      <span className={stockColor(item)}>{item.stok}</span>
+                      <span className="text-xs font-normal text-slate-400 ml-1">{item.uom}</span>
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </button>
             ))
           )}
         </div>
@@ -311,6 +323,90 @@ export default function MasterBarang() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* MOBILE: Bottom Sheet */}
+      {bottomSheetOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setBottomSheetOpen(false)}
+          />
+          {/* Sheet */}
+          <div className="relative bg-white rounded-t-2xl shadow-2xl animate-in slide-in-from-bottom duration-300">
+            {/* Handle bar */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-slate-200" />
+            </div>
+            {/* Item info header */}
+            {selectedItem && (
+              <div className="px-5 pt-3 pb-4 border-b border-slate-100">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-bold text-base text-slate-800 leading-snug">{selectedItem.nama}</p>
+                    <p className="text-xs font-mono text-slate-400 mt-0.5">{selectedItem.tsCode} · {selectedItem.kategori}</p>
+                  </div>
+                  <button onClick={() => setBottomSheetOpen(false)} className="p-1 rounded-full hover:bg-slate-100 text-slate-400 shrink-0">
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="mt-3 flex items-center gap-3">
+                  <StatusBadge status={selectedItem.status} />
+                  <span className="text-sm text-slate-500">
+                    Stok: <span className={`font-bold ${stockColor(selectedItem)}`}>{selectedItem.stok}</span> {selectedItem.uom}
+                  </span>
+                </div>
+              </div>
+            )}
+            {/* Action buttons */}
+            <div className="px-4 py-3 flex flex-col gap-1">
+              <button
+                onClick={() => { setBottomSheetOpen(false); setDetailModalOpen(true); }}
+                className="flex items-center gap-4 w-full px-4 py-3.5 rounded-xl hover:bg-blue-50 active:bg-blue-100 transition-colors text-left"
+              >
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                  <Eye className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-800 text-sm">Lihat Detail</p>
+                  <p className="text-xs text-slate-400">Info lengkap & riwayat transaksi</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-300 ml-auto" />
+              </button>
+
+              <button
+                onClick={() => { setBottomSheetOpen(false); if (selectedItem) handleOpenEdit(selectedItem); }}
+                className="flex items-center gap-4 w-full px-4 py-3.5 rounded-xl hover:bg-amber-50 active:bg-amber-100 transition-colors text-left"
+              >
+                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                  <Pencil className="h-5 w-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-800 text-sm">Edit Data</p>
+                  <p className="text-xs text-slate-400">Ubah informasi barang</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-300 ml-auto" />
+              </button>
+
+              <button
+                onClick={() => { setBottomSheetOpen(false); setQrModalOpen(true); }}
+                className="flex items-center gap-4 w-full px-4 py-3.5 rounded-xl hover:bg-slate-50 active:bg-slate-100 transition-colors text-left"
+              >
+                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                  <QrCode className="h-5 w-5 text-slate-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-800 text-sm">Cetak Label QR</p>
+                  <p className="text-xs text-slate-400">Generate & cetak QR code barang</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-300 ml-auto" />
+              </button>
+            </div>
+            {/* Safe area bottom */}
+            <div className="pb-6" />
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }
