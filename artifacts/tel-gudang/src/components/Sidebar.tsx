@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Package, PackageCheck, PackageX, BarChart3, Users, Settings, LogOut, Factory } from 'lucide-react';
+import { LayoutDashboard, Package, PackageCheck, PackageX, BarChart3, Users, Settings, LogOut } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import { TeLLogo } from '@/components/TeLLogo';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
@@ -25,9 +26,12 @@ export function Sidebar({ className }: { className?: string }) {
 
   return (
     <div className={cn("flex flex-col h-full bg-sidebar text-sidebar-foreground w-60 shrink-0", className)}>
-      <div className="p-6 flex items-center gap-3 font-bold text-xl tracking-tight border-b border-sidebar-border">
-        <Factory className="h-6 w-6 text-primary" />
-        <span>TeL Gudang</span>
+      <div className="p-4 flex items-center gap-3 border-b border-sidebar-border">
+        <TeLLogo size="sm" />
+        <div className="flex flex-col leading-tight">
+          <span className="font-bold text-base tracking-tight">Townsite Warehouse</span>
+          <span className="text-[10px] text-sidebar-foreground/50 uppercase tracking-wider">PT TeL Pulp &amp; Paper</span>
+        </div>
       </div>
 
       <div className="flex-1 py-6 overflow-y-auto">

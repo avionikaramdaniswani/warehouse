@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { Factory } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import { TeLLogo } from '@/components/TeLLogo';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -31,13 +31,12 @@ export default function Login() {
       
       <Card className="w-full max-w-md shadow-2xl border-none z-10 mx-4">
         <CardHeader className="space-y-4 pb-8 pt-8 items-center text-center">
-          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-2">
-            <Factory className="h-8 w-8 text-primary" />
-          </div>
+          <TeLLogo size="lg" className="mb-2" />
           <div className="space-y-2">
-            <CardTitle className="text-3xl font-bold tracking-tight">TeL Gudang</CardTitle>
-            <CardDescription className="text-base">
-              Sistem Manajemen Gudang<br/>PT Tanjungenim Lestari
+            <CardTitle className="text-3xl font-bold tracking-tight">Townsite Warehouse</CardTitle>
+            <CardDescription className="text-base leading-relaxed">
+              Materials Townsite Warehouse System<br/>
+              <span className="font-semibold text-foreground/70">PT Tanjungenim Lestari Pulp &amp; Paper</span>
             </CardDescription>
           </div>
         </CardHeader>
@@ -75,7 +74,7 @@ export default function Login() {
         </CardContent>
         <CardFooter className="justify-center pb-8">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} PT Tanjungenim Lestari Pulp and Paper
+            &copy; {new Date().getFullYear()} PT Tanjungenim Lestari Pulp &amp; Paper
           </p>
         </CardFooter>
       </Card>
