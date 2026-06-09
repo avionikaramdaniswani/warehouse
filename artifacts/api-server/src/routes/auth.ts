@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { verifyPassword, signToken } from "../lib/auth.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import { loginLimiter } from "../middlewares/rateLimiter.js";
 import { logActivity } from "../lib/activity.js";
 
 const router = Router();
@@ -14,7 +15,7 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-router.post("/auth/login", async (req, res) => {
+router.post("/auth/login", loginLimiter, async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ message: "Email dan password wajib diisi" });
