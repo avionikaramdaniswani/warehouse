@@ -7,7 +7,7 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { relations } from "drizzle-orm";
 
 export const roleEnum = pgEnum("role", ["admin", "operator", "viewer"]);
@@ -73,7 +73,7 @@ export const insertUserSchema = createInsertSchema(usersTable)
   })
   .extend({
     password: z.string().min(8, "Password minimal 8 karakter"),
-    email: z.email("Format email tidak valid"),
+    email: z.string().email("Format email tidak valid"),
     nik: z.string().min(1, "NIK tidak boleh kosong"),
     namaLengkap: z.string().min(1, "Nama lengkap tidak boleh kosong"),
   });
