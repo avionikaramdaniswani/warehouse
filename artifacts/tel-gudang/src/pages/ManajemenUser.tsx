@@ -42,6 +42,7 @@ interface ActivityLog {
   aksi: string;
   detail: string | null;
   ipAddress: string | null;
+  userAgent: string | null;
   createdAt: string;
 }
 
@@ -73,9 +74,25 @@ const aksiColor = (aksi: string): { dot: string; badge: string } => {
   if (aksi.includes('LOGOUT'))   return { dot: 'bg-slate-400 ring-slate-200', badge: 'bg-slate-100 text-slate-600' };
   if (aksi.includes('CREATE'))   return { dot: 'bg-green-500 ring-green-200', badge: 'bg-green-50 text-green-700' };
   if (aksi.includes('UPDATE'))   return { dot: 'bg-amber-500 ring-amber-200', badge: 'bg-amber-50 text-amber-700' };
-  if (aksi.includes('PASSWORD')) return { dot: 'bg-violet-500 ring-violet-200', badge: 'bg-violet-50 text-violet-700' };
+  if (aksi.includes('PASSWORD')) return { dot: 'bg-orange-500 ring-orange-200', badge: 'bg-orange-50 text-orange-700' };
   if (aksi.includes('DELETE'))   return { dot: 'bg-red-500 ring-red-200',     badge: 'bg-red-50 text-red-700' };
   return { dot: 'bg-slate-300 ring-slate-100', badge: 'bg-slate-100 text-slate-600' };
+};
+
+const parseUA = (ua: string | null): string => {
+  if (!ua) return '';
+  let browser = 'Browser';
+  if (ua.includes('Edg'))     browser = 'Edge';
+  else if (ua.includes('Chrome'))   browser = 'Chrome';
+  else if (ua.includes('Firefox'))  browser = 'Firefox';
+  else if (ua.includes('Safari'))   browser = 'Safari';
+  let os = '';
+  if (ua.includes('Windows'))       os = 'Windows';
+  else if (ua.includes('Macintosh') || ua.includes('Mac OS')) os = 'macOS';
+  else if (ua.includes('Android'))  os = 'Android';
+  else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+  else if (ua.includes('Linux'))    os = 'Linux';
+  return os ? `${browser} · ${os}` : browser;
 };
 
 export default function ManajemenUser() {
@@ -277,7 +294,7 @@ export default function ManajemenUser() {
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-violet-600 hover:bg-violet-50" onClick={() => handleOpenResetPass(user)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-orange-600 hover:bg-orange-50" onClick={() => handleOpenResetPass(user)}>
             <KeyRound className="h-4 w-4" />
           </Button>
         </TooltipTrigger>
@@ -477,8 +494,15 @@ export default function ManajemenUser() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Email <span className="text-red-500">*</span></Label>
-                  <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                  <Label>Email {!selectedUser && <span className="text-red-500">*</span>}</Label>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    disabled={!!selectedUser}
+                    className={selectedUser ? 'bg-slate-50 text-slate-400' : ''}
+                  />
+                  {selectedUser && <p className="text-[11px] text-muted-foreground">Email tidak dapat diubah.</p>}
                 </div>
                 <div className="space-y-1.5">
                   <Label>No HP</Label>
@@ -546,7 +570,7 @@ export default function ManajemenUser() {
           <DialogContent className="sm:max-w-[400px]">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <KeyRound className="w-5 h-5 text-violet-600" />
+                <KeyRound className="w-5 h-5 text-slate-500" />
                 Reset Password
               </DialogTitle>
             </DialogHeader>
@@ -575,7 +599,7 @@ export default function ManajemenUser() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setResetPassOpen(false)}>Batal</Button>
-              <Button className="bg-violet-600 hover:bg-violet-700" onClick={handleResetPassword} disabled={resettingPass}>
+              <Button className="bg-primary hover:bg-primary/90" onClick={handleResetPassword} disabled={resettingPass}>
                 {resettingPass ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Mereset...</> : <><KeyRound className="w-4 h-4 mr-2" />Reset Password</>}
               </Button>
             </DialogFooter>
@@ -684,11 +708,16 @@ export default function ManajemenUser() {
                                   </span>
                                 </div>
                                 {log.detail && (
-                                  <p className="text-sm text-slate-600 leading-snug">{log.detail}</p>
+                                  <p className="text-sm text-slate-700 leading-snug">{log.detail}</p>
                                 )}
-                                {log.ipAddress && (
-                                  <p className="text-[11px] text-slate-400 font-mono mt-1">{log.ipAddress}</p>
-                                )}
+                                <div className="flex flex-wrap items-center gap-x-3 mt-1.5">
+                                  {log.ipAddress && (
+                                    <span className="text-[11px] text-slate-400 font-mono">IP: {log.ipAddress}</span>
+                                  )}
+                                  {log.userAgent && (
+                                    <span className="text-[11px] text-slate-400">{parseUA(log.userAgent)}</span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           ))}
