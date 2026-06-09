@@ -28,12 +28,12 @@ const publicUserFields = {
   updatedAt: usersTable.updatedAt,
 };
 
-router.get("/users", authenticate, authorize("admin", "operator"), async (_req, res) => {
+router.get("/users", authenticate, authorize("admin"), async (_req, res) => {
   const users = await db.select(publicUserFields).from(usersTable).orderBy(desc(usersTable.createdAt));
   res.json(users);
 });
 
-router.get("/users/:id", authenticate, authorize("admin", "operator"), async (req, res) => {
+router.get("/users/:id", authenticate, authorize("admin"), async (req, res) => {
   const id = Number(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ message: "ID tidak valid" });
@@ -190,7 +190,7 @@ router.delete("/users/:id", authenticate, authorize("admin"), async (req, res) =
   res.json({ message: "Pengguna berhasil dihapus" });
 });
 
-router.get("/users/:id/activity", authenticate, authorize("admin", "operator"), async (req, res) => {
+router.get("/users/:id/activity", authenticate, authorize("admin"), async (req, res) => {
   const id = Number(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ message: "ID tidak valid" });

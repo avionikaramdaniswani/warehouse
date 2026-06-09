@@ -1,45 +1,64 @@
-# [Project name]
+# Tel Gudang
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Sistem manajemen gudang dengan autentikasi dan kontrol akses berbasis peran (RBAC).
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm run dev` — jalankan frontend + backend sekaligus (satu workflow)
+- `pnpm run typecheck` — full typecheck semua package
+- `pnpm run build` — typecheck + build semua package
+- `pnpm --filter @workspace/db run push` — push perubahan skema DB (dev only)
+- Required env: `DATABASE_URL`, `JWT_SECRET`
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
+- Frontend: React + Vite + Tailwind CSS (port 8080)
+- API: Express 5 (port 8081)
 - DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Auth: JWT (jsonwebtoken) + bcryptjs
+- Validation: Zod + drizzle-zod
+- Build: esbuild
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/tel-gudang/` — frontend React/Vite
+- `artifacts/api-server/` — backend Express API
+- `lib/db/src/schema/users.ts` — skema DB (users + activity_logs)
+- `artifacts/api-server/src/routes/` — API routes
+- `artifacts/api-server/src/middlewares/` — auth & RBAC middleware
+- `artifacts/api-server/src/lib/auth.ts` — JWT + bcrypt helpers
+
+## RBAC — Role Definitions
+
+| Role | Akses |
+|------|-------|
+| `admin` | Full access: kelola pengguna, barang, semua fitur |
+| `operator` | Kelola barang/inventori (tidak bisa kelola pengguna) |
+| `viewer` | Hanya lihat laporan (read-only) |
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Single workflow (`pnpm run dev`) pakai `concurrently` jalankan frontend + backend
+- Vite proxy `/api/*` → `http://localhost:8081` (tidak perlu CORS di dev)
+- JWT disimpan di localStorage di client, dikirim via `Authorization: Bearer`
+- Password di-hash dengan bcrypt (salt 12)
+- Semua aksi penting dicatat ke tabel `activity_logs`
+- Manajemen pengguna hanya bisa dilakukan oleh `admin`
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- 1 service / 1 workflow saja (frontend + backend digabung)
+- Bahasa Indonesia untuk UI dan pesan error API
+- Database PostgreSQL (Replit built-in), nanti bisa diganti local PostgreSQL
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Jangan pakai `zod/v4` di `api-server` — esbuild tidak bisa resolve subpath, pakai `zod` saja
+- Jalankan `pnpm --filter @workspace/db run push` setiap ada perubahan skema DB
 
-## Pointers
+## Default Admin Account
 
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Email: `admin@telgudang.com`
+- Password: `Admin@12345`
+- NIK: `ADM001`
