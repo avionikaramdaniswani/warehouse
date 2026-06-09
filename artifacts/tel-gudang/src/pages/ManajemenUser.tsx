@@ -39,8 +39,8 @@ interface ApiUser {
 
 interface ActivityLog {
   id: number;
-  action: string;
-  description: string;
+  aksi: string;
+  detail: string | null;
   ipAddress: string | null;
   createdAt: string;
 }
@@ -602,8 +602,8 @@ export default function ManajemenUser() {
                       <ClipboardList className="h-4 w-4 text-teal-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{log.action.replace(/_/g, ' ')}</p>
-                      <p className="text-sm text-slate-700 mt-0.5">{log.description}</p>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{log.aksi.replace(/_/g, ' ')}</p>
+                      <p className="text-sm text-slate-700 mt-0.5">{log.detail ?? '-'}</p>
                       <div className="flex items-center gap-3 mt-1">
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="h-3 w-3" />
