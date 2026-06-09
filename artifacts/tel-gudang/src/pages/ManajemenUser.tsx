@@ -68,6 +68,16 @@ const statusLabel = (s: string) => ({ active: 'Aktif', inactive: 'Nonaktif', sus
 const fmtDate = (d: string | null) => d ? new Date(d).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
 const fmtDateOnly = (d: string) => new Date(d).toLocaleDateString('id-ID', { dateStyle: 'long' });
 
+const aksiColor = (aksi: string): { dot: string; badge: string } => {
+  if (aksi.includes('LOGIN'))    return { dot: 'bg-blue-500 ring-blue-200',   badge: 'bg-blue-50 text-blue-700' };
+  if (aksi.includes('LOGOUT'))   return { dot: 'bg-slate-400 ring-slate-200', badge: 'bg-slate-100 text-slate-600' };
+  if (aksi.includes('CREATE'))   return { dot: 'bg-green-500 ring-green-200', badge: 'bg-green-50 text-green-700' };
+  if (aksi.includes('UPDATE'))   return { dot: 'bg-amber-500 ring-amber-200', badge: 'bg-amber-50 text-amber-700' };
+  if (aksi.includes('PASSWORD')) return { dot: 'bg-violet-500 ring-violet-200', badge: 'bg-violet-50 text-violet-700' };
+  if (aksi.includes('DELETE'))   return { dot: 'bg-red-500 ring-red-200',     badge: 'bg-red-50 text-red-700' };
+  return { dot: 'bg-slate-300 ring-slate-100', badge: 'bg-slate-100 text-slate-600' };
+};
+
 export default function ManajemenUser() {
   const { currentUser, token } = useAppContext();
   const [users, setUsers] = useState<ApiUser[]>([]);
@@ -90,6 +100,8 @@ export default function ManajemenUser() {
 
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [loadingActivity, setLoadingActivity] = useState(false);
+  const [activityTypeFilter, setActivityTypeFilter] = useState('semua');
+  const [activityTimeFilter, setActivityTimeFilter] = useState('semua');
 
   if (currentUser?.role !== 'admin') return <Redirect to="/dashboard" />;
 
@@ -200,6 +212,8 @@ export default function ManajemenUser() {
   const handleOpenActivity = async (user: ApiUser) => {
     setSelectedUser(user);
     setActivityLogs([]);
+    setActivityTypeFilter('semua');
+    setActivityTimeFilter('semua');
     setActivityOpen(true);
     setLoadingActivity(true);
     try {
@@ -572,50 +586,131 @@ export default function ManajemenUser() {
             SHEET: RIWAYAT AKTIVITAS
         ═══════════════════════════════════ */}
         <Sheet open={activityOpen} onOpenChange={setActivityOpen}>
-          <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-            <SheetHeader className="mb-4">
-              <SheetTitle className="flex items-center gap-2">
-                <ClipboardList className="w-5 h-5 text-teal-600" />
-                Riwayat Aktivitas
-              </SheetTitle>
+          <SheetContent className="w-full sm:max-w-[480px] flex flex-col p-0">
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 border-b">
+              <SheetHeader>
+                <SheetTitle className="text-base font-semibold">Riwayat Aktivitas</SheetTitle>
+              </SheetHeader>
               {selectedUser && (
-                <p className="text-sm text-muted-foreground">
-                  {selectedUser.namaLengkap} · <span className="font-mono">{selectedUser.nik}</span>
-                </p>
-              )}
-            </SheetHeader>
-
-            {loadingActivity ? (
-              <div className="flex items-center justify-center py-20 text-muted-foreground">
-                <Loader2 className="h-6 w-6 animate-spin mr-2" /> Memuat riwayat...
-              </div>
-            ) : activityLogs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
-                <ClipboardList className="h-10 w-10 opacity-30" />
-                <p className="text-sm">Belum ada aktivitas tercatat.</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {activityLogs.map((log) => (
-                  <div key={log.id} className="flex gap-3 pb-3 border-b last:border-0">
-                    <div className="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center">
-                      <ClipboardList className="h-4 w-4 text-teal-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{log.aksi.replace(/_/g, ' ')}</p>
-                      <p className="text-sm text-slate-700 mt-0.5">{log.detail ?? '-'}</p>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {fmtDate(log.createdAt)}
-                        </span>
-                        {log.ipAddress && (
-                          <span className="text-xs text-muted-foreground font-mono">{log.ipAddress}</span>
-                        )}
-                      </div>
-                    </div>
+                <div className="mt-1 flex items-center gap-2">
+                  <Avatar className="h-7 w-7">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                      {selectedUser.namaLengkap.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <span className="text-sm font-medium text-slate-800">{selectedUser.namaLengkap}</span>
+                    <span className="text-xs text-muted-foreground font-mono ml-2">{selectedUser.nik}</span>
                   </div>
-                ))}
+                </div>
+              )}
+            </div>
+
+            {/* Filter bar */}
+            {!loadingActivity && activityLogs.length > 0 && (() => {
+              const uniqueTypes = Array.from(new Set(activityLogs.map(l => l.aksi)));
+              const now = new Date();
+              const filtered = activityLogs.filter(log => {
+                const matchType = activityTypeFilter === 'semua' || log.aksi === activityTypeFilter;
+                let matchTime = true;
+                if (activityTimeFilter === 'hari_ini') {
+                  matchTime = new Date(log.createdAt).toDateString() === now.toDateString();
+                } else if (activityTimeFilter === '7_hari') {
+                  matchTime = (now.getTime() - new Date(log.createdAt).getTime()) <= 7 * 86400000;
+                } else if (activityTimeFilter === '30_hari') {
+                  matchTime = (now.getTime() - new Date(log.createdAt).getTime()) <= 30 * 86400000;
+                }
+                return matchType && matchTime;
+              });
+
+              return (
+                <>
+                  <div className="px-6 py-3 border-b bg-slate-50 flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <Select value={activityTypeFilter} onValueChange={setActivityTypeFilter}>
+                        <SelectTrigger className="h-8 text-xs flex-1 bg-white">
+                          <SelectValue placeholder="Semua jenis" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="semua">Semua Jenis</SelectItem>
+                          {uniqueTypes.map(t => (
+                            <SelectItem key={t} value={t}>{t.replace(/_/g, ' ')}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={activityTimeFilter} onValueChange={setActivityTimeFilter}>
+                        <SelectTrigger className="h-8 text-xs flex-1 bg-white">
+                          <SelectValue placeholder="Semua waktu" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="semua">Semua Waktu</SelectItem>
+                          <SelectItem value="hari_ini">Hari Ini</SelectItem>
+                          <SelectItem value="7_hari">7 Hari Terakhir</SelectItem>
+                          <SelectItem value="30_hari">30 Hari Terakhir</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Menampilkan <span className="font-semibold text-slate-700">{filtered.length}</span> dari {activityLogs.length} entri
+                    </p>
+                  </div>
+
+                  {/* Timeline */}
+                  <div className="flex-1 overflow-y-auto px-6 py-4">
+                    {filtered.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                        <p className="text-sm">Tidak ada aktivitas yang cocok dengan filter.</p>
+                        <button className="text-xs text-primary mt-2 underline underline-offset-2" onClick={() => { setActivityTypeFilter('semua'); setActivityTimeFilter('semua'); }}>
+                          Reset filter
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <div className="absolute left-[7px] top-2 bottom-2 w-px bg-slate-200" />
+                        <div className="space-y-0">
+                          {filtered.map((log, i) => (
+                            <div key={log.id} className="relative flex gap-4 pb-5 last:pb-0">
+                              <div className="relative flex-shrink-0 mt-1">
+                                <div className={`w-3.5 h-3.5 rounded-full border-2 border-white ring-1 ${aksiColor(log.aksi).dot}`} />
+                              </div>
+                              <div className="flex-1 min-w-0 pt-0.5">
+                                <div className="flex items-start justify-between gap-2 mb-1">
+                                  <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded ${aksiColor(log.aksi).badge}`}>
+                                    {log.aksi.replace(/_/g, ' ')}
+                                  </span>
+                                  <span className="text-[11px] text-muted-foreground whitespace-nowrap flex-shrink-0">
+                                    {fmtDate(log.createdAt)}
+                                  </span>
+                                </div>
+                                {log.detail && (
+                                  <p className="text-sm text-slate-600 leading-snug">{log.detail}</p>
+                                )}
+                                {log.ipAddress && (
+                                  <p className="text-[11px] text-slate-400 font-mono mt-1">{log.ipAddress}</p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
+
+            {loadingActivity && (
+              <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                <span className="text-sm">Memuat riwayat...</span>
+              </div>
+            )}
+
+            {!loadingActivity && activityLogs.length === 0 && (
+              <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-1">
+                <ClipboardList className="h-8 w-8 opacity-20" />
+                <p className="text-sm">Belum ada aktivitas tercatat.</p>
               </div>
             )}
           </SheetContent>
