@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import {
   Search, Plus, QrCode, Camera, PackagePlus, FileX,
-  CalendarDays, FileText, Filter, TrendingUp, Clock
+  CalendarDays, FileText, TrendingUp, Clock
 } from 'lucide-react';
 import { useAppContext, Item } from '@/context/AppContext';
 import { toast } from 'sonner';
@@ -143,7 +143,6 @@ export default function BarangMasuk() {
             {/* Filter Kondisi */}
             <Select value={filterKondisi} onValueChange={setFilterKondisi}>
               <SelectTrigger className="w-full sm:w-[160px] bg-white h-9 text-sm">
-                <Filter className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -177,7 +176,7 @@ export default function BarangMasuk() {
           {/* Action buttons */}
           <div className="flex gap-2 w-full sm:w-auto">
             <Button
-              className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 h-9"
+              className="flex-1 sm:flex-none h-9"
               onClick={() => { resetForm(); setFormOpen(true); }}
             >
               <Plus className="h-4 w-4 mr-1.5" />

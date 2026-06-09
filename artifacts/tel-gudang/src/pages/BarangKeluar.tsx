@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import {
   Search, Plus, QrCode, Camera, PackageMinus, FileX,
-  CalendarDays, MapPin, Filter, TrendingDown, Clock, AlertTriangle
+  CalendarDays, MapPin, TrendingDown, Clock, AlertTriangle
 } from 'lucide-react';
 import { useAppContext, Item } from '@/context/AppContext';
 import { toast } from 'sonner';
@@ -149,7 +149,6 @@ export default function BarangKeluar() {
             </div>
             <Select value={filterKeperluan} onValueChange={setFilterKeperluan}>
               <SelectTrigger className="w-full sm:w-[170px] bg-white h-9 text-sm">
-                <Filter className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -175,7 +174,7 @@ export default function BarangKeluar() {
             )}
           </div>
           <Button
-            className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 h-9"
+            className="w-full sm:w-auto h-9"
             onClick={() => { resetForm(); setFormOpen(true); }}
           >
             <Plus className="h-4 w-4 mr-1.5" />
