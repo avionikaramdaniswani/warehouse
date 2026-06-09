@@ -41,8 +41,8 @@ export function QrScannerDialog({ open, onOpenChange, onScan, title = 'Scan QR C
       instanceRef.current = inst;
 
       await inst.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 220, height: 220 } },
+        { facingMode: 'environment', aspectRatio: 1.0 },
+        { fps: 10, qrbox: { width: 200, height: 200 } },
         (text) => {
           const code = text.trim();
           setScannedText(code);
@@ -97,26 +97,34 @@ export function QrScannerDialog({ open, onOpenChange, onScan, title = 'Scan QR C
           </DialogTitle>
         </DialogHeader>
 
-        {/* Camera viewport area */}
-        <div className="relative bg-black overflow-hidden">
-          {/* html5-qrcode mounts video here */}
+        {/* Camera viewport — selalu square, semua state di dalam satu wrapper */}
+        <div className="relative w-full aspect-square bg-black overflow-hidden">
+
+          {/* html5-qrcode mount point: absolute fill + video cover agar tidak miring */}
           <div
             id={SCANNER_ID}
             className={
               phase === 'active' || phase === 'loading'
-                ? 'w-full [&_video]:w-full [&_video]:max-h-72 [&_video]:object-cover [&_img]:hidden [&_button]:hidden [&_select]:hidden'
+                ? [
+                    'absolute inset-0 w-full h-full overflow-hidden',
+                    '[&>div]:!w-full [&>div]:!h-full',
+                    '[&_video]:!absolute [&_video]:!inset-0',
+                    '[&_video]:!w-full [&_video]:!h-full',
+                    '[&_video]:!object-cover [&_video]:!max-w-none',
+                    '[&_img]:hidden [&_button]:hidden [&_select]:hidden',
+                  ].join(' ')
                 : 'hidden'
             }
           />
 
-          {/* Scan frame overlay when active */}
+          {/* Scan-frame corners + laser line overlay */}
           {phase === 'active' && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <div className="relative w-52 h-52">
-                <div className="absolute top-0 left-0 w-6 h-6 border-t-[3px] border-l-[3px] border-primary rounded-tl" />
-                <div className="absolute top-0 right-0 w-6 h-6 border-t-[3px] border-r-[3px] border-primary rounded-tr" />
-                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-[3px] border-l-[3px] border-primary rounded-bl" />
-                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-[3px] border-r-[3px] border-primary rounded-br" />
+                <div className="absolute top-0 left-0 w-7 h-7 border-t-[3px] border-l-[3px] border-primary rounded-tl" />
+                <div className="absolute top-0 right-0 w-7 h-7 border-t-[3px] border-r-[3px] border-primary rounded-tr" />
+                <div className="absolute bottom-0 left-0 w-7 h-7 border-b-[3px] border-l-[3px] border-primary rounded-bl" />
+                <div className="absolute bottom-0 right-0 w-7 h-7 border-b-[3px] border-r-[3px] border-primary rounded-br" />
                 <div className="absolute left-2 right-2 top-1/2 h-0.5 bg-primary/60 animate-pulse" />
               </div>
             </div>
@@ -124,15 +132,15 @@ export function QrScannerDialog({ open, onOpenChange, onScan, title = 'Scan QR C
 
           {/* Loading state */}
           {phase === 'loading' && (
-            <div className="aspect-square max-h-72 flex flex-col items-center justify-center bg-slate-900 gap-3">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 gap-3 z-10">
               <Loader2 className="h-10 w-10 text-white/70 animate-spin" />
               <p className="text-sm text-white/60">Menghidupkan kamera…</p>
             </div>
           )}
 
-          {/* Idle state */}
+          {/* Idle / error state */}
           {(phase === 'idle' || phase === 'error') && (
-            <div className="aspect-square max-h-72 flex flex-col items-center justify-center gap-4 px-6">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 bg-slate-50">
               {phase === 'error' ? (
                 <>
                   <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
@@ -155,12 +163,12 @@ export function QrScannerDialog({ open, onOpenChange, onScan, title = 'Scan QR C
 
           {/* Success flash */}
           {phase === 'success' && (
-            <div className="aspect-square max-h-72 flex flex-col items-center justify-center bg-primary/5 gap-3">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-primary/5 gap-3 z-10">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                 <CheckCircle2 className="h-9 w-9 text-primary" />
               </div>
               <p className="text-sm font-semibold text-primary">QR Terdeteksi!</p>
-              <p className="text-xs font-mono text-slate-500">{scannedText}</p>
+              <p className="text-xs font-mono text-slate-500 px-4 text-center break-all">{scannedText}</p>
             </div>
           )}
         </div>
