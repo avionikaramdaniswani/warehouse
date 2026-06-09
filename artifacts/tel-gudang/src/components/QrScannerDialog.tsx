@@ -105,7 +105,7 @@ export function QrScannerDialog({ open, onOpenChange, onScan, title = 'Scan QR C
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-sm p-0 overflow-hidden gap-0">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-lg p-0 overflow-hidden gap-0">
         <DialogHeader className="px-5 pt-5 pb-3 border-b border-slate-100">
           <DialogTitle className="flex items-center gap-2 text-base">
             <QrCode className="h-4 w-4 text-primary" />
