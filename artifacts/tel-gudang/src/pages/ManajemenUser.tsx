@@ -441,7 +441,7 @@ export default function ManajemenUser() {
             SHEET: LIHAT PROFIL
         ═══════════════════════════════════ */}
         <Sheet open={profileOpen} onOpenChange={setProfileOpen}>
-          <SheetContent className="w-full sm:max-w-[400px] flex flex-col p-0 gap-0">
+          <SheetContent className="w-full sm:max-w-[400px] flex flex-col p-0 gap-0 [&>button]:text-white/60 [&>button]:hover:text-white [&>button]:hover:opacity-100 [&>button]:top-5 [&>button]:right-5">
             {selectedUser && (
               <>
                 {/* ── Header ── */}
@@ -484,10 +484,10 @@ export default function ManajemenUser() {
                   {/* Pekerjaan */}
                   <div className="px-6 py-4">
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-3">Pekerjaan</p>
-                    <div className="grid grid-cols-3 gap-y-3">
-                      <ProfileFieldGrid label="Departemen" value={selectedUser.departemen ?? '-'} />
-                      <ProfileFieldGrid label="Jabatan" value={selectedUser.jabatan ?? '-'} />
-                      <ProfileFieldGrid label="Seksi" value={selectedUser.seksi ?? '-'} />
+                    <div className="space-y-3">
+                      <ProfileField label="Departemen" value={selectedUser.departemen ?? '-'} />
+                      <ProfileField label="Jabatan"    value={selectedUser.jabatan ?? '-'} />
+                      <ProfileField label="Seksi"      value={selectedUser.seksi ?? '-'} />
                     </div>
                   </div>
 
