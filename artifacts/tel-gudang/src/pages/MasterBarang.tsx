@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, ChevronRight, X } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, X } from 'lucide-react';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -14,13 +14,32 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 
+interface KategoriOption {
+  id: number;
+  nama: string;
+}
+
+function useKategoris(token: string | null) {
+  const [kategoris, setKategoris] = useState<KategoriOption[]>([]);
+  useEffect(() => {
+    if (!token) return;
+    fetch('/api/kategoris', { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setKategoris)
+      .catch(() => {});
+  }, [token]);
+  return kategoris;
+}
+
 export default function MasterBarang() {
-  const { items, setItems } = useAppContext();
+  const { items, setItems, token } = useAppContext();
+  const kategoris = useKategoris(token);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('Semua');
   const [statusFilter, setStatusFilter] = useState('Semua');
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -42,9 +61,10 @@ export default function MasterBarang() {
     return () => clearTimeout(timer);
   }, []);
 
-  const filteredItems = items.filter(item => {
-    const matchesSearch = item.nama.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          item.tsCode.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredItems = items.filter((item) => {
+    const matchesSearch =
+      item.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.tsCode.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'Semua' || item.kategori === categoryFilter;
     const matchesStatus = statusFilter === 'Semua' || item.status === statusFilter;
     return matchesSearch && matchesCategory && matchesStatus;
@@ -57,20 +77,24 @@ export default function MasterBarang() {
   };
 
   const handleOpenAdd = () => {
-    setFormData({ tsCode: '', msCode: '', nama: '', kategori: 'Consumables', binLoc: '', uom: 'EA', stok: 0, safetyStok: 5, status: 'Normal' });
+    const defaultKat = kategoris[0]?.nama ?? '';
+    setFormData({ tsCode: '', msCode: '', nama: '', kategori: defaultKat as any, binLoc: '', uom: 'EA', stok: 0, safetyStok: 5, status: 'Normal' });
     setAddModalOpen(true);
   };
 
   const handleSaveEdit = () => {
-    setItems(items.map(item => item.tsCode === formData.tsCode ? formData as Item : item));
+    setItems(items.map((item) => (item.tsCode === formData.tsCode ? (formData as Item) : item)));
     setEditModalOpen(false);
     toast.success('Data barang berhasil diperbarui');
   };
 
   const handleSaveAdd = () => {
-    if (!formData.tsCode || !formData.nama) { toast.error('TS Code dan Nama Barang wajib diisi'); return; }
+    if (!formData.tsCode || !formData.nama) {
+      toast.error('TS Code dan Nama Barang wajib diisi');
+      return;
+    }
     const newItem = { ...formData } as Item;
-    newItem.status = newItem.stok === 0 ? 'Habis' : (newItem.stok <= newItem.safetyStok ? 'Menipis' : 'Normal');
+    newItem.status = newItem.stok === 0 ? 'Habis' : newItem.stok <= newItem.safetyStok ? 'Menipis' : 'Normal';
     setItems([newItem, ...items]);
     setAddModalOpen(false);
     toast.success('Barang baru berhasil ditambahkan');
@@ -80,7 +104,26 @@ export default function MasterBarang() {
     item.stok === 0 ? 'text-red-600' : item.stok <= item.safetyStok ? 'text-amber-600' : 'text-foreground';
 
   const cardBg = (item: Item) =>
-    item.stok === 0 ? 'border-red-200 bg-red-50/40' : item.stok <= item.safetyStok ? 'border-amber-200 bg-amber-50/40' : '';
+    item.stok === 0
+      ? 'border-red-200 bg-red-50/40'
+      : item.stok <= item.safetyStok
+      ? 'border-amber-200 bg-amber-50/40'
+      : '';
+
+  const KategoriSelect = ({ value, onValueChange, className }: { value?: string; onValueChange: (v: string) => void; className?: string }) => (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className={className}><SelectValue placeholder="Pilih Kategori" /></SelectTrigger>
+      <SelectContent>
+        {kategoris.length === 0 ? (
+          <SelectItem value="__none__" disabled>Belum ada kategori</SelectItem>
+        ) : (
+          kategoris.map((k) => (
+            <SelectItem key={k.id} value={k.nama}>{k.nama}</SelectItem>
+          ))
+        )}
+      </SelectContent>
+    </Select>
+  );
 
   return (
     <Layout title="Master Data Barang">
@@ -91,18 +134,20 @@ export default function MasterBarang() {
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-1">
             <div className="relative max-w-sm w-full">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Cari nama barang atau TS Code..." className="pl-9 w-full bg-white" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+              <Input
+                placeholder="Cari nama barang atau TS Code..."
+                className="pl-9 w-full bg-white"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue placeholder="Kategori" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Semua">Semua Kategori</SelectItem>
-                <SelectItem value="Civil">Civil</SelectItem>
-                <SelectItem value="Electrical">Electrical</SelectItem>
-                <SelectItem value="Mechanical">Mechanical</SelectItem>
-                <SelectItem value="Furniture">Furniture</SelectItem>
-                <SelectItem value="Consumables">Consumables</SelectItem>
-                <SelectItem value="GH Consumable">GH Consumable</SelectItem>
+                {kategoris.map((k) => (
+                  <SelectItem key={k.id} value={k.nama}>{k.nama}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -200,7 +245,10 @@ export default function MasterBarang() {
                   </TableRow>
                 ) : (
                   filteredItems.map((item) => (
-                    <TableRow key={item.tsCode} className={item.stok === 0 ? 'bg-red-50/50 hover:bg-red-50' : (item.stok <= item.safetyStok ? 'bg-amber-50/50 hover:bg-amber-50' : '')}>
+                    <TableRow
+                      key={item.tsCode}
+                      className={item.stok === 0 ? 'bg-red-50/50 hover:bg-red-50' : item.stok <= item.safetyStok ? 'bg-amber-50/50 hover:bg-amber-50' : ''}
+                    >
                       <TableCell className="font-mono font-medium text-slate-600">{item.tsCode}</TableCell>
                       <TableCell className="font-semibold text-slate-800">{item.nama}</TableCell>
                       <TableCell>{item.kategori}</TableCell>
@@ -287,31 +335,21 @@ export default function MasterBarang() {
           <DialogHeader><DialogTitle>{editModalOpen ? 'Edit Data Barang' : 'Tambah Barang Baru'}</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label htmlFor="tsCode">TS Code <span className="text-red-500">*</span></Label><Input id="tsCode" value={formData.tsCode || ''} onChange={(e) => setFormData({...formData, tsCode: e.target.value})} disabled={editModalOpen} /></div>
-              <div className="space-y-2"><Label htmlFor="msCode">MS Code</Label><Input id="msCode" value={formData.msCode || ''} onChange={(e) => setFormData({...formData, msCode: e.target.value})} /></div>
+              <div className="space-y-2"><Label htmlFor="tsCode">TS Code <span className="text-red-500">*</span></Label><Input id="tsCode" value={formData.tsCode || ''} onChange={(e) => setFormData({ ...formData, tsCode: e.target.value })} disabled={editModalOpen} /></div>
+              <div className="space-y-2"><Label htmlFor="msCode">MS Code</Label><Input id="msCode" value={formData.msCode || ''} onChange={(e) => setFormData({ ...formData, msCode: e.target.value })} /></div>
             </div>
-            <div className="space-y-2"><Label htmlFor="nama">Nama Barang <span className="text-red-500">*</span></Label><Input id="nama" value={formData.nama || ''} onChange={(e) => setFormData({...formData, nama: e.target.value})} /></div>
+            <div className="space-y-2"><Label htmlFor="nama">Nama Barang <span className="text-red-500">*</span></Label><Input id="nama" value={formData.nama || ''} onChange={(e) => setFormData({ ...formData, nama: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Kategori</Label>
-                <Select value={formData.kategori} onValueChange={(val: any) => setFormData({...formData, kategori: val})}>
-                  <SelectTrigger><SelectValue placeholder="Pilih Kategori" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Civil">Civil</SelectItem>
-                    <SelectItem value="Electrical">Electrical</SelectItem>
-                    <SelectItem value="Mechanical">Mechanical</SelectItem>
-                    <SelectItem value="Furniture">Furniture</SelectItem>
-                    <SelectItem value="Consumables">Consumables</SelectItem>
-                    <SelectItem value="GH Consumable">GH Consumable</SelectItem>
-                  </SelectContent>
-                </Select>
+                <KategoriSelect value={formData.kategori as string} onValueChange={(val) => setFormData({ ...formData, kategori: val as any })} />
               </div>
-              <div className="space-y-2"><Label htmlFor="binLoc">BIN LOC (Lokasi)</Label><Input id="binLoc" value={formData.binLoc || ''} onChange={(e) => setFormData({...formData, binLoc: e.target.value})} /></div>
+              <div className="space-y-2"><Label htmlFor="binLoc">BIN LOC (Lokasi)</Label><Input id="binLoc" value={formData.binLoc || ''} onChange={(e) => setFormData({ ...formData, binLoc: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2"><Label htmlFor="uom">Satuan (UOM)</Label><Input id="uom" value={formData.uom || ''} onChange={(e) => setFormData({...formData, uom: e.target.value})} /></div>
-              <div className="space-y-2"><Label htmlFor="stok">Stok Awal</Label><Input id="stok" type="number" min="0" value={formData.stok !== undefined ? formData.stok : ''} onChange={(e) => setFormData({...formData, stok: parseInt(e.target.value) || 0})} /></div>
-              <div className="space-y-2"><Label htmlFor="safetyStok">Safety Stok</Label><Input id="safetyStok" type="number" min="0" value={formData.safetyStok !== undefined ? formData.safetyStok : ''} onChange={(e) => setFormData({...formData, safetyStok: parseInt(e.target.value) || 0})} /></div>
+              <div className="space-y-2"><Label htmlFor="uom">Satuan (UOM)</Label><Input id="uom" value={formData.uom || ''} onChange={(e) => setFormData({ ...formData, uom: e.target.value })} /></div>
+              <div className="space-y-2"><Label htmlFor="stok">Stok Awal</Label><Input id="stok" type="number" min="0" value={formData.stok !== undefined ? formData.stok : ''} onChange={(e) => setFormData({ ...formData, stok: parseInt(e.target.value) || 0 })} /></div>
+              <div className="space-y-2"><Label htmlFor="safetyStok">Safety Stok</Label><Input id="safetyStok" type="number" min="0" value={formData.safetyStok !== undefined ? formData.safetyStok : ''} onChange={(e) => setFormData({ ...formData, safetyStok: parseInt(e.target.value) || 0 })} /></div>
             </div>
           </div>
           <DialogFooter>
@@ -321,12 +359,11 @@ export default function MasterBarang() {
         </DialogContent>
       </Dialog>
 
-      {/* MOBILE: Bottom Sheets (Detail / Edit / QR) */}
+      {/* MOBILE: Bottom Sheets */}
       {bottomSheetType !== null && selectedItem && (
         <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeMobileSheet} />
           <div className="relative bg-white rounded-t-2xl shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[90vh] flex flex-col">
-            {/* Handle + header */}
             <div className="flex justify-center pt-3 pb-0 shrink-0">
               <div className="w-10 h-1 rounded-full bg-slate-200" />
             </div>
@@ -344,10 +381,8 @@ export default function MasterBarang() {
               </button>
             </div>
 
-            {/* Scrollable content */}
             <div className="overflow-y-auto flex-1">
-
-              {/* ── DETAIL ── */}
+              {/* DETAIL */}
               {bottomSheetType === 'detail' && (
                 <div className="px-5 py-4 space-y-4">
                   <div className="flex items-start justify-between gap-3">
@@ -404,7 +439,7 @@ export default function MasterBarang() {
                 </div>
               )}
 
-              {/* ── EDIT ── */}
+              {/* EDIT */}
               {bottomSheetType === 'edit' && (
                 <div className="px-5 py-4 space-y-3">
                   <div className="space-y-1.5"><Label className="text-xs">TS Code</Label><Input value={formData.tsCode || ''} disabled className="bg-slate-50" /></div>
@@ -413,12 +448,7 @@ export default function MasterBarang() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <Label className="text-xs">Kategori</Label>
-                      <Select value={formData.kategori} onValueChange={(val: any) => setFormData({ ...formData, kategori: val })}>
-                        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {['Civil','Electrical','Mechanical','Furniture','Consumables','GH Consumable'].map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
+                      <KategoriSelect value={formData.kategori as string} onValueChange={(val) => setFormData({ ...formData, kategori: val as any })} className="h-9" />
                     </div>
                     <div className="space-y-1.5"><Label className="text-xs">BIN LOC</Label><Input value={formData.binLoc || ''} onChange={(e) => setFormData({ ...formData, binLoc: e.target.value })} /></div>
                   </div>
@@ -434,7 +464,7 @@ export default function MasterBarang() {
                 </div>
               )}
 
-              {/* ── QR ── */}
+              {/* QR */}
               {bottomSheetType === 'qr' && (
                 <div className="px-5 py-4 flex flex-col items-center gap-4">
                   <div className="bg-white border rounded-xl shadow-sm p-6 flex flex-col items-center w-full max-w-[280px]">
