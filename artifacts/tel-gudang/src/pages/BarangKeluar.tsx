@@ -63,7 +63,7 @@ export default function BarangKeluar() {
       tsCode: selectedItem.tsCode,
       nama: selectedItem.nama,
       jumlah,
-      petugas: currentUser?.nama || 'Admin',
+      petugas: currentUser?.namaLengkap || 'Admin',
       tujuan: formData.tujuan,
       keperluan: formData.keperluan
     };

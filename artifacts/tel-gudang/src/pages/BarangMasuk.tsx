@@ -59,7 +59,7 @@ export default function BarangMasuk() {
       tsCode: selectedItem.tsCode,
       nama: selectedItem.nama,
       jumlah,
-      petugas: currentUser?.nama || 'Admin',
+      petugas: currentUser?.namaLengkap || 'Admin',
       kondisi: formData.kondisi,
       noPo: formData.noPo
     };

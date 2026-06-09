@@ -47,7 +47,7 @@ export default function Dashboard() {
       <div className="flex flex-row justify-between items-center mb-6 gap-3">
         <div className="min-w-0">
           <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-foreground truncate">
-            Selamat Datang, {currentUser?.nama}
+            Selamat Datang, {currentUser?.namaLengkap}
           </h2>
           <p className="text-muted-foreground text-xs sm:text-sm mt-0.5 hidden sm:block">
             Berikut adalah ringkasan inventaris gudang saat ini.

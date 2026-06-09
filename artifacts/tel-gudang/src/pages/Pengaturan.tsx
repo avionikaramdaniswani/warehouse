@@ -25,21 +25,22 @@ export default function Pengaturan() {
   return (
     <Layout title="Pengaturan Sistem">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
+
         {/* Left Col: Profile & Info */}
         <div className="space-y-6 md:col-span-1">
           <Card className="shadow-sm border-border">
             <CardContent className="pt-6 flex flex-col items-center text-center">
               <Avatar className="h-24 w-24 mb-4 border-2 border-primary/20">
                 <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
-                  {currentUser?.nama.substring(0, 2).toUpperCase()}
+                  {currentUser?.namaLengkap.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <h3 className="text-xl font-bold text-slate-800">{currentUser?.nama}</h3>
-              <p className="text-slate-500 font-mono text-sm mb-2">@{currentUser?.username}</p>
+              <h3 className="text-xl font-bold text-slate-800">{currentUser?.namaLengkap}</h3>
+              <p className="text-slate-500 font-mono text-sm mb-2">{currentUser?.nik}</p>
+              <p className="text-slate-400 text-sm mb-2">{currentUser?.email}</p>
               <div className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                {currentUser?.role === 'Admin' ? <Shield className="w-3 h-3" /> : <UserIcon className="w-3 h-3" />}
-                {currentUser?.role}
+                {currentUser?.role === 'admin' ? <Shield className="w-3 h-3" /> : <UserIcon className="w-3 h-3" />}
+                {currentUser?.role === 'admin' ? 'Admin' : currentUser?.role === 'operator' ? 'Operator' : 'Viewer'}
               </div>
             </CardContent>
           </Card>
@@ -57,12 +58,18 @@ export default function Pengaturan() {
                 <span className="font-mono text-white">v1.2.0</span>
               </div>
               <div className="flex justify-between border-b border-sidebar-border pb-2">
-                <span>Pembaruan Terakhir</span>
-                <span className="font-mono text-white">15 Jan 2025</span>
+                <span>Departemen</span>
+                <span className="text-white">{currentUser?.departemen ?? '-'}</span>
+              </div>
+              <div className="flex justify-between border-b border-sidebar-border pb-2">
+                <span>Jabatan</span>
+                <span className="text-white">{currentUser?.jabatan ?? '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span>Database</span>
-                <span className="text-green-400 flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500 block"></span> Connected</span>
+                <span className="text-green-400 flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-green-500 block"></span> Connected
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -70,27 +77,27 @@ export default function Pengaturan() {
 
         {/* Right Col: Forms */}
         <div className="space-y-6 md:col-span-2">
-          
+
           <Card className="shadow-sm border-border">
             <CardHeader>
               <CardTitle>Profil Pengguna</CardTitle>
-              <CardDescription>Perbarui informasi profil Anda.</CardDescription>
+              <CardDescription>Informasi akun Anda saat ini.</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSaveProfile} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="nama">Nama Lengkap</Label>
-                    <Input id="nama" defaultValue={currentUser?.nama} />
+                    <Label htmlFor="namaLengkap">Nama Lengkap</Label>
+                    <Input id="namaLengkap" defaultValue={currentUser?.namaLengkap} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="username">Username (Tidak dapat diubah)</Label>
-                    <Input id="username" defaultValue={currentUser?.username} disabled className="bg-slate-50" />
+                    <Label htmlFor="nik">NIK (Tidak dapat diubah)</Label>
+                    <Input id="nik" defaultValue={currentUser?.nik} disabled className="bg-slate-50" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue={`${currentUser?.username}@telpp.com`} />
+                  <Input id="email" type="email" defaultValue={currentUser?.email} />
                 </div>
                 <div className="pt-2">
                   <Button type="submit" className="bg-primary hover:bg-primary/90">
@@ -117,11 +124,11 @@ export default function Pengaturan() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="new-password">Password Baru</Label>
-                  <Input id="new-password" type="password" required minLength={6} />
+                  <Input id="new-password" type="password" required minLength={8} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm-password">Konfirmasi Password Baru</Label>
-                  <Input id="confirm-password" type="password" required minLength={6} />
+                  <Input id="confirm-password" type="password" required minLength={8} />
                 </div>
                 <div className="pt-2">
                   <Button type="submit" variant="secondary" className="bg-slate-800 text-white hover:bg-slate-900">
@@ -131,7 +138,7 @@ export default function Pengaturan() {
               </form>
             </CardContent>
           </Card>
-          
+
         </div>
       </div>
     </Layout>

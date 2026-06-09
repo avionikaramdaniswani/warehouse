@@ -13,7 +13,7 @@ interface SidebarProps {
 
 export function Sidebar({ className, collapsed = false }: SidebarProps) {
   const [location, setLocation] = useLocation();
-  const { currentUser, setCurrentUser } = useAppContext();
+  const { currentUser, clearAuth } = useAppContext();
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -21,12 +21,12 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
     { href: '/barang-masuk', label: 'Barang Masuk', icon: PackageCheck },
     { href: '/barang-keluar', label: 'Barang Keluar', icon: PackageX },
     { href: '/laporan', label: 'Laporan', icon: BarChart3 },
-    ...(currentUser?.role === 'Admin' ? [{ href: '/users', label: 'Pengguna', icon: Users }] : []),
+    ...(currentUser?.role === 'admin' ? [{ href: '/users', label: 'Pengguna', icon: Users }] : []),
     { href: '/pengaturan', label: 'Pengaturan', icon: Settings },
   ];
 
   const handleLogout = () => {
-    setCurrentUser(null);
+    clearAuth();
     setLocation('/login');
   };
 
@@ -100,12 +100,12 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
                 <TooltipTrigger asChild>
                   <Avatar className="h-9 w-9 border border-sidebar-border cursor-pointer">
                     <AvatarFallback className="bg-primary/20 text-primary text-xs">
-                      {currentUser?.nama.substring(0, 2).toUpperCase()}
+                      {currentUser?.namaLengkap.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  <p className="font-medium">{currentUser?.nama}</p>
+                  <p className="font-medium">{currentUser?.namaLengkap}</p>
                   <p className="text-xs opacity-70">{currentUser?.role}</p>
                 </TooltipContent>
               </Tooltip>
@@ -126,11 +126,11 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
               <div className="flex items-center gap-3 mb-4">
                 <Avatar className="h-10 w-10 border border-sidebar-border">
                   <AvatarFallback className="bg-primary/20 text-primary">
-                    {currentUser?.nama.substring(0, 2).toUpperCase()}
+                    {currentUser?.namaLengkap.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col overflow-hidden">
-                  <span className="text-sm font-medium truncate">{currentUser?.nama}</span>
+                  <span className="text-sm font-medium truncate">{currentUser?.namaLengkap}</span>
                   <span className="text-xs text-sidebar-foreground/60 truncate">{currentUser?.role}</span>
                 </div>
               </div>

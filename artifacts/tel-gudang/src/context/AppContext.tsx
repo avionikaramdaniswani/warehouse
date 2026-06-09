@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export type Status = 'Normal' | 'Menipis' | 'Habis';
 export type Kategori = 'Civil' | 'Electrical' | 'Mechanical' | 'Furniture' | 'Consumables' | 'GH Consumable';
@@ -15,12 +15,15 @@ export interface Item {
   status: Status;
 }
 
-export interface User {
-  nama: string;
-  username: string;
-  role: string;
-  status: 'Aktif' | 'Nonaktif';
-  lastLogin?: string;
+export interface CurrentUser {
+  id: number;
+  nik: string;
+  namaLengkap: string;
+  email: string;
+  role: 'admin' | 'operator' | 'viewer';
+  departemen: string | null;
+  jabatan: string | null;
+  seksi: string | null;
 }
 
 export interface Transaksi {
@@ -37,16 +40,16 @@ export interface Transaksi {
 }
 
 interface AppContextType {
-  currentUser: User | null;
-  setCurrentUser: (user: User | null) => void;
+  currentUser: CurrentUser | null;
+  token: string | null;
+  setAuth: (user: CurrentUser, token: string) => void;
+  clearAuth: () => void;
   items: Item[];
   setItems: (items: Item[]) => void;
   transaksiMasuk: Transaksi[];
   setTransaksiMasuk: (t: Transaksi[]) => void;
   transaksiKeluar: Transaksi[];
   setTransaksiKeluar: (t: Transaksi[]) => void;
-  users: User[];
-  setUsers: (users: User[]) => void;
 }
 
 const ITEM_DATA: Item[] = [
@@ -67,24 +70,42 @@ const ITEM_DATA: Item[] = [
   { tsCode: 'TS-099', msCode: 'MS-099', nama: 'BULB TL-LED ECOFIT TUBE 16W 120CM', kategori: 'Electrical', binLoc: 'TS-L.29', uom: 'EA', stok: 0, safetyStok: 20, status: 'Habis' },
 ];
 
-const USER_DATA: User[] = [
-  { nama: 'Budi Santoso', username: 'budi.s', role: 'Admin', status: 'Aktif', lastLogin: '2025-01-15 09:30' },
-  { nama: 'Andi Rahman', username: 'andi.r', role: 'Staff Gudang', status: 'Aktif', lastLogin: '2025-01-15 08:15' },
-  { nama: 'Siti Rahayu', username: 'siti.r', role: 'Staff Gudang', status: 'Aktif', lastLogin: '2025-01-14 16:45' },
-  { nama: 'Doni Wijaya', username: 'doni.w', role: 'Staff Gudang', status: 'Nonaktif', lastLogin: '2025-01-10 11:20' },
-];
-
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const TOKEN_KEY = 'tel_gudang_token';
+const USER_KEY = 'tel_gudang_user';
+
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User | null>({ nama: 'Budi Santoso', role: 'Admin', username: 'budi.s', status: 'Aktif' });
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(() => {
+    const stored = localStorage.getItem(USER_KEY);
+    return stored ? JSON.parse(stored) : null;
+  });
   const [items, setItems] = useState<Item[]>(ITEM_DATA);
   const [transaksiMasuk, setTransaksiMasuk] = useState<Transaksi[]>([]);
   const [transaksiKeluar, setTransaksiKeluar] = useState<Transaksi[]>([]);
-  const [users, setUsers] = useState<User[]>(USER_DATA);
+
+  const setAuth = (user: CurrentUser, newToken: string) => {
+    setCurrentUser(user);
+    setToken(newToken);
+    localStorage.setItem(TOKEN_KEY, newToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  };
+
+  const clearAuth = () => {
+    setCurrentUser(null);
+    setToken(null);
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  };
 
   return (
-    <AppContext.Provider value={{ currentUser, setCurrentUser, items, setItems, transaksiMasuk, setTransaksiMasuk, transaksiKeluar, setTransaksiKeluar, users, setUsers }}>
+    <AppContext.Provider value={{
+      currentUser, token, setAuth, clearAuth,
+      items, setItems,
+      transaksiMasuk, setTransaksiMasuk,
+      transaksiKeluar, setTransaksiKeluar,
+    }}>
       {children}
     </AppContext.Provider>
   );
