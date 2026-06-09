@@ -1,9 +1,8 @@
-import { pgTable, text, serial, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod/v4";
-import { relations } from "drizzle-orm";
 
-export const kategorisTable = pgTable("kategoris", {
+export const kategoriTable = pgTable("kategori", {
   id: serial("id").primaryKey(),
   nama: text("nama").notNull().unique(),
   keterangan: text("keterangan"),
@@ -12,7 +11,7 @@ export const kategorisTable = pgTable("kategoris", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const insertKategoriSchema = createInsertSchema(kategorisTable)
+export const insertKategoriSchema = createInsertSchema(kategoriTable)
   .omit({ id: true, createdAt: true, updatedAt: true })
   .extend({
     nama: z.string().min(1, "Nama kategori tidak boleh kosong").max(100, "Nama kategori maksimal 100 karakter"),
@@ -20,8 +19,8 @@ export const insertKategoriSchema = createInsertSchema(kategorisTable)
 
 export const updateKategoriSchema = insertKategoriSchema.partial();
 
-export const selectKategoriSchema = createSelectSchema(kategorisTable);
+export const selectKategoriSchema = createSelectSchema(kategoriTable);
 
 export type InsertKategori = z.infer<typeof insertKategoriSchema>;
 export type UpdateKategori = z.infer<typeof updateKategoriSchema>;
-export type Kategori = typeof kategorisTable.$inferSelect;
+export type Kategori = typeof kategoriTable.$inferSelect;

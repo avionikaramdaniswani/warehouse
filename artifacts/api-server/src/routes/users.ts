@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { usersTable, activityLogsTable, insertUserSchema, updateUserSchema } from "@workspace/db/schema";
-import { eq, desc, ne } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { hashPassword } from "../lib/auth.js";
 import { authenticate } from "../middlewares/authenticate.js";
@@ -9,6 +10,8 @@ import { authorize } from "../middlewares/authorize.js";
 import { logActivity } from "../lib/activity.js";
 
 const router = Router();
+
+const creator = alias(usersTable, "creator");
 
 const publicUserFields = {
   id: usersTable.id,
@@ -22,6 +25,7 @@ const publicUserFields = {
   seksi: usersTable.seksi,
   status: usersTable.status,
   dibuatOleh: usersTable.dibuatOleh,
+  dibuatOlehNama: creator.namaLengkap,
   tanggalGabung: usersTable.tanggalGabung,
   loginTerakhir: usersTable.loginTerakhir,
   createdAt: usersTable.createdAt,
@@ -29,7 +33,11 @@ const publicUserFields = {
 };
 
 router.get("/users", authenticate, authorize("admin"), async (_req, res) => {
-  const users = await db.select(publicUserFields).from(usersTable).orderBy(desc(usersTable.createdAt));
+  const users = await db
+    .select(publicUserFields)
+    .from(usersTable)
+    .leftJoin(creator, eq(usersTable.dibuatOleh, creator.id))
+    .orderBy(desc(usersTable.createdAt));
   res.json(users);
 });
 
@@ -43,6 +51,7 @@ router.get("/users/:id", authenticate, authorize("admin"), async (req, res) => {
   const [user] = await db
     .select(publicUserFields)
     .from(usersTable)
+    .leftJoin(creator, eq(usersTable.dibuatOleh, creator.id))
     .where(eq(usersTable.id, id))
     .limit(1);
 
@@ -62,17 +71,19 @@ router.post("/users", authenticate, authorize("admin"), async (req, res) => {
   }
 
   const data = parsed.data;
-
   const hashedPassword = await hashPassword(data.password);
 
-  const [newUser] = await db
+  const [inserted] = await db
     .insert(usersTable)
-    .values({
-      ...data,
-      password: hashedPassword,
-      dibuatOleh: req.user!.userId,
-    })
-    .returning(publicUserFields);
+    .values({ ...data, password: hashedPassword, dibuatOleh: req.user!.userId })
+    .returning({ id: usersTable.id });
+
+  const [newUser] = await db
+    .select(publicUserFields)
+    .from(usersTable)
+    .leftJoin(creator, eq(usersTable.dibuatOleh, creator.id))
+    .where(eq(usersTable.id, inserted.id))
+    .limit(1);
 
   await logActivity(
     req.user!.userId,
@@ -97,11 +108,17 @@ router.put("/users/:id", authenticate, authorize("admin"), async (req, res) => {
     return;
   }
 
-  const [updated] = await db
+  await db
     .update(usersTable)
     .set({ ...parsed.data, updatedAt: new Date() })
+    .where(eq(usersTable.id, id));
+
+  const [updated] = await db
+    .select(publicUserFields)
+    .from(usersTable)
+    .leftJoin(creator, eq(usersTable.dibuatOleh, creator.id))
     .where(eq(usersTable.id, id))
-    .returning(publicUserFields);
+    .limit(1);
 
   if (!updated) {
     res.status(404).json({ message: "Pengguna tidak ditemukan" });

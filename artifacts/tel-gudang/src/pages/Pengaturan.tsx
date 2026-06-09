@@ -27,7 +27,7 @@ function useKategoris(token: string | null) {
   const fetchKategoris = async () => {
     if (!token) return;
     try {
-      const res = await fetch('/api/kategoris/all', {
+      const res = await fetch('/api/kategori/all', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) setKategoris(await res.json());
@@ -59,7 +59,7 @@ export default function Pengaturan() {
     if (!form.nama.trim()) { toast.error('Nama kategori tidak boleh kosong'); return; }
     setSaving(true);
     try {
-      const res = await fetch('/api/kategoris', {
+      const res = await fetch('/api/kategori', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ nama: form.nama.trim(), keterangan: form.keterangan.trim() || undefined }),
@@ -78,7 +78,7 @@ export default function Pengaturan() {
     if (!form.nama.trim()) { toast.error('Nama kategori tidak boleh kosong'); return; }
     setSaving(true);
     try {
-      const res = await fetch(`/api/kategoris/${editTarget.id}`, {
+      const res = await fetch(`/api/kategori/${editTarget.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ nama: form.nama.trim(), keterangan: form.keterangan.trim() || undefined }),
@@ -96,7 +96,7 @@ export default function Pengaturan() {
     if (!deleteTarget) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/kategoris/${deleteTarget.id}`, {
+      const res = await fetch(`/api/kategori/${deleteTarget.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

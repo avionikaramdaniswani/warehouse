@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { kategorisTable } from "@workspace/db/schema";
+import { kategoriTable } from "@workspace/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { z } from "zod";
 import { authenticate } from "../middlewares/authenticate.js";
@@ -16,24 +16,24 @@ const createSchema = z.object({
 
 const updateSchema = createSchema.partial();
 
-router.get("/kategoris", authenticate, async (_req, res) => {
+router.get("/kategori", authenticate, async (_req, res) => {
   const rows = await db
     .select()
-    .from(kategorisTable)
-    .where(eq(kategorisTable.isActive, true))
-    .orderBy(asc(kategorisTable.nama));
+    .from(kategoriTable)
+    .where(eq(kategoriTable.isActive, true))
+    .orderBy(asc(kategoriTable.nama));
   res.json(rows);
 });
 
-router.get("/kategoris/all", authenticate, authorize("admin"), async (_req, res) => {
+router.get("/kategori/all", authenticate, authorize("admin"), async (_req, res) => {
   const rows = await db
     .select()
-    .from(kategorisTable)
-    .orderBy(asc(kategorisTable.nama));
+    .from(kategoriTable)
+    .orderBy(asc(kategoriTable.nama));
   res.json(rows);
 });
 
-router.post("/kategoris", authenticate, authorize("admin"), async (req, res) => {
+router.post("/kategori", authenticate, authorize("admin"), async (req, res) => {
   const parsed = createSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ message: parsed.error.errors[0]?.message ?? "Data tidak valid" });
@@ -42,8 +42,8 @@ router.post("/kategoris", authenticate, authorize("admin"), async (req, res) => 
 
   const existing = await db
     .select()
-    .from(kategorisTable)
-    .where(eq(kategorisTable.nama, parsed.data.nama))
+    .from(kategoriTable)
+    .where(eq(kategoriTable.nama, parsed.data.nama))
     .limit(1);
 
   if (existing.length > 0) {
@@ -52,7 +52,7 @@ router.post("/kategoris", authenticate, authorize("admin"), async (req, res) => 
   }
 
   const [row] = await db
-    .insert(kategorisTable)
+    .insert(kategoriTable)
     .values({
       nama: parsed.data.nama,
       keterangan: parsed.data.keterangan ?? null,
@@ -63,7 +63,7 @@ router.post("/kategoris", authenticate, authorize("admin"), async (req, res) => 
   res.status(201).json(row);
 });
 
-router.put("/kategoris/:id", authenticate, authorize("admin"), async (req, res) => {
+router.put("/kategori/:id", authenticate, authorize("admin"), async (req, res) => {
   const id = Number(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ message: "ID tidak valid" });
@@ -78,8 +78,8 @@ router.put("/kategoris/:id", authenticate, authorize("admin"), async (req, res) 
 
   const [existing] = await db
     .select()
-    .from(kategorisTable)
-    .where(eq(kategorisTable.id, id))
+    .from(kategoriTable)
+    .where(eq(kategoriTable.id, id))
     .limit(1);
 
   if (!existing) {
@@ -90,8 +90,8 @@ router.put("/kategoris/:id", authenticate, authorize("admin"), async (req, res) 
   if (parsed.data.nama && parsed.data.nama !== existing.nama) {
     const dup = await db
       .select()
-      .from(kategorisTable)
-      .where(eq(kategorisTable.nama, parsed.data.nama))
+      .from(kategoriTable)
+      .where(eq(kategoriTable.nama, parsed.data.nama))
       .limit(1);
     if (dup.length > 0) {
       res.status(409).json({ message: "Nama kategori sudah ada" });
@@ -100,16 +100,16 @@ router.put("/kategoris/:id", authenticate, authorize("admin"), async (req, res) 
   }
 
   const [updated] = await db
-    .update(kategorisTable)
+    .update(kategoriTable)
     .set({ ...parsed.data, updatedAt: new Date() })
-    .where(eq(kategorisTable.id, id))
+    .where(eq(kategoriTable.id, id))
     .returning();
 
   await logActivity(req.user!.userId, "UPDATE_KATEGORI", `Edit kategori: ${updated.nama}`, req);
   res.json(updated);
 });
 
-router.delete("/kategoris/:id", authenticate, authorize("admin"), async (req, res) => {
+router.delete("/kategori/:id", authenticate, authorize("admin"), async (req, res) => {
   const id = Number(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ message: "ID tidak valid" });
@@ -118,8 +118,8 @@ router.delete("/kategoris/:id", authenticate, authorize("admin"), async (req, re
 
   const [existing] = await db
     .select()
-    .from(kategorisTable)
-    .where(eq(kategorisTable.id, id))
+    .from(kategoriTable)
+    .where(eq(kategoriTable.id, id))
     .limit(1);
 
   if (!existing) {
@@ -128,9 +128,9 @@ router.delete("/kategoris/:id", authenticate, authorize("admin"), async (req, re
   }
 
   await db
-    .update(kategorisTable)
+    .update(kategoriTable)
     .set({ isActive: false, updatedAt: new Date() })
-    .where(eq(kategorisTable.id, id));
+    .where(eq(kategoriTable.id, id));
 
   await logActivity(req.user!.userId, "DELETE_KATEGORI", `Nonaktifkan kategori: ${existing.nama}`, req);
   res.json({ message: "Kategori berhasil dihapus" });

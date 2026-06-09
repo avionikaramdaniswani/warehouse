@@ -33,6 +33,8 @@ interface ApiUser {
   jabatan: string | null;
   seksi: string | null;
   status: 'active' | 'inactive' | 'suspended';
+  dibuatOleh: number | null;
+  dibuatOlehNama: string | null;
   loginTerakhir: string | null;
   tanggalGabung: string;
 }
@@ -495,8 +497,10 @@ export default function ManajemenUser() {
                   <div className="px-6 py-4">
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-3">Akun</p>
                     <div className="space-y-3">
+                      <ProfileField label="NIK" value={selectedUser.nik} />
                       <ProfileField label="Bergabung" value={fmtDateOnly(selectedUser.tanggalGabung)} />
                       <ProfileField label="Login Terakhir" value={fmtDate(selectedUser.loginTerakhir)} />
+                      <ProfileField label="Dibuat Oleh" value={selectedUser.dibuatOlehNama ?? 'Sistem'} />
                     </div>
                   </div>
                 </div>

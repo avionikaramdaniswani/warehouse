@@ -23,7 +23,7 @@ function useKategoris(token: string | null) {
   const [kategoris, setKategoris] = useState<KategoriOption[]>([]);
   useEffect(() => {
     if (!token) return;
-    fetch('/api/kategoris', { headers: { Authorization: `Bearer ${token}` } })
+    fetch('/api/kategori', { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => (r.ok ? r.json() : []))
       .then(setKategoris)
       .catch(() => {});
