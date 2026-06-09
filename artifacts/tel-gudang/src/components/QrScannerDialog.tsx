@@ -36,36 +36,52 @@ export function QrScannerDialog({ open, onOpenChange, onScan, title = 'Scan QR C
     setPhase('loading');
     setErrMsg('');
 
-    try {
+    const onSuccess = (text: string) => {
+      const code = text.trim();
+      setScannedText(code);
+      setPhase('success');
+      stopScanner();
+      setTimeout(() => {
+        onScan(code);
+        onOpenChange(false);
+        setPhase('idle');
+      }, 600);
+    };
+    const onFrameError = () => { /* per-frame error — ignore */ };
+
+    const tryStart = async (withAspectRatio: boolean) => {
       const inst = new Html5Qrcode(SCANNER_ID, { verbose: false });
       instanceRef.current = inst;
-
+      const cameraConstraint = withAspectRatio
+        ? { facingMode: 'environment', aspectRatio: 1.0 }
+        : { facingMode: 'environment' };
       await inst.start(
-        { facingMode: 'environment', aspectRatio: 1.0 },
+        cameraConstraint,
         { fps: 10, qrbox: { width: 200, height: 200 } },
-        (text) => {
-          const code = text.trim();
-          setScannedText(code);
-          setPhase('success');
-          stopScanner();
-          setTimeout(() => {
-            onScan(code);
-            onOpenChange(false);
-            setPhase('idle');
-          }, 600);
-        },
-        () => { /* per-frame error — ignore */ }
+        onSuccess,
+        onFrameError,
       );
+    };
+
+    try {
+      await tryStart(true);
       setPhase('active');
-    } catch (e: unknown) {
-      setPhase('error');
-      const name = (e as { name?: string })?.name ?? '';
-      if (name === 'NotAllowedError') {
-        setErrMsg('Izin kamera ditolak. Aktifkan akses kamera di pengaturan browser lalu coba lagi.');
-      } else if (name === 'NotFoundError') {
-        setErrMsg('Tidak ada kamera yang ditemukan pada perangkat ini.');
-      } else {
-        setErrMsg('Gagal membuka kamera. Pastikan tidak ada aplikasi lain yang sedang menggunakan kamera.');
+    } catch (e1: unknown) {
+      // aspectRatio constraint ditolak browser — coba tanpa-nya
+      try {
+        await stopScanner();
+        await tryStart(false);
+        setPhase('active');
+      } catch (e2: unknown) {
+        setPhase('error');
+        const name = (e2 as { name?: string })?.name ?? '';
+        if (name === 'NotAllowedError') {
+          setErrMsg('Izin kamera ditolak. Aktifkan akses kamera di pengaturan browser lalu coba lagi.');
+        } else if (name === 'NotFoundError') {
+          setErrMsg('Tidak ada kamera yang ditemukan pada perangkat ini.');
+        } else {
+          setErrMsg('Kamera tidak dapat dibuka. Pastikan browser memiliki izin kamera dan tidak digunakan aplikasi lain.');
+        }
       }
     }
   }, [onScan, onOpenChange, stopScanner]);
