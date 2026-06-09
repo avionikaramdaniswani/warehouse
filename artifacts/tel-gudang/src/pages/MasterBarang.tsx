@@ -400,27 +400,48 @@ export default function MasterBarang() {
             <DialogTitle className="text-xl border-b pb-4">Detail Barang: {selectedItem?.tsCode}</DialogTitle>
           </DialogHeader>
           {selectedItem && (
-            <div className="grid gap-6 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div><h4 className="text-sm font-semibold text-muted-foreground mb-1">Nama Barang</h4><p className="font-medium">{selectedItem.nama}</p></div>
-                <div><h4 className="text-sm font-semibold text-muted-foreground mb-1">Status</h4><StatusBadge status={selectedItem.status} /></div>
-                <div><h4 className="text-sm font-semibold text-muted-foreground mb-1">Kategori</h4><p>{selectedItem.kategori}</p></div>
-                <div><h4 className="text-sm font-semibold text-muted-foreground mb-1">Lokasi Penyimpanan</h4><p className="font-mono text-sm">{selectedItem.binLoc || '-'}</p></div>
-                <div><h4 className="text-sm font-semibold text-muted-foreground mb-1">Stok Saat Ini</h4><p className="text-2xl font-bold">{selectedItem.stok} <span className="text-sm font-normal text-muted-foreground">{selectedItem.uom}</span></p></div>
-                <div><h4 className="text-sm font-semibold text-muted-foreground mb-1">Batas Aman (Safety Stok)</h4><p className="text-xl font-semibold text-slate-600">{selectedItem.safetyStok}</p></div>
+            <div className="grid gap-5 py-4">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <div className="col-span-2">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Nama Barang</h4>
+                  <p className="font-semibold text-base leading-snug">{selectedItem.nama}</p>
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">TS Code</h4>
+                  <p className="font-mono font-medium">{selectedItem.tsCode}</p>
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">MS Code</h4>
+                  <p className="font-mono font-medium">{selectedItem.msCode || <span className="text-muted-foreground italic">—</span>}</p>
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Kategori</h4>
+                  <p>{selectedItem.kategori || '-'}</p>
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Satuan (UOM)</h4>
+                  <p>{selectedItem.uom}</p>
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Lokasi Penyimpanan</h4>
+                  <p className="font-mono text-sm">{selectedItem.binLoc || '-'}</p>
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Status</h4>
+                  <StatusBadge status={selectedItem.status} />
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Stok Saat Ini</h4>
+                  <p className="text-2xl font-bold">{selectedItem.stok} <span className="text-sm font-normal text-muted-foreground">{selectedItem.uom}</span></p>
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Batas Aman (Safety Stok)</h4>
+                  <p className="text-xl font-semibold text-slate-600">{selectedItem.safetyStok} <span className="text-sm font-normal text-muted-foreground">{selectedItem.uom}</span></p>
+                </div>
               </div>
               <div>
-                <h4 className="text-sm font-bold border-b pb-2 mb-3">Riwayat Transaksi Terakhir</h4>
-                <div className="bg-slate-50 rounded-md border text-sm">
-                  <table className="w-full">
-                    <thead className="bg-slate-100 text-slate-500"><tr><th className="px-3 py-2 text-left font-medium">Tanggal</th><th className="px-3 py-2 text-left font-medium">Jenis</th><th className="px-3 py-2 text-right font-medium">Jumlah</th><th className="px-3 py-2 text-left font-medium">Petugas</th></tr></thead>
-                    <tbody className="divide-y">
-                      <tr><td className="px-3 py-2">2025-01-14 10:30</td><td className="px-3 py-2 text-green-600 font-medium">Masuk</td><td className="px-3 py-2 text-right">+20</td><td className="px-3 py-2">Budi Santoso</td></tr>
-                      <tr><td className="px-3 py-2">2025-01-10 14:15</td><td className="px-3 py-2 text-orange-600 font-medium">Keluar</td><td className="px-3 py-2 text-right">-5</td><td className="px-3 py-2">Andi Rahman</td></tr>
-                      <tr><td className="px-3 py-2">2025-01-05 09:00</td><td className="px-3 py-2 text-orange-600 font-medium">Keluar</td><td className="px-3 py-2 text-right">-12</td><td className="px-3 py-2">Siti Rahayu</td></tr>
-                    </tbody>
-                  </table>
-                </div>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide border-b pb-2 mb-3">Riwayat Transaksi Terakhir</h4>
+                <p className="text-sm text-muted-foreground text-center py-4 bg-slate-50 rounded-md border">Belum ada transaksi untuk barang ini.</p>
               </div>
             </div>
           )}
