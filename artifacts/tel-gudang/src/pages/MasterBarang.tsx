@@ -62,9 +62,11 @@ export default function MasterBarang() {
   }, []);
 
   const filteredItems = items.filter((item) => {
+    const q = searchTerm.toLowerCase();
     const matchesSearch =
-      item.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.tsCode.toLowerCase().includes(searchTerm.toLowerCase());
+      item.nama.toLowerCase().includes(q) ||
+      item.tsCode.toLowerCase().includes(q) ||
+      (item.msCode ?? '').toLowerCase().includes(q);
     const matchesCategory = categoryFilter === 'Semua' || item.kategori === categoryFilter;
     const matchesStatus = statusFilter === 'Semua' || item.status === statusFilter;
     return matchesSearch && matchesCategory && matchesStatus;

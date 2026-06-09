@@ -34,7 +34,8 @@ router.get("/items", authenticate, async (_req, res) => {
     .from(itemsTable)
     .where(eq(itemsTable.isActive, true))
     .orderBy(asc(itemsTable.nama));
-  res.json(rows);
+  const normalized = rows.map((r) => ({ ...r, status: computeStatus(r.stok, r.safetyStok) }));
+  res.json(normalized);
 });
 
 router.post("/items", authenticate, authorize("admin", "operator"), async (req, res) => {
