@@ -10,11 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import {
-  Search, Plus, QrCode, Camera, PackagePlus, FileX,
+  Search, Plus, QrCode, PackagePlus, FileX,
   CalendarDays, FileText, TrendingUp, Clock
 } from 'lucide-react';
 import { useAppContext, Item } from '@/context/AppContext';
 import { toast } from 'sonner';
+import { QrScannerDialog } from '@/components/QrScannerDialog';
 
 const KONDISI_OPTIONS = ['Semua', 'Baik Baru', 'Baik Bekas', 'Rusak'];
 
@@ -62,6 +63,19 @@ export default function BarangMasuk() {
     setSelectedItem(null);
     setSearchItem('');
     setFormData({ jumlah: '', kondisi: 'Baik Baru', tanggal: new Date().toISOString().split('T')[0], noPo: '', keterangan: '' });
+  };
+
+  const handleQrScan = (tsCode: string) => {
+    const found = items.find((i) => i.tsCode === tsCode);
+    if (!found) {
+      toast.error(`Barang dengan kode "${tsCode}" tidak ditemukan dalam daftar`);
+      return;
+    }
+    setSelectedItem(found);
+    setSearchItem('');
+    setShowSuggestions(false);
+    if (!formOpen) setFormOpen(true);
+    toast.success(`Barang terdeteksi: ${found.nama}`);
   };
 
   const handleSimpan = async () => {
@@ -381,26 +395,13 @@ export default function BarangMasuk() {
         </DialogContent>
       </Dialog>
 
-      {/* QR Dialog */}
-      <Dialog open={qrOpen} onOpenChange={setQrOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <QrCode className="h-5 w-5 text-emerald-600" />Scan QR Code
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-3">
-            <div className="w-full aspect-square max-w-[220px] border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 flex flex-col items-center justify-center gap-3">
-              <QrCode className="h-12 w-12 text-slate-300" />
-              <p className="text-xs text-slate-400 text-center px-4">Arahkan kamera ke QR Code pada barang</p>
-            </div>
-            <Button className="w-full bg-emerald-600 hover:bg-emerald-700"
-              onClick={() => { toast.info('Fitur kamera segera hadir'); setQrOpen(false); }}>
-              <Camera className="w-4 h-4 mr-2" />Aktifkan Kamera
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* QR Scanner */}
+      <QrScannerDialog
+        open={qrOpen}
+        onOpenChange={setQrOpen}
+        onScan={handleQrScan}
+        title="Scan QR Code — Barang Masuk"
+      />
 
       {/* Floating QR */}
       <button onClick={() => setQrOpen(true)}

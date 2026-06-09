@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Layout } from '@/components/Layout';
 import { useAppContext, Item } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -168,6 +168,56 @@ export default function MasterBarang() {
     } catch {
       toast.error('Gagal terhubung ke server');
     }
+  };
+
+  const handlePrintLabel = (item: Item) => {
+    const svgEl =
+      (document.getElementById('qr-desktop-box') ?? document.getElementById('qr-mobile-box'))
+        ?.querySelector('svg');
+    let svgHtml = '';
+    if (svgEl) {
+      const clone = svgEl.cloneNode(true) as SVGElement;
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      svgHtml = clone.outerHTML;
+    }
+    const win = window.open('', '_blank', 'width=520,height=620');
+    if (!win) { toast.error('Popup diblokir — izinkan popup di browser lalu coba lagi'); return; }
+    win.document.write(`<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<title>Label ${item.tsCode}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#fff;display:flex;justify-content:center;padding:10mm;font-family:'Courier New',Courier,monospace}
+  .label{width:90mm;border:1.5px solid #333;padding:5mm}
+  .hdr{text-align:center;border-bottom:1px solid #999;padding-bottom:2.5mm;margin-bottom:2.5mm}
+  .co{font-size:6.5pt;font-weight:bold;letter-spacing:.5px}
+  .sub{font-size:5.5pt;color:#555;margin-top:.5mm}
+  .qr{text-align:center;margin:2.5mm 0}
+  .qr svg{width:48mm!important;height:48mm!important;display:inline-block}
+  .ts{text-align:center;font-size:15pt;font-weight:bold;letter-spacing:3px;margin:1.5mm 0 1mm}
+  .nama{text-align:center;font-size:6.5pt;font-weight:bold;margin:0 3mm 2mm;line-height:1.4;word-wrap:break-word}
+  .divider{border-top:1px dashed #bbb;margin:2mm 0}
+  .row{display:flex;justify-content:space-between;font-size:6.5pt;padding:.6mm 0}
+  .val{font-weight:bold}
+  @media print{body{padding:2mm}@page{margin:0}}
+</style>
+</head><body>
+<div class="label">
+  <div class="hdr">
+    <div class="co">PT TANJUNGENIM LESTARI PULP & PAPER</div>
+    <div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div>
+  </div>
+  <div class="qr">${svgHtml}</div>
+  <div class="ts">${item.tsCode}</div>
+  <div class="nama">${item.nama}</div>
+  <div class="divider"></div>
+  <div class="row"><span>Kategori</span><span class="val">${item.kategori || '—'}</span></div>
+  <div class="row"><span>BIN LOC</span><span class="val">${item.binLoc || '—'}</span></div>
+  <div class="row"><span>Satuan (UOM)</span><span class="val">${item.uom || '—'}</span></div>
+</div>
+<script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}</script>
+</body></html>`);
+    win.document.close();
   };
 
   const stockColor = (item: Item) =>
@@ -383,18 +433,22 @@ export default function MasterBarang() {
         <DialogContent className="sm:max-w-md text-center flex flex-col items-center p-8">
           <DialogHeader><DialogTitle className="text-xl mb-4">Label QR Code</DialogTitle></DialogHeader>
           {selectedItem && (
-            <div className="bg-white p-6 border rounded-xl shadow-sm mb-6 flex flex-col items-center w-full max-w-[280px]">
+            <div id="qr-desktop-box" className="bg-white p-6 border rounded-xl shadow-sm mb-4 flex flex-col items-center w-full max-w-[280px]">
               <QRCodeSVG value={selectedItem.tsCode} size={200} />
-              <div className="mt-6 w-full text-left space-y-1">
+              <div className="mt-5 w-full text-left space-y-1">
                 <p className="font-mono font-bold text-lg text-center tracking-widest">{selectedItem.tsCode}</p>
                 <p className="text-sm font-semibold truncate text-center" title={selectedItem.nama}>{selectedItem.nama}</p>
-                <div className="flex justify-between border-t mt-3 pt-3 text-sm"><span className="text-muted-foreground">Lokasi:</span><span className="font-mono font-medium">{selectedItem.binLoc}</span></div>
+                <div className="flex justify-between border-t mt-3 pt-3 text-sm"><span className="text-muted-foreground">Lokasi:</span><span className="font-mono font-medium">{selectedItem.binLoc || '—'}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Kategori:</span><span className="font-mono font-medium">{selectedItem.kategori}</span></div>
               </div>
             </div>
           )}
+          <p className="text-xs text-slate-400 -mt-2 mb-2 text-center">Klik "Cetak Label" untuk membuka dialog cetak browser</p>
           <DialogFooter className="w-full flex-row gap-2 justify-center sm:justify-center">
             <Button variant="outline" onClick={() => setQrModalOpen(false)}>Batal</Button>
-            <Button className="bg-primary hover:bg-primary/90" onClick={() => { toast.success('Mencetak label...'); setQrModalOpen(false); }}>Cetak Label</Button>
+            <Button className="bg-primary hover:bg-primary/90" onClick={() => { if (selectedItem) handlePrintLabel(selectedItem); }}>
+              Cetak Label
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -537,20 +591,27 @@ export default function MasterBarang() {
               {/* QR */}
               {bottomSheetType === 'qr' && (
                 <div className="px-5 py-4 flex flex-col items-center gap-4">
-                  <div className="bg-white border rounded-xl shadow-sm p-6 flex flex-col items-center w-full max-w-[280px]">
+                  <div id="qr-mobile-box" className="bg-white border rounded-xl shadow-sm p-6 flex flex-col items-center w-full max-w-[280px]">
                     <QRCodeSVG value={selectedItem.tsCode} size={180} />
                     <div className="mt-5 w-full text-center space-y-1">
                       <p className="font-mono font-bold text-lg tracking-widest">{selectedItem.tsCode}</p>
                       <p className="text-sm font-semibold text-slate-700 truncate">{selectedItem.nama}</p>
                       <div className="flex justify-between border-t mt-3 pt-3 text-xs text-slate-500">
                         <span>Lokasi:</span>
-                        <span className="font-mono font-semibold text-slate-700">{selectedItem.binLoc || '-'}</span>
+                        <span className="font-mono font-semibold text-slate-700">{selectedItem.binLoc || '—'}</span>
+                      </div>
+                      <div className="flex justify-between text-xs text-slate-500">
+                        <span>Kategori:</span>
+                        <span className="font-mono font-semibold text-slate-700">{selectedItem.kategori}</span>
                       </div>
                     </div>
                   </div>
+                  <p className="text-xs text-slate-400 -mt-2 text-center">
+                    Klik "Cetak Label" untuk membuka dialog cetak browser
+                  </p>
                   <div className="flex gap-2 w-full pb-2">
                     <Button variant="outline" className="flex-1" onClick={closeMobileSheet}>Batal</Button>
-                    <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={() => { toast.success('Mencetak label...'); closeMobileSheet(); }}>Cetak Label</Button>
+                    <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={() => handlePrintLabel(selectedItem)}>Cetak Label</Button>
                   </div>
                 </div>
               )}
