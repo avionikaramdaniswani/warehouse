@@ -27,7 +27,7 @@ const keperluanBadge: Record<string, string> = {
 };
 
 export default function BarangKeluar() {
-  const { items, setItems, transaksiKeluar, setTransaksiKeluar, currentUser } = useAppContext();
+  const { items, setItems, transaksiKeluar, setTransaksiKeluar, currentUser, token } = useAppContext();
 
   const [search, setSearch] = useState('');
   const [filterKeperluan, setFilterKeperluan] = useState('Semua');
@@ -69,7 +69,7 @@ export default function BarangKeluar() {
     setFormData({ jumlah: '', tujuan: '', tanggal: new Date().toISOString().split('T')[0], keperluan: 'Perbaikan', keterangan: '' });
   };
 
-  const handleSimpan = () => {
+  const handleSimpan = async () => {
     if (!selectedItem || !formData.jumlah || jumlahInt <= 0) {
       toast.error('Pilih barang dan masukkan jumlah yang valid');
       return;
@@ -78,14 +78,23 @@ export default function BarangKeluar() {
       toast.error(`Stok tidak mencukupi! Tersedia: ${selectedItem.stok}`);
       return;
     }
-    const updatedItems = items.map((item) => {
-      if (item.tsCode === selectedItem.tsCode) {
-        const newStok = item.stok - jumlahInt;
-        return { ...item, stok: newStok, status: newStok <= item.safetyStok ? (newStok === 0 ? 'Habis' : 'Menipis') : 'Normal' };
+    try {
+      const res = await fetch(`/api/items/${selectedItem.tsCode}/stok`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ delta: -jumlahInt }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast.error(err.message ?? 'Gagal update stok');
+        return;
       }
-      return item;
-    });
-    setItems(updatedItems);
+      const updated = await res.json();
+      setItems(items.map((item) => item.tsCode === selectedItem.tsCode ? { ...item, stok: updated.stok, status: updated.status } : item));
+    } catch {
+      toast.error('Gagal terhubung ke server');
+      return;
+    }
     setTransaksiKeluar([
       {
         id: `TROUT-${Date.now()}`,

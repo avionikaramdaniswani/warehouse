@@ -1,0 +1,2 @@
+- [Port conflict fix](port-conflict.md) — mockup sandbox takes port 8081; API must use 8082, Vite proxy must target 8082.
+- [Items backend](items-backend.md) — items table in DB, /api/items CRUD + PATCH stok, seeded 15 items; AppContext fetches from API on login.

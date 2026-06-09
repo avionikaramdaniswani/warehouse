@@ -25,7 +25,7 @@ const kondisiBadge: Record<string, string> = {
 };
 
 export default function BarangMasuk() {
-  const { items, setItems, transaksiMasuk, setTransaksiMasuk, currentUser } = useAppContext();
+  const { items, setItems, transaksiMasuk, setTransaksiMasuk, currentUser, token } = useAppContext();
 
   const [search, setSearch] = useState('');
   const [filterKondisi, setFilterKondisi] = useState('Semua');
@@ -64,20 +64,29 @@ export default function BarangMasuk() {
     setFormData({ jumlah: '', kondisi: 'Baik Baru', tanggal: new Date().toISOString().split('T')[0], noPo: '', keterangan: '' });
   };
 
-  const handleSimpan = () => {
+  const handleSimpan = async () => {
     if (!selectedItem || !formData.jumlah || parseInt(formData.jumlah) <= 0) {
       toast.error('Pilih barang dan masukkan jumlah yang valid');
       return;
     }
     const jumlah = parseInt(formData.jumlah);
-    const updatedItems = items.map((item) => {
-      if (item.tsCode === selectedItem.tsCode) {
-        const newStok = item.stok + jumlah;
-        return { ...item, stok: newStok, status: newStok <= item.safetyStok ? (newStok === 0 ? 'Habis' : 'Menipis') : 'Normal' };
+    try {
+      const res = await fetch(`/api/items/${selectedItem.tsCode}/stok`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ delta: jumlah }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast.error(err.message ?? 'Gagal update stok');
+        return;
       }
-      return item;
-    });
-    setItems(updatedItems);
+      const updated = await res.json();
+      setItems(items.map((item) => item.tsCode === selectedItem.tsCode ? { ...item, stok: updated.stok, status: updated.status } : item));
+    } catch {
+      toast.error('Gagal terhubung ke server');
+      return;
+    }
     setTransaksiMasuk([
       {
         id: `TRIN-${Date.now()}`,

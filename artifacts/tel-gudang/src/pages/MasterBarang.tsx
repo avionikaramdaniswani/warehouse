@@ -82,22 +82,92 @@ export default function MasterBarang() {
     setAddModalOpen(true);
   };
 
-  const handleSaveEdit = () => {
-    setItems(items.map((item) => (item.tsCode === formData.tsCode ? (formData as Item) : item)));
-    setEditModalOpen(false);
-    toast.success('Data barang berhasil diperbarui');
+  const handleSaveEdit = async () => {
+    if (!formData.tsCode) return;
+    try {
+      const res = await fetch(`/api/items/${formData.tsCode}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          msCode: formData.msCode,
+          nama: formData.nama,
+          kategori: formData.kategori,
+          binLoc: formData.binLoc,
+          uom: formData.uom,
+          stok: formData.stok,
+          safetyStok: formData.safetyStok,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast.error(err.message ?? 'Gagal menyimpan perubahan');
+        return;
+      }
+      const updated = await res.json();
+      const mapped: Item = {
+        id: updated.id,
+        tsCode: updated.tsCode ?? updated.ts_code,
+        msCode: updated.msCode ?? updated.ms_code ?? '',
+        nama: updated.nama,
+        kategori: updated.kategori ?? '',
+        binLoc: updated.binLoc ?? updated.bin_loc ?? '',
+        uom: updated.uom ?? 'EA',
+        stok: updated.stok,
+        safetyStok: updated.safetyStok ?? updated.safety_stok ?? 5,
+        status: updated.status ?? 'Normal',
+      };
+      setItems(items.map((item) => item.tsCode === mapped.tsCode ? mapped : item));
+      setEditModalOpen(false);
+      toast.success('Data barang berhasil diperbarui');
+    } catch {
+      toast.error('Gagal terhubung ke server');
+    }
   };
 
-  const handleSaveAdd = () => {
+  const handleSaveAdd = async () => {
     if (!formData.tsCode || !formData.nama) {
       toast.error('TS Code dan Nama Barang wajib diisi');
       return;
     }
-    const newItem = { ...formData } as Item;
-    newItem.status = newItem.stok === 0 ? 'Habis' : newItem.stok <= newItem.safetyStok ? 'Menipis' : 'Normal';
-    setItems([newItem, ...items]);
-    setAddModalOpen(false);
-    toast.success('Barang baru berhasil ditambahkan');
+    try {
+      const res = await fetch('/api/items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          tsCode: formData.tsCode,
+          msCode: formData.msCode,
+          nama: formData.nama,
+          kategori: formData.kategori,
+          binLoc: formData.binLoc,
+          uom: formData.uom ?? 'EA',
+          stok: formData.stok ?? 0,
+          safetyStok: formData.safetyStok ?? 5,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast.error(err.message ?? 'Gagal menambah barang');
+        return;
+      }
+      const created = await res.json();
+      const newItem: Item = {
+        id: created.id,
+        tsCode: created.tsCode ?? created.ts_code,
+        msCode: created.msCode ?? created.ms_code ?? '',
+        nama: created.nama,
+        kategori: created.kategori ?? '',
+        binLoc: created.binLoc ?? created.bin_loc ?? '',
+        uom: created.uom ?? 'EA',
+        stok: created.stok,
+        safetyStok: created.safetyStok ?? created.safety_stok ?? 5,
+        status: created.status ?? 'Normal',
+      };
+      setItems([newItem, ...items]);
+      setAddModalOpen(false);
+      toast.success('Barang baru berhasil ditambahkan');
+    } catch {
+      toast.error('Gagal terhubung ke server');
+    }
   };
 
   const stockColor = (item: Item) =>
