@@ -19,11 +19,11 @@ import { toast } from 'sonner';
 const KEPERLUAN_OPTIONS = ['Semua', 'Perbaikan', 'Penggantian', 'Proyek Baru', 'Peminjaman', 'Lainnya'];
 
 const keperluanBadge: Record<string, string> = {
-  'Perbaikan': 'bg-orange-50 text-orange-700 border-orange-200',
-  'Penggantian': 'bg-amber-50 text-amber-700 border-amber-200',
+  'Perbaikan':   'bg-amber-50 text-amber-700 border-amber-200',
+  'Penggantian': 'bg-sky-50 text-sky-700 border-sky-200',
   'Proyek Baru': 'bg-blue-50 text-blue-700 border-blue-200',
-  'Peminjaman': 'bg-purple-50 text-purple-700 border-purple-200',
-  'Lainnya': 'bg-slate-50 text-slate-600 border-slate-200',
+  'Peminjaman':  'bg-purple-50 text-purple-700 border-purple-200',
+  'Lainnya':     'bg-slate-50 text-slate-600 border-slate-200',
 };
 
 export default function BarangKeluar() {
@@ -125,7 +125,7 @@ export default function BarangKeluar() {
 
         {/* Stat strip */}
         <div className="flex gap-3 flex-wrap">
-          <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 text-orange-800 rounded-lg px-4 py-2 text-sm font-medium">
+          <div className="flex items-center gap-2 bg-primary/5 border border-primary/20 text-primary rounded-lg px-4 py-2 text-sm font-medium">
             <TrendingDown className="h-4 w-4" />
             <span>{totalHariIni} pengeluaran hari ini</span>
           </div>
@@ -138,6 +138,7 @@ export default function BarangKeluar() {
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
           <div className="flex flex-col sm:flex-row gap-2.5 flex-1 w-full sm:w-auto">
+            {/* Search */}
             <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -147,6 +148,7 @@ export default function BarangKeluar() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
+            {/* Filter Keperluan */}
             <Select value={filterKeperluan} onValueChange={setFilterKeperluan}>
               <SelectTrigger className="w-full sm:w-[170px] bg-white h-9 text-sm">
                 <SelectValue />
@@ -157,15 +159,13 @@ export default function BarangKeluar() {
                 ))}
               </SelectContent>
             </Select>
-            <div className="relative w-full sm:w-auto">
-              <CalendarDays className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-              <Input
-                type="date"
-                className="pl-9 bg-white h-9 text-sm w-full sm:w-[160px]"
-                value={filterTanggal}
-                onChange={(e) => setFilterTanggal(e.target.value)}
-              />
-            </div>
+            {/* Filter Tanggal — plain, no custom icon overlay */}
+            <Input
+              type="date"
+              className="bg-white h-9 text-sm w-full sm:w-[160px]"
+              value={filterTanggal}
+              onChange={(e) => setFilterTanggal(e.target.value)}
+            />
             {(search || filterKeperluan !== 'Semua' || filterTanggal) && (
               <Button variant="ghost" size="sm" className="h-9 text-muted-foreground hover:text-slate-800 shrink-0"
                 onClick={() => { setSearch(''); setFilterKeperluan('Semua'); setFilterTanggal(''); }}>
@@ -197,10 +197,10 @@ export default function BarangKeluar() {
               <p className="text-sm text-slate-400">Coba sesuaikan filter atau tambah pengeluaran baru</p>
             </div>
           ) : filtered.map((trx, idx) => (
-            <Card key={idx} className="p-4 border-orange-50 shadow-sm">
+            <Card key={idx} className="p-4 border-slate-100 shadow-sm">
               <div className="flex items-start justify-between gap-2 mb-1.5">
                 <p className="font-semibold text-sm text-slate-800 leading-snug flex-1">{trx.nama}</p>
-                <span className="font-mono text-sm font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded shrink-0">-{trx.jumlah}</span>
+                <span className="font-mono text-sm font-bold text-primary bg-primary/5 border border-primary/20 px-2 py-0.5 rounded shrink-0">-{trx.jumlah}</span>
               </div>
               <p className="text-xs font-mono text-slate-400 mb-2">{trx.tsCode}</p>
               <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
@@ -215,7 +215,7 @@ export default function BarangKeluar() {
         </div>
 
         {/* Desktop table */}
-        <Card className="hidden md:block overflow-hidden border-orange-50 shadow-sm">
+        <Card className="hidden md:block overflow-hidden border-slate-100 shadow-sm">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -232,12 +232,12 @@ export default function BarangKeluar() {
               <TableBody>
                 {filtered.length > 0 ? (
                   filtered.map((trx, idx) => (
-                    <TableRow key={idx} className="hover:bg-orange-50/30 transition-colors border-b border-slate-50">
+                    <TableRow key={idx} className="hover:bg-slate-50 transition-colors border-b border-slate-50">
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">{trx.waktu}</TableCell>
                       <TableCell className="font-mono text-sm text-slate-600">{trx.tsCode}</TableCell>
                       <TableCell className="font-medium text-sm text-slate-800">{trx.nama}</TableCell>
                       <TableCell className="text-right">
-                        <span className="font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded text-sm font-mono">-{trx.jumlah}</span>
+                        <span className="font-bold text-primary bg-primary/5 border border-primary/20 px-2 py-0.5 rounded text-sm font-mono">-{trx.jumlah}</span>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">{trx.tujuan || '—'}</TableCell>
                       <TableCell>
@@ -268,7 +268,7 @@ export default function BarangKeluar() {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base">
-              <PackageMinus className="h-5 w-5 text-orange-500" />
+              <PackageMinus className="h-5 w-5 text-primary" />
               Input Pengeluaran Barang
             </DialogTitle>
           </DialogHeader>
@@ -294,7 +294,7 @@ export default function BarangKeluar() {
                         <button key={item.tsCode}
                           disabled={item.stok === 0}
                           className={`w-full px-4 py-2.5 flex justify-between items-center border-b last:border-0 text-left transition-colors
-                            ${item.stok === 0 ? 'opacity-50 cursor-not-allowed bg-slate-50' : 'hover:bg-orange-50/50'}`}
+                            ${item.stok === 0 ? 'opacity-50 cursor-not-allowed bg-slate-50' : 'hover:bg-slate-50'}`}
                           onMouseDown={() => item.stok > 0 && handleSelectItem(item)}>
                           <div>
                             <p className="font-medium text-sm">{item.nama}</p>
@@ -309,11 +309,11 @@ export default function BarangKeluar() {
                   )}
                 </div>
               ) : (
-                <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 flex items-center justify-between gap-3">
+                <div className="bg-primary/5 border border-primary/20 rounded-lg px-4 py-3 flex items-center justify-between gap-3">
                   <div>
                     <p className="font-semibold text-sm text-slate-800">{selectedItem.nama}</p>
                     <p className="text-xs font-mono text-slate-500 mt-0.5">
-                      {selectedItem.tsCode} · Stok tersedia: <strong className="text-orange-700">{selectedItem.stok}</strong> {selectedItem.uom}
+                      {selectedItem.tsCode} · Stok tersedia: <strong className="text-primary">{selectedItem.stok}</strong> {selectedItem.uom}
                     </p>
                   </div>
                   <button className="text-xs text-slate-400 hover:text-red-500 shrink-0 transition-colors" onClick={() => setSelectedItem(null)}>Ganti</button>
@@ -377,7 +377,7 @@ export default function BarangKeluar() {
 
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => { setFormOpen(false); resetForm(); }}>Batal</Button>
-            <Button className="bg-orange-500 hover:bg-orange-600" onClick={handleSimpan}
+            <Button onClick={handleSimpan}
               disabled={!selectedItem || !formData.jumlah || jumlahInt <= 0 || isOverStok}>
               Simpan Pengeluaran
             </Button>
@@ -390,7 +390,7 @@ export default function BarangKeluar() {
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <QrCode className="h-5 w-5 text-orange-500" />Scan QR Code
+              <QrCode className="h-5 w-5 text-primary" />Scan QR Code
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-3">
@@ -398,7 +398,7 @@ export default function BarangKeluar() {
               <QrCode className="h-12 w-12 text-slate-300" />
               <p className="text-xs text-slate-400 text-center px-4">Arahkan kamera ke QR Code pada barang</p>
             </div>
-            <Button className="w-full bg-orange-500 hover:bg-orange-600"
+            <Button className="w-full"
               onClick={() => { toast.info('Fitur kamera segera hadir'); setQrOpen(false); }}>
               <Camera className="w-4 h-4 mr-2" />Aktifkan Kamera
             </Button>
@@ -408,7 +408,7 @@ export default function BarangKeluar() {
 
       {/* Floating QR */}
       <button onClick={() => setQrOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-[52px] h-[52px] bg-orange-500 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-50 w-[52px] h-[52px] bg-primary text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
         title="Scan QR">
         <QrCode className="w-5 h-5" />
       </button>

@@ -152,15 +152,12 @@ export default function BarangMasuk() {
               </SelectContent>
             </Select>
             {/* Filter Tanggal */}
-            <div className="relative w-full sm:w-auto">
-              <CalendarDays className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-              <Input
-                type="date"
-                className="pl-9 bg-white h-9 text-sm w-full sm:w-[160px]"
-                value={filterTanggal}
-                onChange={(e) => setFilterTanggal(e.target.value)}
-              />
-            </div>
+            <Input
+              type="date"
+              className="bg-white h-9 text-sm w-full sm:w-[160px]"
+              value={filterTanggal}
+              onChange={(e) => setFilterTanggal(e.target.value)}
+            />
             {/* Reset filter */}
             {(search || filterKondisi !== 'Semua' || filterTanggal) && (
               <Button
