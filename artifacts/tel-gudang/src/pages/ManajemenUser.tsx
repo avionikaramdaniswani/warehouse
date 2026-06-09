@@ -69,6 +69,24 @@ const statusLabel = (s: string) => ({ active: 'Aktif', inactive: 'Nonaktif', sus
 const fmtDate = (d: string | null) => d ? new Date(d).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
 const fmtDateOnly = (d: string) => new Date(d).toLocaleDateString('id-ID', { dateStyle: 'long' });
 
+function ProfileField({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <span className="text-xs text-slate-400 flex-shrink-0">{label}</span>
+      <span className="text-sm text-slate-700 font-medium text-right truncate">{value || '-'}</span>
+    </div>
+  );
+}
+
+function ProfileFieldGrid({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-[10px] text-slate-400">{label}</span>
+      <span className="text-sm text-slate-700 font-medium truncate">{value || '-'}</span>
+    </div>
+  );
+}
+
 const aksiColor = (aksi: string): { dot: string; badge: string } => {
   if (aksi.includes('LOGIN'))    return { dot: 'bg-blue-500 ring-blue-200',   badge: 'bg-blue-50 text-blue-700' };
   if (aksi.includes('LOGOUT'))   return { dot: 'bg-slate-400 ring-slate-200', badge: 'bg-slate-100 text-slate-600' };
@@ -423,54 +441,76 @@ export default function ManajemenUser() {
             SHEET: LIHAT PROFIL
         ═══════════════════════════════════ */}
         <Sheet open={profileOpen} onOpenChange={setProfileOpen}>
-          <SheetContent className="w-full sm:max-w-md overflow-y-auto">
-            <SheetHeader className="mb-6">
-              <SheetTitle>Profil Pengguna</SheetTitle>
-            </SheetHeader>
+          <SheetContent className="w-full sm:max-w-[400px] flex flex-col p-0 gap-0">
             {selectedUser && (
-              <div className="space-y-6">
-                {/* Avatar + Name */}
-                <div className="flex flex-col items-center text-center gap-3 pb-6 border-b">
-                  <Avatar className="h-20 w-20 border-2 border-primary/20">
-                    <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
+              <>
+                {/* ── Header ── */}
+                <div className="bg-sidebar px-6 pt-8 pb-6 flex flex-col items-center text-center gap-3">
+                  <Avatar className="h-16 w-16 ring-2 ring-white/20">
+                    <AvatarFallback className="bg-white/10 text-white text-xl font-bold tracking-wide">
                       {selectedUser.namaLengkap.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-800">{selectedUser.namaLengkap}</h3>
-                    <p className="text-sm text-muted-foreground font-mono">{selectedUser.nik}</p>
-                    <div className="flex items-center justify-center gap-2 mt-2">
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-xs font-semibold">
-                        {selectedUser.role === 'admin' ? <Shield className="w-3 h-3 mr-1" /> : <UserIcon className="w-3 h-3 mr-1" />}
-                        {roleBadge(selectedUser.role)}
-                      </Badge>
-                      <StatusBadge status={statusLabel(selectedUser.status) as any} />
+                    <h3 className="text-base font-semibold text-white leading-tight">{selectedUser.namaLengkap}</h3>
+                    <p className="text-xs text-white/50 font-mono mt-0.5">{selectedUser.nik}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-white/10 text-white/90 text-[11px] font-medium px-2.5 py-0.5 rounded-full">
+                      {roleBadge(selectedUser.role)}
+                    </span>
+                    <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
+                      selectedUser.status === 'active'
+                        ? 'bg-green-400/20 text-green-300'
+                        : 'bg-red-400/20 text-red-300'
+                    }`}>
+                      {statusLabel(selectedUser.status)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* ── Info Sections ── */}
+                <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+
+                  {/* Kontak */}
+                  <div className="px-6 py-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-3">Kontak</p>
+                    <div className="space-y-3">
+                      <ProfileField label="Email" value={selectedUser.email} />
+                      <ProfileField label="No HP" value={selectedUser.noHp ?? '-'} />
+                    </div>
+                  </div>
+
+                  {/* Pekerjaan */}
+                  <div className="px-6 py-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-3">Pekerjaan</p>
+                    <div className="grid grid-cols-3 gap-y-3">
+                      <ProfileFieldGrid label="Departemen" value={selectedUser.departemen ?? '-'} />
+                      <ProfileFieldGrid label="Jabatan" value={selectedUser.jabatan ?? '-'} />
+                      <ProfileFieldGrid label="Seksi" value={selectedUser.seksi ?? '-'} />
+                    </div>
+                  </div>
+
+                  {/* Akun */}
+                  <div className="px-6 py-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-3">Akun</p>
+                    <div className="space-y-3">
+                      <ProfileField label="Bergabung" value={fmtDateOnly(selectedUser.tanggalGabung)} />
+                      <ProfileField label="Login Terakhir" value={fmtDate(selectedUser.loginTerakhir)} />
                     </div>
                   </div>
                 </div>
 
-                {/* Info rows */}
-                <div className="space-y-4">
-                  <InfoRow icon={<Mail className="h-4 w-4 text-blue-500" />} label="Email" value={selectedUser.email} />
-                  <InfoRow icon={<Phone className="h-4 w-4 text-green-500" />} label="No HP" value={selectedUser.noHp ?? '-'} />
-                  <InfoRow icon={<Building2 className="h-4 w-4 text-orange-500" />} label="Departemen" value={selectedUser.departemen ?? '-'} />
-                  <InfoRow icon={<CreditCard className="h-4 w-4 text-violet-500" />} label="Jabatan" value={selectedUser.jabatan ?? '-'} />
-                  <InfoRow icon={<CreditCard className="h-4 w-4 text-teal-500" />} label="Seksi" value={selectedUser.seksi ?? '-'} />
-                  <div className="border-t pt-4 space-y-4">
-                    <InfoRow icon={<CalendarDays className="h-4 w-4 text-slate-400" />} label="Tanggal Bergabung" value={fmtDateOnly(selectedUser.tanggalGabung)} />
-                    <InfoRow icon={<Clock className="h-4 w-4 text-slate-400" />} label="Login Terakhir" value={fmtDate(selectedUser.loginTerakhir)} />
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <Button variant="outline" className="flex-1" onClick={() => { setProfileOpen(false); handleOpenEdit(selectedUser); }}>
-                    <Pencil className="w-4 h-4 mr-2" /> Edit Data
+                {/* ── Actions ── */}
+                <div className="px-6 py-4 border-t bg-slate-50 flex gap-2">
+                  <Button variant="outline" size="sm" className="flex-1 h-9" onClick={() => { setProfileOpen(false); handleOpenEdit(selectedUser); }}>
+                    <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit Data
                   </Button>
-                  <Button variant="outline" className="flex-1" onClick={() => { setProfileOpen(false); handleOpenResetPass(selectedUser); }}>
-                    <KeyRound className="w-4 h-4 mr-2" /> Reset Pass
+                  <Button variant="outline" size="sm" className="flex-1 h-9" onClick={() => { setProfileOpen(false); handleOpenResetPass(selectedUser); }}>
+                    <KeyRound className="w-3.5 h-3.5 mr-1.5" /> Reset Password
                   </Button>
                 </div>
-              </div>
+              </>
             )}
           </SheetContent>
         </Sheet>
