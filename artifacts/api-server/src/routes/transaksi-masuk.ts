@@ -25,21 +25,19 @@ async function generateNomor(): Promise<string> {
 const createSchema = z.object({
   tsCode: z.string().min(1),
   jumlah: z.number().int().positive("Jumlah harus lebih dari 0"),
-  kondisi: z.enum(["Baik Baru", "Baik Bekas", "Rusak"]).default("Baik Baru"),
   tanggal: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format tanggal YYYY-MM-DD"),
   noPo: z.string().optional(),
   keterangan: z.string().optional(),
 });
 
 router.get("/transaksi-masuk", authenticate, async (req, res) => {
-  const { search, kondisi, tanggal } = req.query as Record<string, string>;
+  const { search, tanggal } = req.query as Record<string, string>;
 
   const rows = await db
     .select({
       id: transaksiMasukTable.id,
       nomor: transaksiMasukTable.nomor,
       jumlah: transaksiMasukTable.jumlah,
-      kondisi: transaksiMasukTable.kondisi,
       tanggal: transaksiMasukTable.tanggal,
       noPo: transaksiMasukTable.noPo,
       keterangan: transaksiMasukTable.keterangan,
@@ -64,9 +62,6 @@ router.get("/transaksi-masuk", authenticate, async (req, res) => {
         (r.noPo ?? "").toLowerCase().includes(q)
     );
   }
-  if (kondisi && kondisi !== "Semua") {
-    result = result.filter((r: Row) => r.kondisi === kondisi);
-  }
   if (tanggal) {
     result = result.filter((r: Row) => r.tanggal === tanggal);
   }
@@ -81,7 +76,7 @@ router.post("/transaksi-masuk", authenticate, authorize("admin", "operator"), as
     return;
   }
 
-  const { tsCode, jumlah, kondisi, tanggal, noPo, keterangan } = parsed.data;
+  const { tsCode, jumlah, tanggal, noPo, keterangan } = parsed.data;
 
   const [item] = await db
     .select()
@@ -108,7 +103,6 @@ router.post("/transaksi-masuk", authenticate, authorize("admin", "operator"), as
       itemId: item.id,
       userId: req.user!.userId,
       jumlah,
-      kondisi,
       tanggal,
       noPo: noPo || null,
       keterangan: keterangan || null,

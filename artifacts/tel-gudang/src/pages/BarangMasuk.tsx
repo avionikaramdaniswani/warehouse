@@ -3,12 +3,10 @@ import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import {
   Search, Plus, QrCode, PackagePlus, FileX,
   CalendarDays, FileText, TrendingUp, Clock, Loader2
@@ -21,7 +19,6 @@ interface TransaksiMasuk {
   id: number;
   nomor: string;
   jumlah: number;
-  kondisi: string | null;
   tanggal: string;
   noPo: string | null;
   keterangan: string | null;
@@ -30,14 +27,6 @@ interface TransaksiMasuk {
   namaBarang: string;
   petugas: string;
 }
-
-const KONDISI_OPTIONS = ['Semua', 'Baik Baru', 'Baik Bekas', 'Rusak'];
-
-const kondisiBadge: Record<string, string> = {
-  'Baik Baru': 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  'Baik Bekas': 'bg-sky-50 text-sky-700 border-sky-200',
-  'Rusak': 'bg-red-50 text-red-700 border-red-200',
-};
 
 function formatWaktu(iso: string): string {
   const d = new Date(iso);
@@ -54,7 +43,6 @@ export default function BarangMasuk() {
   const [saving, setSaving] = useState(false);
 
   const [search, setSearch] = useState('');
-  const [filterKondisi, setFilterKondisi] = useState('Semua');
   const [filterTanggal, setFilterTanggal] = useState('');
 
   const [formOpen, setFormOpen] = useState(false);
@@ -65,7 +53,6 @@ export default function BarangMasuk() {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [formData, setFormData] = useState({
     jumlah: '',
-    kondisi: 'Baik Baru',
     tanggal: new Date().toISOString().split('T')[0],
     noPo: '',
     keterangan: '',
@@ -109,7 +96,7 @@ export default function BarangMasuk() {
   const resetForm = () => {
     setSelectedItem(null);
     setSearchItem('');
-    setFormData({ jumlah: '', kondisi: 'Baik Baru', tanggal: new Date().toISOString().split('T')[0], noPo: '', keterangan: '' });
+    setFormData({ jumlah: '', tanggal: new Date().toISOString().split('T')[0], noPo: '', keterangan: '' });
   };
 
   const handleQrScan = (tsCode: string) => {
@@ -138,7 +125,6 @@ export default function BarangMasuk() {
         body: JSON.stringify({
           tsCode: selectedItem.tsCode,
           jumlah: parseInt(formData.jumlah),
-          kondisi: formData.kondisi,
           tanggal: formData.tanggal,
           noPo: formData.noPo || undefined,
           keterangan: formData.keterangan || undefined,
@@ -175,9 +161,8 @@ export default function BarangMasuk() {
       trx.tsCode.toLowerCase().includes(search.toLowerCase()) ||
       (trx.noPo ?? '').toLowerCase().includes(search.toLowerCase()) ||
       trx.nomor.toLowerCase().includes(search.toLowerCase());
-    const matchKondisi = filterKondisi === 'Semua' || trx.kondisi === filterKondisi;
     const matchTanggal = !filterTanggal || trx.tanggal === filterTanggal;
-    return matchSearch && matchKondisi && matchTanggal;
+    return matchSearch && matchTanggal;
   });
 
   const totalHariIni = transaksi.filter((t) => t.tanggal === today).length;
@@ -210,28 +195,18 @@ export default function BarangMasuk() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <Select value={filterKondisi} onValueChange={setFilterKondisi}>
-              <SelectTrigger className="w-full sm:w-[160px] bg-white h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {KONDISI_OPTIONS.map((k) => (
-                  <SelectItem key={k} value={k}>{k === 'Semua' ? 'Semua Kondisi' : k}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <Input
               type="date"
               className="bg-white h-9 text-sm w-full sm:w-[160px]"
               value={filterTanggal}
               onChange={(e) => setFilterTanggal(e.target.value)}
             />
-            {(search || filterKondisi !== 'Semua' || filterTanggal) && (
+            {(search || filterTanggal) && (
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-9 text-muted-foreground hover:text-slate-800 shrink-0"
-                onClick={() => { setSearch(''); setFilterKondisi('Semua'); setFilterTanggal(''); }}
+                onClick={() => { setSearch(''); setFilterTanggal(''); }}
               >
                 Reset
               </Button>
@@ -248,7 +223,7 @@ export default function BarangMasuk() {
           </div>
         </div>
 
-        {(search || filterKondisi !== 'Semua' || filterTanggal) && (
+        {(search || filterTanggal) && (
           <p className="text-sm text-muted-foreground -mt-2">
             Menampilkan <strong>{filtered.length}</strong> dari {transaksi.length} transaksi
           </p>
@@ -281,7 +256,6 @@ export default function BarangMasuk() {
                 <span>·</span>
                 <span>{trx.petugas}</span>
                 {trx.noPo && <><span>·</span><span className="font-mono">{trx.noPo}</span></>}
-                <Badge variant="outline" className={`text-xs px-1.5 py-0 ${kondisiBadge[trx.kondisi ?? ''] || ''}`}>{trx.kondisi}</Badge>
               </div>
             </Card>
           ))}
@@ -293,12 +267,11 @@ export default function BarangMasuk() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50 border-b border-slate-100">
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-32">Nomor</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-36">Nomor</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-36">Waktu</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">TS Code</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500">Nama Barang</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 text-right w-24">Jumlah</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">Kondisi</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-32">No. PO</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-32">Petugas</TableHead>
                 </TableRow>
@@ -306,7 +279,7 @@ export default function BarangMasuk() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-40 text-center">
+                    <TableCell colSpan={7} className="h-40 text-center">
                       <div className="flex items-center justify-center gap-2 text-muted-foreground">
                         <Loader2 className="h-5 w-5 animate-spin" /><span>Memuat data...</span>
                       </div>
@@ -322,16 +295,13 @@ export default function BarangMasuk() {
                       <TableCell className="text-right">
                         <span className="font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-sm font-mono">+{trx.jumlah}</span>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={`text-xs ${kondisiBadge[trx.kondisi ?? ''] || ''}`}>{trx.kondisi}</Badge>
-                      </TableCell>
                       <TableCell className="font-mono text-sm text-muted-foreground">{trx.noPo || '—'}</TableCell>
                       <TableCell className="text-sm">{trx.petugas}</TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-56 text-center">
+                    <TableCell colSpan={7} className="h-56 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground">
                         <FileX className="h-10 w-10 mb-2 text-slate-200" />
                         <p className="font-medium text-slate-500">Tidak ada data penerimaan</p>
@@ -408,31 +378,18 @@ export default function BarangMasuk() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium">Kondisi</Label>
-                <Select value={formData.kondisi} onValueChange={(v) => setFormData({ ...formData, kondisi: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Baik Baru">Baik (Baru)</SelectItem>
-                    <SelectItem value="Baik Bekas">Baik (Bekas)</SelectItem>
-                    <SelectItem value="Rusak">Rusak</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
                 <Label className="text-sm font-medium flex items-center gap-1">
                   <CalendarDays className="h-3.5 w-3.5" />Tanggal Terima
                 </Label>
                 <Input type="date" value={formData.tanggal} onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })} />
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm font-medium flex items-center gap-1">
-                  <FileText className="h-3.5 w-3.5" />No. PO / Referensi
-                </Label>
-                <Input placeholder="PO-2025-001" value={formData.noPo} onChange={(e) => setFormData({ ...formData, noPo: e.target.value })} />
-              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium flex items-center gap-1">
+                <FileText className="h-3.5 w-3.5" />No. PO / Referensi
+              </Label>
+              <Input placeholder="PO-2025-001" value={formData.noPo} onChange={(e) => setFormData({ ...formData, noPo: e.target.value })} />
             </div>
 
             <div className="space-y-1.5">

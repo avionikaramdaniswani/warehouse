@@ -32,7 +32,6 @@ export const transaksiMasukTable = pgTable("transaksi_masuk", {
   itemId: integer("item_id").notNull().references(() => itemsTable.id),
   userId: integer("user_id").notNull().references(() => usersTable.id),
   jumlah: integer("jumlah").notNull(),
-  kondisi: text("kondisi").notNull().default("Baik Baru"),
   tanggal: date("tanggal").notNull(),
   noPo: text("no_po"),
   keterangan: text("keterangan"),
