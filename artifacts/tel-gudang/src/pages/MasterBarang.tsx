@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, X, Printer } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, X, Printer, CheckSquare } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -41,7 +41,11 @@ export default function MasterBarang() {
   const [statusFilter, setStatusFilter] = useState('Semua');
   const [isLoading, setIsLoading] = useState(true);
 
+  const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedForPrint, setSelectedForPrint] = useState<Set<string>>(new Set());
+
+  const enterSelectMode = () => setIsSelectMode(true);
+  const exitSelectMode = () => { setIsSelectMode(false); setSelectedForPrint(new Set()); };
 
   const toggleSelectForPrint = (tsCode: string) => {
     setSelectedForPrint((prev) => {
@@ -378,32 +382,35 @@ ${labelHtmls.join('\n')}
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={handleOpenAdd} className="bg-primary hover:bg-primary/90 w-full sm:w-auto shrink-0">
-            <Plus className="mr-2 h-4 w-4" /> Tambah Barang Baru
-          </Button>
+          <div className="flex gap-2 w-full sm:w-auto shrink-0">
+            {!isSelectMode && (
+              <Button variant="outline" onClick={enterSelectMode} className="w-full sm:w-auto">
+                <CheckSquare className="mr-2 h-4 w-4" /> Pilih Item
+              </Button>
+            )}
+            <Button onClick={handleOpenAdd} className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
+              <Plus className="mr-2 h-4 w-4" /> Tambah Barang Baru
+            </Button>
+          </div>
         </div>
 
-        {/* Selection action bar */}
-        {selectedForPrint.size > 0 && (
+        {/* Selection action bar — only shown in select mode */}
+        {isSelectMode && (
           <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-lg px-4 py-2.5 flex-wrap">
             <span className="text-sm font-medium text-primary flex-1">
-              {selectedForPrint.size} barang dipilih
+              {selectedForPrint.size > 0 ? `${selectedForPrint.size} barang dipilih` : 'Pilih barang untuk dicetak labelnya'}
             </span>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 text-xs"
-              onClick={() => setSelectedForPrint(new Set())}
-            >
-              Batal Pilih
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={exitSelectMode}>
+              Batal
             </Button>
             <Button
               size="sm"
               className="h-8 text-xs bg-primary hover:bg-primary/90"
+              disabled={selectedForPrint.size === 0}
               onClick={handleBatchPrint}
             >
               <Printer className="h-3.5 w-3.5 mr-1.5" />
-              Cetak {selectedForPrint.size} Label
+              Cetak {selectedForPrint.size > 0 ? `${selectedForPrint.size} ` : ''}Label
             </Button>
           </div>
         )}
@@ -426,11 +433,13 @@ ${labelHtmls.join('\n')}
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex items-start gap-2.5 min-w-0">
-                      <Checkbox
-                        className="mt-0.5 shrink-0"
-                        checked={selectedForPrint.has(item.tsCode)}
-                        onCheckedChange={() => toggleSelectForPrint(item.tsCode)}
-                      />
+                      {isSelectMode && (
+                        <Checkbox
+                          className="mt-0.5 shrink-0"
+                          checked={selectedForPrint.has(item.tsCode)}
+                          onCheckedChange={() => toggleSelectForPrint(item.tsCode)}
+                        />
+                      )}
                       <div className="min-w-0">
                         <p className="font-semibold text-sm text-slate-800 leading-tight">{item.nama}</p>
                         <p className="text-xs font-mono text-muted-foreground mt-0.5">{item.tsCode}</p>
@@ -465,14 +474,18 @@ ${labelHtmls.join('\n')}
             <Table>
               <TableHeader className="bg-slate-100">
                 <TableRow>
-                  <TableHead className="w-10">
-                    <Checkbox
-                      checked={allFilteredSelected}
-                      onCheckedChange={toggleSelectAll}
-                      aria-label="Pilih semua"
-                    />
+                  <TableHead className="w-[110px]">
+                    <div className="flex items-center gap-2 whitespace-nowrap">
+                      {isSelectMode && (
+                        <Checkbox
+                          checked={allFilteredSelected}
+                          onCheckedChange={toggleSelectAll}
+                          aria-label="Pilih semua"
+                        />
+                      )}
+                      TS Code
+                    </div>
                   </TableHead>
-                  <TableHead className="w-[100px]">TS Code</TableHead>
                   <TableHead className="min-w-[250px]">Nama Barang</TableHead>
                   <TableHead>Kategori</TableHead>
                   <TableHead>BIN LOC</TableHead>
@@ -487,12 +500,12 @@ ${labelHtmls.join('\n')}
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
-                      {Array.from({ length: 10 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}
+                      {Array.from({ length: 9 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}
                     </TableRow>
                   ))
                 ) : filteredItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="h-64 text-center">
+                    <TableCell colSpan={9} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground">
                         <FileX className="h-12 w-12 mb-2 text-slate-300" />
                         <p className="text-lg font-medium text-slate-500">Tidak ada data ditemukan</p>
@@ -506,13 +519,17 @@ ${labelHtmls.join('\n')}
                       key={item.tsCode}
                       className={item.stok === 0 ? 'bg-red-50/50 hover:bg-red-50' : item.stok <= item.safetyStok ? 'bg-amber-50/50 hover:bg-amber-50' : ''}
                     >
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedForPrint.has(item.tsCode)}
-                          onCheckedChange={() => toggleSelectForPrint(item.tsCode)}
-                        />
+                      <TableCell className="font-mono font-medium text-slate-600">
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                          {isSelectMode && (
+                            <Checkbox
+                              checked={selectedForPrint.has(item.tsCode)}
+                              onCheckedChange={() => toggleSelectForPrint(item.tsCode)}
+                            />
+                          )}
+                          {item.tsCode}
+                        </div>
                       </TableCell>
-                      <TableCell className="font-mono font-medium text-slate-600">{item.tsCode}</TableCell>
                       <TableCell className="font-semibold text-slate-800">{item.nama}</TableCell>
                       <TableCell>{item.kategori}</TableCell>
                       <TableCell className="font-mono text-sm">{item.binLoc}</TableCell>
