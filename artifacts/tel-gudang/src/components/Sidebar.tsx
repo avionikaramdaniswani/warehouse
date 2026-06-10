@@ -1,5 +1,9 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Package, PackageCheck, PackageX, BarChart3, Users, Settings, LogOut } from 'lucide-react';
+import {
+  LayoutDashboard, Package, PackageCheck, PackageX,
+  BarChart3, Users, Settings, LogOut, ChevronDown,
+} from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { TeLLogo } from '@/components/TeLLogo';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -15,12 +19,27 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
   const [location, setLocation] = useLocation();
   const { currentUser, clearAuth } = useAppContext();
 
-  const navItems = [
+  const laporanActive = location.startsWith('/laporan');
+  const [laporanOpen, setLaporanOpen] = useState(laporanActive);
+
+  const topNavItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/barang', label: 'Master Barang', icon: Package },
     { href: '/barang-masuk', label: 'Barang Masuk', icon: PackageCheck },
     { href: '/barang-keluar', label: 'Barang Keluar', icon: PackageX },
-    { href: '/laporan', label: 'Laporan', icon: BarChart3 },
+  ];
+
+  const laporanSubItems = [
+    { href: '/laporan', label: 'Ringkasan', icon: BarChart3 },
+    { href: '/laporan/barang', label: 'Laporan Barang', icon: Package },
+    { href: '/laporan/barang-masuk', label: 'Lap. Barang Masuk', icon: PackageCheck },
+    { href: '/laporan/barang-keluar', label: 'Lap. Barang Keluar', icon: PackageX },
+    ...(currentUser?.role === 'admin'
+      ? [{ href: '/laporan/pengguna', label: 'Laporan Pengguna', icon: Users }]
+      : []),
+  ];
+
+  const bottomNavItems = [
     ...(currentUser?.role === 'admin' ? [{ href: '/users', label: 'Pengguna', icon: Users }] : []),
     { href: '/pengaturan', label: 'Pengaturan', icon: Settings },
   ];
@@ -28,6 +47,35 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
   const handleLogout = () => {
     clearAuth();
     setLocation('/login');
+  };
+
+  const navLinkClass = (active: boolean) =>
+    cn(
+      'flex items-center rounded-md transition-colors text-sm font-medium',
+      collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
+      active
+        ? 'bg-primary text-primary-foreground'
+        : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+    );
+
+  const renderSimpleItem = (item: { href: string; label: string; icon: React.ElementType }) => {
+    const isActive = location === item.href;
+    const Icon = item.icon;
+    const linkEl = (
+      <Link key={item.href} href={item.href} className={navLinkClass(isActive)}>
+        <Icon className="h-5 w-5 shrink-0" />
+        {!collapsed && item.label}
+      </Link>
+    );
+    if (collapsed) {
+      return (
+        <Tooltip key={item.href}>
+          <TooltipTrigger asChild>{linkEl}</TooltipTrigger>
+          <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
+        </Tooltip>
+      );
+    }
+    return linkEl;
   };
 
   return (
@@ -39,7 +87,7 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
           className
         )}
       >
-        {/* Logo area — hidden when collapsed */}
+        {/* Logo area */}
         {!collapsed && (
           <div className="px-4 py-4 flex flex-col items-center gap-2 border-b border-sidebar-border">
             <TeLLogo size="md" />
@@ -53,42 +101,68 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
         {/* Nav items */}
         <div className="flex-1 py-4 overflow-y-auto">
           <nav className={cn('space-y-1', collapsed ? 'px-2' : 'px-3')}>
-            {navItems.map((item) => {
-              const isActive = location === item.href;
-              const Icon = item.icon;
+            {/* Top items */}
+            {topNavItems.map(renderSimpleItem)}
 
-              const linkEl = (
-                <Link
-                  key={item.href}
-                  href={item.href}
+            {/* Laporan dropdown */}
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href="/laporan"
+                    className={navLinkClass(laporanActive)}
+                  >
+                    <BarChart3 className="h-5 w-5 shrink-0" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="font-medium">Laporan</TooltipContent>
+              </Tooltip>
+            ) : (
+              <div>
+                <button
+                  onClick={() => setLaporanOpen((v) => !v)}
                   className={cn(
-                    'flex items-center rounded-md transition-colors text-sm font-medium',
-                    collapsed
-                      ? 'justify-center p-2.5'
-                      : 'gap-3 px-3 py-2.5',
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
+                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors text-sm font-medium',
+                    laporanActive
+                      ? 'bg-primary/10 text-primary'
                       : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                   )}
                 >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  {!collapsed && item.label}
-                </Link>
-              );
+                  <BarChart3 className="h-5 w-5 shrink-0" />
+                  <span className="flex-1 text-left">Laporan</span>
+                  <ChevronDown
+                    className={cn('h-4 w-4 shrink-0 transition-transform duration-200', laporanOpen && 'rotate-180')}
+                  />
+                </button>
 
-              if (collapsed) {
-                return (
-                  <Tooltip key={item.href}>
-                    <TooltipTrigger asChild>{linkEl}</TooltipTrigger>
-                    <TooltipContent side="right" className="font-medium">
-                      {item.label}
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              }
+                {laporanOpen && (
+                  <div className="mt-1 ml-3 pl-3 border-l border-sidebar-border space-y-0.5">
+                    {laporanSubItems.map((item) => {
+                      const isActive = location === item.href;
+                      const Icon = item.icon;
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={cn(
+                            'flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-colors text-sm',
+                            isActive
+                              ? 'bg-primary text-primary-foreground font-medium'
+                              : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                          )}
+                        >
+                          <Icon className="h-4 w-4 shrink-0" />
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
-              return linkEl;
-            })}
+            {/* Bottom items */}
+            {bottomNavItems.map(renderSimpleItem)}
           </nav>
         </div>
 

@@ -12,6 +12,10 @@ import MasterBarang from "@/pages/MasterBarang";
 import BarangMasuk from "@/pages/BarangMasuk";
 import BarangKeluar from "@/pages/BarangKeluar";
 import Laporan from "@/pages/Laporan";
+import LaporanBarang from "@/pages/LaporanBarang";
+import LaporanBarangMasuk from "@/pages/LaporanBarangMasuk";
+import LaporanBarangKeluar from "@/pages/LaporanBarangKeluar";
+import LaporanPengguna from "@/pages/LaporanPengguna";
 import ManajemenUser from "@/pages/ManajemenUser";
 import Pengaturan from "@/pages/Pengaturan";
 
@@ -39,6 +43,10 @@ function Router() {
       <Route path="/barang-masuk" component={() => <ProtectedRoute component={BarangMasuk} />} />
       <Route path="/barang-keluar" component={() => <ProtectedRoute component={BarangKeluar} />} />
       <Route path="/laporan" component={() => <ProtectedRoute component={Laporan} />} />
+      <Route path="/laporan/barang" component={() => <ProtectedRoute component={LaporanBarang} />} />
+      <Route path="/laporan/barang-masuk" component={() => <ProtectedRoute component={LaporanBarangMasuk} />} />
+      <Route path="/laporan/barang-keluar" component={() => <ProtectedRoute component={LaporanBarangKeluar} />} />
+      <Route path="/laporan/pengguna" component={() => <ProtectedRoute component={LaporanPengguna} />} />
       <Route path="/users" component={() => <ProtectedRoute component={ManajemenUser} />} />
       <Route path="/pengaturan" component={() => <ProtectedRoute component={Pengaturan} />} />
       
