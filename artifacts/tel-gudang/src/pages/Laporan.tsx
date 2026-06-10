@@ -179,7 +179,8 @@ export default function Laporan() {
               ) : itemSeringKeluar ? (
                 <>
                   <p className="text-sm font-bold line-clamp-2 leading-tight" title={itemSeringKeluar.nama}>{itemSeringKeluar.nama}</p>
-                  <p className="text-xs text-primary font-medium mt-1.5">{itemSeringKeluar.count}× keluar · {labelPeriode}</p>
+                  <p className="text-xs text-primary font-medium mt-1.5">{itemSeringKeluar.count}× keluar</p>
+                  <p className="text-xs text-muted-foreground">{labelPeriode}</p>
                 </>
               ) : (
                 <p className="text-sm text-muted-foreground">Belum ada data</p>
@@ -193,7 +194,8 @@ export default function Laporan() {
                 <h3 className="font-semibold text-sm uppercase">Total Transaksi</h3>
               </div>
               {isLoading ? <Skeleton className="h-9 w-20 mb-1 bg-slate-700" /> : <p className="text-3xl font-bold font-mono">{totalTransaksi}</p>}
-              <p className="text-xs text-slate-400 mt-1">{isLoading ? '—' : `${filteredMasuk.length} masuk · ${filteredKeluar.length} keluar · ${labelPeriode}`}</p>
+              <p className="text-xs text-slate-400 mt-1">{isLoading ? '—' : `${filteredMasuk.length} masuk · ${filteredKeluar.length} keluar`}</p>
+              <p className="text-xs text-slate-500">{isLoading ? '' : labelPeriode}</p>
             </CardContent>
           </Card>
         </div>
