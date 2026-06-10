@@ -30,12 +30,22 @@ interface CombinedRow {
 
 const PAGE_SIZE = 10;
 
+const HARI = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+const HARI_FULL = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
 const fmt = (d: string) =>
   new Date(d + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 
+const fmtWithDay = (d: string) => {
+  const dt = new Date(d + 'T00:00:00');
+  const day = HARI_FULL[dt.getDay()];
+  return `${day}, ${dt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+};
+
 const fmtShort = (d: string) => {
   const dt = new Date(d + 'T00:00:00');
-  return `${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')}`;
+  const day = HARI[dt.getDay()];
+  return `${day} ${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')}`;
 };
 
 const nextDay = (d: string): string => {
@@ -450,7 +460,7 @@ export default function Laporan() {
                     </div>
                     <p className="text-xs font-mono text-muted-foreground mb-1">{row.tsCode} · {row.kategori}</p>
                     <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-                      <span>{fmt(row.tanggal)}</span><span>{row.ref}</span><span>{row.petugas}</span>
+                      <span>{fmtWithDay(row.tanggal)}</span><span>{row.ref}</span><span>{row.petugas}</span>
                     </div>
                   </div>
                 ))}
@@ -474,7 +484,7 @@ export default function Laporan() {
                   <TableBody>
                     {pageRows.map(row => (
                       <TableRow key={row.key}>
-                        <TableCell className="text-sm whitespace-nowrap">{fmt(row.tanggal)}</TableCell>
+                        <TableCell className="text-sm whitespace-nowrap">{fmtWithDay(row.tanggal)}</TableCell>
                         <TableCell className="font-mono text-sm">{row.tsCode}</TableCell>
                         <TableCell className="font-medium max-w-[180px] truncate" title={row.namaBarang}>{row.namaBarang}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{row.kategori}</TableCell>
