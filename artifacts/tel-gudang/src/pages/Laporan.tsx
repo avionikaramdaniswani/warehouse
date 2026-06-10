@@ -54,6 +54,9 @@ export default function Laporan() {
   const totalKeluar = filteredKeluar.reduce((s, t) => s + t.jumlah, 0);
   const totalTransaksi = filteredMasuk.length + filteredKeluar.length;
 
+  const fmt = (d: string) => new Date(d + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+  const labelPeriode = dateFrom === dateTo ? fmt(dateFrom) : `${fmt(dateFrom)} – ${fmt(dateTo)}`;
+
   const itemSeringKeluar = (() => {
     const freq: Record<string, { nama: string; count: number }> = {};
     filteredKeluar.forEach(t => {
@@ -155,7 +158,7 @@ export default function Laporan() {
                 <h3 className="font-semibold text-sm uppercase">Total Masuk</h3>
               </div>
               {isLoading ? <Skeleton className="h-9 w-24 mb-1" /> : <p className="text-3xl font-bold font-mono">{totalMasuk.toLocaleString('id-ID')}</p>}
-              <p className="text-xs text-muted-foreground mt-1">Unit diterima periode ini</p>
+              <p className="text-xs text-muted-foreground mt-1">{labelPeriode}</p>
             </CardContent>
           </Card>
           <Card className="border-orange-100 shadow-sm">
@@ -165,7 +168,7 @@ export default function Laporan() {
                 <h3 className="font-semibold text-sm uppercase">Total Keluar</h3>
               </div>
               {isLoading ? <Skeleton className="h-9 w-24 mb-1" /> : <p className="text-3xl font-bold font-mono">{totalKeluar.toLocaleString('id-ID')}</p>}
-              <p className="text-xs text-muted-foreground mt-1">Unit dikeluarkan periode ini</p>
+              <p className="text-xs text-muted-foreground mt-1">{labelPeriode}</p>
             </CardContent>
           </Card>
           <Card className="shadow-sm">
@@ -176,7 +179,7 @@ export default function Laporan() {
               ) : itemSeringKeluar ? (
                 <>
                   <p className="text-sm font-bold line-clamp-2 leading-tight" title={itemSeringKeluar.nama}>{itemSeringKeluar.nama}</p>
-                  <p className="text-xs text-primary font-medium mt-1.5">{itemSeringKeluar.count}× pengeluaran</p>
+                  <p className="text-xs text-primary font-medium mt-1.5">{itemSeringKeluar.count}× keluar · {labelPeriode}</p>
                 </>
               ) : (
                 <p className="text-sm text-muted-foreground">Belum ada data</p>
@@ -190,7 +193,7 @@ export default function Laporan() {
                 <h3 className="font-semibold text-sm uppercase">Total Transaksi</h3>
               </div>
               {isLoading ? <Skeleton className="h-9 w-20 mb-1 bg-slate-700" /> : <p className="text-3xl font-bold font-mono">{totalTransaksi}</p>}
-              <p className="text-xs text-slate-400 mt-1">{isLoading ? '—' : `${filteredMasuk.length} masuk · ${filteredKeluar.length} keluar`}</p>
+              <p className="text-xs text-slate-400 mt-1">{isLoading ? '—' : `${filteredMasuk.length} masuk · ${filteredKeluar.length} keluar · ${labelPeriode}`}</p>
             </CardContent>
           </Card>
         </div>
