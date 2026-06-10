@@ -6,6 +6,7 @@ import kategoriRouter from "./kategori.js";
 import itemsRouter from "./items.js";
 import transaksiMasukRouter from "./transaksi-masuk.js";
 import transaksiKeluarRouter from "./transaksi-keluar.js";
+import dashboardRouter from "./dashboard.js";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(kategoriRouter);
 router.use(itemsRouter);
 router.use(transaksiMasukRouter);
 router.use(transaksiKeluarRouter);
+router.use(dashboardRouter);
 
 export default router;

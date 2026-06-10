@@ -12,6 +12,8 @@ export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [todayMasuk, setTodayMasuk] = useState(0);
   const [todayKeluar, setTodayKeluar] = useState(0);
+  const [barData, setBarData] = useState<{ day: string; masuk: number; keluar: number }[]>([]);
+  const [pieData, setPieData] = useState<{ name: string; value: number }[]>([]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -21,37 +23,24 @@ export default function Dashboard() {
   useEffect(() => {
     if (!token) return;
     const today = new Date().toISOString().split('T')[0];
+    const headers = { Authorization: `Bearer ${token}` };
+
     Promise.all([
-      fetch(`/api/transaksi-masuk?tanggal=${today}`, { headers: { Authorization: `Bearer ${token}` } }),
-      fetch(`/api/transaksi-keluar?tanggal=${today}`, { headers: { Authorization: `Bearer ${token}` } }),
-    ]).then(async ([r1, r2]) => {
-      const [m, k] = await Promise.all([r1.json(), r2.json()]);
+      fetch(`/api/transaksi-masuk?tanggal=${today}`, { headers }),
+      fetch(`/api/transaksi-keluar?tanggal=${today}`, { headers }),
+      fetch(`/api/dashboard/stats`, { headers }),
+    ]).then(async ([r1, r2, r3]) => {
+      const [m, k, stats] = await Promise.all([r1.json(), r2.json(), r3.json()]);
       setTodayMasuk(m?.length ?? 0);
       setTodayKeluar(k?.length ?? 0);
+      if (stats?.barData) setBarData(stats.barData);
+      if (stats?.pieData) setPieData(stats.pieData);
     }).catch(() => {});
   }, [token]);
 
   const totalItems = items.length;
   const lowStockItems = items.filter(item => item.stok <= item.safetyStok);
 
-  const barData = [
-    { day: 'Sen', masuk: 15, keluar: 8 },
-    { day: 'Sel', masuk: 22, keluar: 14 },
-    { day: 'Rab', masuk: 18, keluar: 20 },
-    { day: 'Kam', masuk: 30, keluar: 12 },
-    { day: 'Jum', masuk: 25, keluar: 18 },
-    { day: 'Sab', masuk: 10, keluar: 5 },
-    { day: 'Min', masuk: 8, keluar: 3 }
-  ];
-
-  const pieData = [
-    { name: 'Civil Material', value: 35 },
-    { name: 'Electrical', value: 20 },
-    { name: 'Mechanical', value: 18 },
-    { name: 'Furniture', value: 8 },
-    { name: 'Consumables', value: 12 },
-    { name: 'GH Consumable', value: 7 }
-  ];
   const COLORS = ['#f97316', '#22c55e', '#3b82f6', '#8b5cf6', '#eab308', '#ef4444'];
 
   return (
