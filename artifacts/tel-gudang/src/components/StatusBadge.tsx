@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 
 interface StatusBadgeProps {
-  status: 'Normal' | 'Menipis' | 'Habis' | 'Aktif' | 'Nonaktif' | 'Admin' | 'Staff Gudang';
+  status: string;
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {

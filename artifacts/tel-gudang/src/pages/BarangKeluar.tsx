@@ -231,7 +231,7 @@ export default function BarangKeluar() {
                 <span>·</span>
                 <span>{trx.petugas}</span>
                 {trx.tujuan && <><span>·</span><span className="flex items-center gap-0.5"><MapPin className="h-3 w-3" />{trx.tujuan}</span></>}
-                <Badge variant="outline" className={`text-xs px-1.5 py-0 ${keperluanBadge[trx.keperluan] || ''}`}>{trx.keperluan}</Badge>
+                <Badge variant="outline" className={`text-xs px-1.5 py-0 ${keperluanBadge[trx.keperluan ?? ''] || ''}`}>{trx.keperluan}</Badge>
               </div>
             </Card>
           ))}
@@ -264,7 +264,7 @@ export default function BarangKeluar() {
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">{trx.tujuan || '—'}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={`text-xs ${keperluanBadge[trx.keperluan] || ''}`}>{trx.keperluan}</Badge>
+                        <Badge variant="outline" className={`text-xs ${keperluanBadge[trx.keperluan ?? ''] || ''}`}>{trx.keperluan}</Badge>
                       </TableCell>
                       <TableCell className="text-sm">{trx.petugas}</TableCell>
                     </TableRow>

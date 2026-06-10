@@ -19,9 +19,13 @@ export interface CurrentUser {
   namaLengkap: string;
   email: string;
   role: 'admin' | 'operator' | 'viewer';
+  noHp: string | null;
   departemen: string | null;
   jabatan: string | null;
   seksi: string | null;
+  status: string;
+  tanggalGabung: string | null;
+  loginTerakhir: string | null;
 }
 
 export interface Transaksi {

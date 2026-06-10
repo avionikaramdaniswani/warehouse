@@ -3,7 +3,7 @@ import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { verifyPassword, signToken } from "../lib/auth.js";
+import { verifyPassword, hashPassword, signToken } from "../lib/auth.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { loginLimiter } from "../middlewares/rateLimiter.js";
 import { logActivity } from "../lib/activity.js";
@@ -62,6 +62,106 @@ router.post("/auth/login", loginLimiter, async (req, res) => {
 router.post("/auth/logout", authenticate, async (req, res) => {
   await logActivity(req.user!.userId, "LOGOUT", "Logout", req);
   res.json({ message: "Berhasil logout" });
+});
+
+const updateProfileSchema = z.object({
+  namaLengkap: z.string().min(1, "Nama lengkap tidak boleh kosong").max(150).optional(),
+  email: z.string().email("Format email tidak valid").optional(),
+  noHp: z.string().max(20).optional().nullable(),
+  departemen: z.string().max(100).optional().nullable(),
+  jabatan: z.string().max(100).optional().nullable(),
+  seksi: z.string().max(100).optional().nullable(),
+});
+
+router.patch("/auth/profile", authenticate, async (req, res) => {
+  const parsed = updateProfileSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ message: parsed.error.errors[0]?.message ?? "Data tidak valid" });
+    return;
+  }
+
+  const userId = req.user!.userId;
+
+  if (parsed.data.email) {
+    const [existing] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.email, parsed.data.email))
+      .limit(1);
+    if (existing && existing.id !== userId) {
+      res.status(409).json({ message: "Email sudah digunakan oleh akun lain" });
+      return;
+    }
+  }
+
+  const [updated] = await db
+    .update(usersTable)
+    .set({ ...parsed.data, updatedAt: new Date() })
+    .where(eq(usersTable.id, userId))
+    .returning({
+      id: usersTable.id,
+      nik: usersTable.nik,
+      namaLengkap: usersTable.namaLengkap,
+      email: usersTable.email,
+      role: usersTable.role,
+      noHp: usersTable.noHp,
+      departemen: usersTable.departemen,
+      jabatan: usersTable.jabatan,
+      seksi: usersTable.seksi,
+      status: usersTable.status,
+      tanggalGabung: usersTable.tanggalGabung,
+      loginTerakhir: usersTable.loginTerakhir,
+    });
+
+  await logActivity(userId, "UPDATE_PROFILE", "Perbarui profil", req);
+  res.json(updated);
+});
+
+const changePasswordSchema = z.object({
+  passwordLama: z.string().min(1, "Password lama wajib diisi"),
+  passwordBaru: z.string().min(8, "Password baru minimal 8 karakter"),
+  konfirmasi: z.string().min(1, "Konfirmasi password wajib diisi"),
+});
+
+router.post("/auth/change-password", authenticate, async (req, res) => {
+  const parsed = changePasswordSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ message: parsed.error.errors[0]?.message ?? "Data tidak valid" });
+    return;
+  }
+
+  const { passwordLama, passwordBaru, konfirmasi } = parsed.data;
+
+  if (passwordBaru !== konfirmasi) {
+    res.status(400).json({ message: "Konfirmasi password tidak cocok" });
+    return;
+  }
+
+  const [user] = await db
+    .select({ id: usersTable.id, password: usersTable.password })
+    .from(usersTable)
+    .where(eq(usersTable.id, req.user!.userId))
+    .limit(1);
+
+  if (!user) {
+    res.status(404).json({ message: "Pengguna tidak ditemukan" });
+    return;
+  }
+
+  const valid = await verifyPassword(passwordLama, user.password);
+  if (!valid) {
+    res.status(400).json({ message: "Password lama tidak sesuai" });
+    return;
+  }
+
+  const hashed = await hashPassword(passwordBaru);
+  await db
+    .update(usersTable)
+    .set({ password: hashed, updatedAt: new Date() })
+    .where(eq(usersTable.id, user.id));
+
+  await logActivity(user.id, "CHANGE_PASSWORD", "Ubah password", req);
+  res.json({ message: "Password berhasil diubah" });
 });
 
 router.get("/auth/me", authenticate, async (req, res) => {

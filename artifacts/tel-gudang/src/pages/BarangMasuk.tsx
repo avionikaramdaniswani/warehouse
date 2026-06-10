@@ -232,7 +232,7 @@ export default function BarangMasuk() {
                 <span>·</span>
                 <span>{trx.petugas}</span>
                 {trx.noPo && <><span>·</span><span className="font-mono">{trx.noPo}</span></>}
-                <Badge variant="outline" className={`text-xs px-1.5 py-0 ${kondisiBadge[trx.kondisi] || ''}`}>{trx.kondisi}</Badge>
+                <Badge variant="outline" className={`text-xs px-1.5 py-0 ${kondisiBadge[trx.kondisi ?? ''] || ''}`}>{trx.kondisi}</Badge>
               </div>
             </Card>
           ))}
@@ -264,7 +264,7 @@ export default function BarangMasuk() {
                         <span className="font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-sm font-mono">+{trx.jumlah}</span>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={`text-xs ${kondisiBadge[trx.kondisi] || ''}`}>{trx.kondisi}</Badge>
+                        <Badge variant="outline" className={`text-xs ${kondisiBadge[trx.kondisi ?? ''] || ''}`}>{trx.kondisi}</Badge>
                       </TableCell>
                       <TableCell className="font-mono text-sm text-muted-foreground">{trx.noPo || '—'}</TableCell>
                       <TableCell className="text-sm">{trx.petugas}</TableCell>
