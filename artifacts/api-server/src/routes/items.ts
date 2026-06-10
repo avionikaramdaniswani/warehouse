@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { itemsTable } from "@workspace/db/schema";
-import { eq, asc, and } from "drizzle-orm";
+import { eq, asc, and, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { authenticate } from "../middlewares/authenticate.js";
 import { authorize } from "../middlewares/authorize.js";
@@ -160,38 +160,42 @@ router.post("/items/import", authenticate, authorize("admin", "operator"), async
   }
 
   const { items } = parsed.data;
-  let inserted = 0;
-  let skipped = 0;
   const errors: { tsCode: string; reason: string }[] = [];
 
-  for (const item of items) {
+  // 1. Satu query untuk ambil semua TS Code yang sudah ada
+  const allTsCodes = items.map((i) => i.tsCode);
+  const existingRows = await db
+    .select({ tsCode: itemsTable.tsCode })
+    .from(itemsTable)
+    .where(inArray(itemsTable.tsCode, allTsCodes));
+  const existingSet = new Set(existingRows.map((r) => r.tsCode));
+
+  // 2. Pisahkan item baru vs duplikat
+  const newItems = items.filter((i) => !existingSet.has(i.tsCode));
+  const skipped = items.length - newItems.length;
+
+  // 3. Satu INSERT bulk untuk semua item baru (dalam chunk 200)
+  let inserted = 0;
+  const CHUNK = 200;
+  for (let i = 0; i < newItems.length; i += CHUNK) {
+    const chunk = newItems.slice(i, i + CHUNK);
     try {
-      const existing = await db
-        .select({ id: itemsTable.id })
-        .from(itemsTable)
-        .where(eq(itemsTable.tsCode, item.tsCode))
-        .limit(1);
-
-      if (existing.length > 0) {
-        skipped++;
-        continue;
-      }
-
-      const { stok, safetyStok } = item;
-      await db.insert(itemsTable).values({
-        tsCode: item.tsCode,
-        msCode: item.msCode ?? null,
-        nama: item.nama,
-        kategori: item.kategori,
-        binLoc: item.binLoc ?? null,
-        uom: item.uom,
-        stok,
-        safetyStok,
-        status: computeStatus(stok, safetyStok),
-      });
-      inserted++;
+      await db.insert(itemsTable).values(
+        chunk.map((item) => ({
+          tsCode: item.tsCode,
+          msCode: item.msCode ?? null,
+          nama: item.nama,
+          kategori: item.kategori,
+          binLoc: item.binLoc ?? null,
+          uom: item.uom,
+          stok: item.stok,
+          safetyStok: item.safetyStok,
+          status: computeStatus(item.stok, item.safetyStok),
+        }))
+      );
+      inserted += chunk.length;
     } catch {
-      errors.push({ tsCode: item.tsCode, reason: "Gagal disimpan" });
+      chunk.forEach((item) => errors.push({ tsCode: item.tsCode, reason: "Gagal disimpan" }));
     }
   }
 
