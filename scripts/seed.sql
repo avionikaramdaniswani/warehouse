@@ -21,11 +21,14 @@ ON CONFLICT (email) DO NOTHING;
 -- Kategori barang (sesuai data real Excel)
 -- ---------------------------------------------------------------------------
 INSERT INTO kategori (nama, keterangan, is_active, created_at, updated_at) VALUES
-  ('Civil',               'Material sipil & bangunan',              true, NOW(), NOW()),
-  ('Civil Material',      'Material konstruksi sipil',              true, NOW(), NOW()),
-  ('Consumables',         'Material habis pakai operasional',       true, NOW(), NOW()),
-  ('Mechanical Material', 'Material mekanikal & peralatan',         true, NOW(), NOW()),
-  ('GH Consumable',       'Consumable untuk guest house/fasilitas', true, NOW(), NOW())
+  ('Civil',                'Material sipil & bangunan',              true, NOW(), NOW()),
+  ('Civil Material',       'Material konstruksi sipil',              true, NOW(), NOW()),
+  ('Consumables',          'Material habis pakai operasional',       true, NOW(), NOW()),
+  ('Mechanical Material',  'Material mekanikal & peralatan',         true, NOW(), NOW()),
+  ('GH Consumable',        'Consumable untuk guest house/fasilitas', true, NOW(), NOW()),
+  ('Electrical Material',  'Material elektrikal & instrumentasi',    true, NOW(), NOW()),
+  ('Furniture Material',   'Material furnitur & inventaris kantor',  true, NOW(), NOW()),
+  ('Asset Tool',           'Alat & aset tools operasional',          true, NOW(), NOW())
 ON CONFLICT (nama) DO NOTHING;
 
 -- ---------------------------------------------------------------------------

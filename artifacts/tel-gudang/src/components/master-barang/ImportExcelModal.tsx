@@ -37,6 +37,26 @@ const COL_ALIASES: Record<string, string[]> = {
   safetyStok: ['safety stok', 'safety stock', 'safety', 'min stok', 'minimum stock', 'min stock', 'min qty'],
 };
 
+const KATEGORI_NORMALIZE: Record<string, string> = {
+  'civil': 'Civil',
+  'civil material': 'Civil Material',
+  'civilmaterial': 'Civil Material',
+  'consumables': 'Consumables',
+  'consumable': 'Consumables',
+  'mechanical material': 'Mechanical Material',
+  'gh consumable': 'GH Consumable',
+  'electrical material': 'Electrical Material',
+  'furniture material': 'Furniture Material',
+  'furniture materials': 'Furniture Material',
+  'asset tool': 'Asset Tool',
+  'asset tools': 'Asset Tool',
+};
+
+function normalizeKategori(raw: string): string {
+  const key = raw.trim().toLowerCase();
+  return KATEGORI_NORMALIZE[key] ?? raw.trim();
+}
+
 function norm(s: string): string {
   return String(s ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
 }
@@ -97,10 +117,10 @@ function parseRows(sheet: XLSX.WorkSheet): { rows: ParsedRow[]; detectedHeaders:
     if (!row || row.every((c) => c == null || String(c).trim() === '')) continue;
 
     const errors: string[] = [];
-    const tsCode  = getStr(row, 'tsCode');
-    const nama    = getStr(row, 'nama');
-    const kategori = getStr(row, 'kategori');
-    const stok    = getNum(row, 'stok', 0);
+    const tsCode   = getStr(row, 'tsCode');
+    const nama     = getStr(row, 'nama');
+    const kategori = normalizeKategori(getStr(row, 'kategori'));
+    const stok     = getNum(row, 'stok', 0);
     const safetyStok = getNum(row, 'safetyStok', 5);
 
     if (!tsCode)   errors.push('TS Code kosong');
