@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import {
   LayoutDashboard, Package, PackageCheck, PackageX,
-  BarChart3, Users, Settings, LogOut, ChevronDown,
+  BarChart3, Users, Settings, LogOut, ChevronDown, History,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { TeLLogo } from '@/components/TeLLogo';
@@ -35,7 +35,10 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
     { href: '/laporan/barang-masuk', label: 'Lap. Barang Masuk', icon: PackageCheck },
     { href: '/laporan/barang-keluar', label: 'Lap. Barang Keluar', icon: PackageX },
     ...(currentUser?.role === 'admin'
-      ? [{ href: '/laporan/pengguna', label: 'Laporan Pengguna', icon: Users }]
+      ? [
+          { href: '/laporan/pengguna', label: 'Laporan Pengguna', icon: Users },
+          { href: '/laporan/aktivitas', label: 'Riwayat Aktivitas', icon: History },
+        ]
       : []),
   ];
 

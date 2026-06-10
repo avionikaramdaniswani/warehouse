@@ -16,6 +16,7 @@ import LaporanBarang from "@/pages/LaporanBarang";
 import LaporanBarangMasuk from "@/pages/LaporanBarangMasuk";
 import LaporanBarangKeluar from "@/pages/LaporanBarangKeluar";
 import LaporanPengguna from "@/pages/LaporanPengguna";
+import RiwayatAktivitas from "@/pages/RiwayatAktivitas";
 import ManajemenUser from "@/pages/ManajemenUser";
 import Pengaturan from "@/pages/Pengaturan";
 
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/laporan/barang-masuk" component={() => <ProtectedRoute component={LaporanBarangMasuk} />} />
       <Route path="/laporan/barang-keluar" component={() => <ProtectedRoute component={LaporanBarangKeluar} />} />
       <Route path="/laporan/pengguna" component={() => <ProtectedRoute component={LaporanPengguna} />} />
+      <Route path="/laporan/aktivitas" component={() => <ProtectedRoute component={RiwayatAktivitas} />} />
       <Route path="/users" component={() => <ProtectedRoute component={ManajemenUser} />} />
       <Route path="/pengaturan" component={() => <ProtectedRoute component={Pengaturan} />} />
       

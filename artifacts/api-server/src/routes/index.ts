@@ -7,6 +7,7 @@ import itemsRouter from "./items.js";
 import transaksiMasukRouter from "./transaksi-masuk.js";
 import transaksiKeluarRouter from "./transaksi-keluar.js";
 import dashboardRouter from "./dashboard.js";
+import activityRouter from "./activity.js";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(itemsRouter);
 router.use(transaksiMasukRouter);
 router.use(transaksiKeluarRouter);
 router.use(dashboardRouter);
+router.use(activityRouter);
 
 export default router;
