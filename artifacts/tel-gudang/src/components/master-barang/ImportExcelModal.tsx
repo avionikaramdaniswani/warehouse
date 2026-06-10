@@ -26,83 +26,105 @@ interface Props {
   onImported: () => void;
 }
 
-const REQUIRED_COLS = ['TS Code', 'Nama Barang', 'Kategori'];
-const ALL_COLS = ['TS Code', 'MS Code', 'Nama Barang', 'Kategori', 'BIN LOC', 'UOM', 'Stok', 'Safety Stok'];
+const COL_ALIASES: Record<string, string[]> = {
+  tsCode:     ['ts code', 'ts-code', 'tscode', 'kode ts', 'kode'],
+  msCode:     ['ms code', 'ms-code', 'mscode', 'ms no', 'material no', 'material number', 'material'],
+  nama:       ['nama barang', 'item', 'description', 'deskripsi', 'nama material', 'nama item', 'nama', 'item name', 'uraian', 'keterangan barang'],
+  kategori:   ['kategori', 'category', 'grup', 'group', 'kat', 'material group'],
+  binLoc:     ['bin loc', 'binloc', 'bin location', 'lokasi', 'bin', 'location', 'storage loc'],
+  uom:        ['uom', 'satuan', 'unit', 'unit of measure', 'base unit'],
+  stok:       ['stok', 'stock', 'qty', 'quantity', 'jumlah', 'unrestricted', 'soh'],
+  safetyStok: ['safety stok', 'safety stock', 'safety', 'min stok', 'minimum stock', 'min stock', 'min qty'],
+};
 
-function normalizeHeader(h: string): string {
-  return h.trim().toLowerCase().replace(/\s+/g, ' ');
+function norm(s: string): string {
+  return String(s ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
-function findCol(headers: string[], target: string): number {
-  const t = normalizeHeader(target);
-  return headers.findIndex((h) => normalizeHeader(h) === t);
-}
-
-function cellStr(row: Record<string, unknown>, idx: number): string {
-  const keys = Object.keys(row);
-  const key = keys[idx];
-  if (key === undefined) return '';
-  const val = row[key];
-  return val == null ? '' : String(val).trim();
-}
-
-function parseRows(sheet: XLSX.WorkSheet): ParsedRow[] {
-  const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { header: 1 });
-  if (json.length < 2) return [];
-
-  const headerRow = (json[0] as string[]).map(String);
-  const colIdx: Record<string, number> = {};
-  for (const col of ALL_COLS) {
-    colIdx[col] = findCol(headerRow, col);
+function findHeaderRow(rows: unknown[][]): number {
+  for (let i = 0; i < Math.min(rows.length, 5); i++) {
+    const row = rows[i] as unknown[];
+    const nonEmpty = row.filter((c) => c != null && String(c).trim() !== '');
+    if (nonEmpty.length >= 3) return i;
   }
+  return 0;
+}
+
+function buildColMap(headers: unknown[]): Record<string, number> {
+  const map: Record<string, number> = {};
+  const used = new Set<number>();
+
+  for (const [field, aliases] of Object.entries(COL_ALIASES)) {
+    for (let idx = 0; idx < headers.length; idx++) {
+      if (used.has(idx)) continue;
+      const h = norm(String(headers[idx] ?? ''));
+      if (aliases.includes(h)) {
+        map[field] = idx;
+        used.add(idx);
+        break;
+      }
+    }
+  }
+  return map;
+}
+
+function parseRows(sheet: XLSX.WorkSheet): { rows: ParsedRow[]; detectedHeaders: string[] } {
+  const raw2d = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1 });
+  if (raw2d.length < 2) return { rows: [], detectedHeaders: [] };
+
+  const headerRowIdx = findHeaderRow(raw2d);
+  const headerRow = raw2d[headerRowIdx] as unknown[];
+  const colMap = buildColMap(headerRow);
+  const detectedHeaders = headerRow.map((h) => String(h ?? '').trim()).filter(Boolean);
+
+  const getStr = (dataRow: unknown[], field: string): string => {
+    const idx = colMap[field];
+    if (idx === undefined) return '';
+    const v = dataRow[idx];
+    return v == null ? '' : String(v).trim();
+  };
+
+  const getNum = (dataRow: unknown[], field: string, def: number): number => {
+    const v = getStr(dataRow, field);
+    if (v === '') return def;
+    const n = Number(v);
+    return isNaN(n) ? NaN : Math.floor(n);
+  };
 
   const rows: ParsedRow[] = [];
-  for (let i = 1; i < json.length; i++) {
-    const raw = json[i] as Record<string, unknown>;
-    if (!raw || Object.values(raw).every((v) => v == null || String(v).trim() === '')) continue;
-
-    const get = (col: string) => {
-      const idx = colIdx[col];
-      if (idx < 0 || idx === undefined) return '';
-      const arr = raw as unknown[];
-      const val = arr[idx];
-      return val == null ? '' : String(val).trim();
-    };
-
-    const getNum = (col: string, def: number) => {
-      const v = get(col);
-      if (v === '') return def;
-      const n = Number(v);
-      return isNaN(n) ? NaN : Math.floor(n);
-    };
+  for (let i = headerRowIdx + 1; i < raw2d.length; i++) {
+    const row = raw2d[i] as unknown[];
+    if (!row || row.every((c) => c == null || String(c).trim() === '')) continue;
 
     const errors: string[] = [];
-    const tsCode = get('TS Code');
-    const nama = get('Nama Barang');
-    const kategori = get('Kategori');
-    const stok = getNum('Stok', 0);
-    const safetyStok = getNum('Safety Stok', 5);
+    const tsCode  = getStr(row, 'tsCode');
+    const nama    = getStr(row, 'nama');
+    const kategori = getStr(row, 'kategori');
+    const stok    = getNum(row, 'stok', 0);
+    const safetyStok = getNum(row, 'safetyStok', 5);
 
-    if (!tsCode) errors.push('TS Code kosong');
-    if (!nama) errors.push('Nama Barang kosong');
+    if (!tsCode)   errors.push('TS Code kosong');
+    if (!nama)     errors.push('Nama Barang kosong');
     if (!kategori) errors.push('Kategori kosong');
-    if (isNaN(stok)) errors.push('Stok harus angka');
+    if (isNaN(stok))      errors.push('Stok harus angka');
     if (isNaN(safetyStok)) errors.push('Safety Stok harus angka');
+
+    const msRaw = getStr(row, 'msCode');
 
     rows.push({
       rowNum: i + 1,
       tsCode,
-      msCode: get('MS Code') || undefined,
+      msCode: msRaw || undefined,
       nama,
       kategori,
-      binLoc: get('BIN LOC') || undefined,
-      uom: get('UOM') || 'EA',
+      binLoc: getStr(row, 'binLoc') || undefined,
+      uom: getStr(row, 'uom') || 'EA',
       stok: isNaN(stok) ? 0 : stok,
       safetyStok: isNaN(safetyStok) ? 5 : safetyStok,
       errors,
     });
   }
-  return rows;
+  return { rows, detectedHeaders };
 }
 
 function downloadTemplate() {
@@ -149,9 +171,9 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
         const data = e.target?.result;
         const wb = XLSX.read(data, { type: 'array' });
         const ws = wb.Sheets[wb.SheetNames[0]];
-        const parsed = parseRows(ws);
+        const { rows: parsed } = parseRows(ws);
         if (parsed.length === 0) {
-          toast.error('File kosong atau format kolom tidak sesuai template');
+          toast.error('File kosong atau kolom tidak dikenali. Coba download Template terlebih dahulu.');
           setFileName('');
           return;
         }
