@@ -3,14 +3,15 @@ import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAppContext } from '@/context/AppContext';
 import { BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
-import { Package, PackageMinus, Activity, Layers } from 'lucide-react';
+import { Package, PackageMinus, PackagePlus, TrendingDown } from 'lucide-react';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function Dashboard() {
   const { currentUser, items, token } = useAppContext();
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [todayTransactions, setTodayTransactions] = useState(0);
+  const [todayMasuk, setTodayMasuk] = useState(0);
+  const [todayKeluar, setTodayKeluar] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -25,13 +26,13 @@ export default function Dashboard() {
       fetch(`/api/transaksi-keluar?tanggal=${today}`, { headers: { Authorization: `Bearer ${token}` } }),
     ]).then(async ([r1, r2]) => {
       const [m, k] = await Promise.all([r1.json(), r2.json()]);
-      setTodayTransactions((m?.length ?? 0) + (k?.length ?? 0));
+      setTodayMasuk(m?.length ?? 0);
+      setTodayKeluar(k?.length ?? 0);
     }).catch(() => {});
   }, [token]);
 
   const totalItems = items.length;
   const lowStockItems = items.filter(item => item.stok <= item.safetyStok);
-  const totalCategories = new Set(items.map(i => i.kategori)).size;
 
   const barData = [
     { day: 'Sen', masuk: 15, keluar: 8 },
@@ -107,11 +108,11 @@ export default function Dashboard() {
         <Card>
           <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Transaksi Hari Ini</p>
-              <h3 className="text-2xl sm:text-3xl font-bold">{todayTransactions}</h3>
+              <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Masuk Hari Ini</p>
+              <h3 className="text-2xl sm:text-3xl font-bold text-emerald-700">{todayMasuk}</h3>
             </div>
-            <div className="p-2 sm:p-3 bg-green-100 text-green-600 rounded-full shrink-0">
-              <Activity className="h-5 w-5 sm:h-6 sm:w-6" />
+            <div className="p-2 sm:p-3 bg-emerald-100 text-emerald-600 rounded-full shrink-0">
+              <PackagePlus className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
@@ -119,11 +120,11 @@ export default function Dashboard() {
         <Card>
           <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Total Kategori</p>
-              <h3 className="text-2xl sm:text-3xl font-bold">{totalCategories}</h3>
+              <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Keluar Hari Ini</p>
+              <h3 className="text-2xl sm:text-3xl font-bold text-orange-600">{todayKeluar}</h3>
             </div>
             <div className="p-2 sm:p-3 bg-orange-100 text-orange-600 rounded-full shrink-0">
-              <Layers className="h-5 w-5 sm:h-6 sm:w-6" />
+              <TrendingDown className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
