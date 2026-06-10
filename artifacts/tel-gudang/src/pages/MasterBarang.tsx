@@ -9,9 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 import { ItemDetailModal } from '@/components/master-barang/ItemDetailModal';
 import { ItemFormModal } from '@/components/master-barang/ItemFormModal';
@@ -51,7 +56,7 @@ function rowBg(item: Item) {
 }
 
 export default function MasterBarang() {
-  const { items, setItems, token } = useAppContext();
+  const { items, setItems, token, currentUser } = useAppContext();
   const kategoris = useKategoris(token);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,6 +73,10 @@ export default function MasterBarang() {
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [sheetType, setSheetType] = useState<SheetType | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const isAdmin = currentUser?.role === 'admin';
 
   useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 400);
@@ -208,6 +217,29 @@ export default function MasterBarang() {
     toast.success('Barang baru berhasil ditambahkan');
   };
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/items/${deleteTarget.tsCode}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast.error(err.message ?? 'Gagal menghapus barang');
+        return;
+      }
+      setItems(items.filter((i) => i.tsCode !== deleteTarget.tsCode));
+      toast.success(`Barang "${deleteTarget.nama}" berhasil dihapus`);
+      setDeleteTarget(null);
+    } catch {
+      toast.error('Gagal terhubung ke server');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <Layout title="Master Data Barang">
       {/* Hidden QR codes for batch print */}
@@ -334,6 +366,12 @@ export default function MasterBarang() {
                       onClick={() => { setSelectedItem(item); setSheetType('qr'); }}>
                       <QrCode className="h-4 w-4" />
                     </Button>
+                    {isAdmin && (
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50"
+                        onClick={() => setDeleteTarget(item)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -416,6 +454,12 @@ export default function MasterBarang() {
                           onClick={() => { setSelectedItem(item); setQrOpen(true); }}>
                           <QrCode className="h-4 w-4" />
                         </Button>
+                        {isAdmin && (
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50"
+                            onClick={() => setDeleteTarget(item)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -465,6 +509,30 @@ export default function MasterBarang() {
           await handleSaveEdit(data);
         }}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(v) => { if (!v) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Barang?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Barang <span className="font-semibold text-foreground">"{deleteTarget?.nama}"</span>{' '}
+              dengan TS Code <span className="font-mono font-semibold text-foreground">{deleteTarget?.tsCode}</span>{' '}
+              akan dihapus dari sistem. Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90 text-white"
+              onClick={handleDelete}
+              disabled={deleting}
+            >
+              {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 }
