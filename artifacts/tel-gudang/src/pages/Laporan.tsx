@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -6,12 +6,63 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Download, FileDown, Search, ArrowDownRight, ArrowUpRight, Filter } from 'lucide-react';
+import { Download, FileDown, Search, ArrowDownRight, ArrowUpRight, Filter, Activity } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { useAppContext } from '@/context/AppContext';
+
+interface TrxMasuk {
+  id: number; nomor: string; jumlah: number; tanggal: string;
+  noPo: string | null; keterangan: string | null; tsCode: string;
+  namaBarang: string; petugas: string;
+}
+interface TrxKeluar {
+  id: number; nomor: string; jumlah: number; tanggal: string;
+  keperluan: string; tujuan: string | null; keterangan: string | null;
+  tsCode: string; namaBarang: string; petugas: string;
+}
 
 export default function Laporan() {
-  const [dateFrom, setDateFrom] = useState('2025-01-01');
-  const [dateTo, setDateTo] = useState('2025-01-31');
+  const { token } = useAppContext();
+
+  const today = new Date().toISOString().split('T')[0];
+  const firstOfMonth = today.slice(0, 7) + '-01';
+  const [dateFrom, setDateFrom] = useState(firstOfMonth);
+  const [dateTo, setDateTo] = useState(today);
+  const [jenisFilter, setJenisFilter] = useState('Semua');
+
+  const [trxMasuk, setTrxMasuk] = useState<TrxMasuk[]>([]);
+  const [trxKeluar, setTrxKeluar] = useState<TrxKeluar[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!token) return;
+    setIsLoading(true);
+    Promise.all([
+      fetch('/api/transaksi-masuk', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.ok ? r.json() : []),
+      fetch('/api/transaksi-keluar', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.ok ? r.json() : []),
+    ]).then(([masuk, keluar]) => {
+      setTrxMasuk(masuk);
+      setTrxKeluar(keluar);
+    }).catch(() => toast.error('Gagal memuat data transaksi')).finally(() => setIsLoading(false));
+  }, [token]);
+
+  const filteredMasuk = trxMasuk.filter(t => t.tanggal >= dateFrom && t.tanggal <= dateTo);
+  const filteredKeluar = trxKeluar.filter(t => t.tanggal >= dateFrom && t.tanggal <= dateTo);
+
+  const totalMasuk = filteredMasuk.reduce((s, t) => s + t.jumlah, 0);
+  const totalKeluar = filteredKeluar.reduce((s, t) => s + t.jumlah, 0);
+  const totalTransaksi = filteredMasuk.length + filteredKeluar.length;
+
+  const itemSeringKeluar = (() => {
+    const freq: Record<string, { nama: string; count: number }> = {};
+    filteredKeluar.forEach(t => {
+      if (!freq[t.tsCode]) freq[t.tsCode] = { nama: t.namaBarang, count: 0 };
+      freq[t.tsCode].count++;
+    });
+    const sorted = Object.entries(freq).sort((a, b) => b[1].count - a[1].count);
+    return sorted[0] ? { ...sorted[0][1], tsCode: sorted[0][0] } : null;
+  })();
 
   const chartData = [
     { tanggal: '1 Jan', masuk: 120, keluar: 80 },
@@ -103,8 +154,8 @@ export default function Laporan() {
                 <ArrowDownRight className="w-5 h-5" />
                 <h3 className="font-semibold text-sm uppercase">Total Masuk</h3>
               </div>
-              <p className="text-3xl font-bold font-mono">1,000</p>
-              <p className="text-xs text-muted-foreground mt-1">Item dalam periode ini</p>
+              {isLoading ? <Skeleton className="h-9 w-24 mb-1" /> : <p className="text-3xl font-bold font-mono">{totalMasuk.toLocaleString('id-ID')}</p>}
+              <p className="text-xs text-muted-foreground mt-1">Unit diterima periode ini</p>
             </CardContent>
           </Card>
           <Card className="border-orange-100 shadow-sm">
@@ -113,22 +164,33 @@ export default function Laporan() {
                 <ArrowUpRight className="w-5 h-5" />
                 <h3 className="font-semibold text-sm uppercase">Total Keluar</h3>
               </div>
-              <p className="text-3xl font-bold font-mono">87</p>
-              <p className="text-xs text-muted-foreground mt-1">Item dalam periode ini</p>
+              {isLoading ? <Skeleton className="h-9 w-24 mb-1" /> : <p className="text-3xl font-bold font-mono">{totalKeluar.toLocaleString('id-ID')}</p>}
+              <p className="text-xs text-muted-foreground mt-1">Unit dikeluarkan periode ini</p>
             </CardContent>
           </Card>
           <Card className="shadow-sm">
             <CardContent className="p-5 flex flex-col justify-center">
               <h3 className="font-semibold text-sm uppercase text-slate-500 mb-2">Item Sering Keluar</h3>
-              <p className="text-lg font-bold line-clamp-1" title="BATTERY NON RECHARGEABLE TYPE AAA 1.5V">BATTERY NON RE...</p>
-              <p className="text-xs text-primary font-medium mt-1">45 pengeluaran</p>
+              {isLoading ? (
+                <><Skeleton className="h-5 w-full mb-1" /><Skeleton className="h-3 w-20" /></>
+              ) : itemSeringKeluar ? (
+                <>
+                  <p className="text-sm font-bold line-clamp-2 leading-tight" title={itemSeringKeluar.nama}>{itemSeringKeluar.nama}</p>
+                  <p className="text-xs text-primary font-medium mt-1.5">{itemSeringKeluar.count}× pengeluaran</p>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">Belum ada data</p>
+              )}
             </CardContent>
           </Card>
           <Card className="shadow-sm bg-slate-900 text-white">
             <CardContent className="p-5 flex flex-col justify-center">
-              <h3 className="font-semibold text-sm uppercase text-slate-400 mb-2">Estimasi Nilai Keluar</h3>
-              <p className="text-2xl font-bold">Rp 12.5M</p>
-              <p className="text-xs text-slate-400 mt-1">Berdasarkan data master</p>
+              <div className="flex items-center gap-2 mb-2 text-slate-300">
+                <Activity className="w-5 h-5" />
+                <h3 className="font-semibold text-sm uppercase">Total Transaksi</h3>
+              </div>
+              {isLoading ? <Skeleton className="h-9 w-20 mb-1 bg-slate-700" /> : <p className="text-3xl font-bold font-mono">{totalTransaksi}</p>}
+              <p className="text-xs text-slate-400 mt-1">{isLoading ? '—' : `${filteredMasuk.length} masuk · ${filteredKeluar.length} keluar`}</p>
             </CardContent>
           </Card>
         </div>
