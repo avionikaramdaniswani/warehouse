@@ -99,7 +99,7 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
         )}
 
         {/* Nav items */}
-        <div className="flex-1 py-4 overflow-y-auto">
+        <div className="flex-1 py-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
           <nav className={cn('space-y-1', collapsed ? 'px-2' : 'px-3')}>
             {/* Top items */}
             {topNavItems.map(renderSimpleItem)}

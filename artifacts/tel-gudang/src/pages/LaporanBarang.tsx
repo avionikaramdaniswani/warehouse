@@ -1,25 +1,253 @@
+import { useState, useEffect, useMemo } from 'react';
+import * as XLSX from 'xlsx';
 import { Layout } from '@/components/Layout';
-import { Card, CardContent } from '@/components/ui/card';
-import { Package, Construction } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { StatusBadge } from '@/components/StatusBadge';
+import { Search, FileDown, Package, CheckCircle2, AlertTriangle, XCircle, FileX } from 'lucide-react';
+import { toast } from 'sonner';
+
+interface KategoriOption { id: number; nama: string; }
 
 export default function LaporanBarang() {
+  const { items, token } = useAppContext();
+  const [kategoris, setKategoris] = useState<KategoriOption[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [search, setSearch] = useState('');
+  const [kategoriFilter, setKategoriFilter] = useState('Semua');
+  const [statusFilter, setStatusFilter] = useState('Semua');
+
+  useEffect(() => {
+    if (!token) return;
+    fetch('/api/kategori', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.ok ? r.json() : [])
+      .then(setKategoris)
+      .catch(() => {});
+    const t = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(t);
+  }, [token]);
+
+  const filtered = useMemo(() => items.filter(item => {
+    const q = search.toLowerCase();
+    const matchSearch = !q ||
+      item.nama.toLowerCase().includes(q) ||
+      item.tsCode.toLowerCase().includes(q) ||
+      (item.msCode ?? '').toLowerCase().includes(q);
+    const matchKat = kategoriFilter === 'Semua' || item.kategori === kategoriFilter;
+    const matchStatus = statusFilter === 'Semua' || item.status === statusFilter;
+    return matchSearch && matchKat && matchStatus;
+  }), [items, search, kategoriFilter, statusFilter]);
+
+  const total = items.length;
+  const normal = items.filter(i => i.status === 'Normal').length;
+  const menipis = items.filter(i => i.status === 'Menipis').length;
+  const habis = items.filter(i => i.status === 'Habis').length;
+
+  const handleExportExcel = () => {
+    if (filtered.length === 0) { toast.error('Tidak ada data untuk diekspor'); return; }
+    const rows = filtered.map((item, idx) => ({
+      'No': idx + 1,
+      'TS Code': item.tsCode,
+      'MS Code': item.msCode ?? '',
+      'Nama Barang': item.nama,
+      'Kategori': item.kategori,
+      'BIN LOC': item.binLoc ?? '',
+      'UOM': item.uom,
+      'Stok': item.stok,
+      'Safety Stok': item.safetyStok,
+      'Status': item.status,
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [
+      { wch: 4 }, { wch: 10 }, { wch: 12 }, { wch: 55 },
+      { wch: 20 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 10 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Laporan Barang');
+    const tanggal = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'2-digit', year:'numeric' }).replace(/\//g, '-');
+    XLSX.writeFile(wb, `Laporan_Barang_${tanggal}.xlsx`);
+    toast.success(`Berhasil mengekspor ${filtered.length} data`);
+  };
+
+  const stockColor = (item: typeof items[0]) =>
+    item.stok === 0 ? 'text-red-600' : item.stok <= item.safetyStok ? 'text-amber-600' : 'text-green-700';
+
   return (
     <Layout title="Laporan Barang">
-      <Card className="shadow-sm">
-        <CardContent className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-          <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center">
-            <Package className="h-8 w-8 text-slate-400" />
+      <div className="flex flex-col gap-5">
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="shadow-sm">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                  <Package className="h-5 w-5 text-slate-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Total Item</p>
+                  {isLoading ? <Skeleton className="h-7 w-12 mt-1" /> : <p className="text-2xl font-bold font-mono">{total}</p>}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-green-100">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Normal</p>
+                  {isLoading ? <Skeleton className="h-7 w-12 mt-1" /> : <p className="text-2xl font-bold font-mono text-green-700">{normal}</p>}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-amber-100">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Menipis</p>
+                  {isLoading ? <Skeleton className="h-7 w-12 mt-1" /> : <p className="text-2xl font-bold font-mono text-amber-600">{menipis}</p>}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-red-100">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+                  <XCircle className="h-5 w-5 text-red-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Habis</p>
+                  {isLoading ? <Skeleton className="h-7 w-12 mt-1" /> : <p className="text-2xl font-bold font-mono text-red-600">{habis}</p>}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filter + Export */}
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+          <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full">
+            <div className="relative max-w-sm w-full">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Cari TS Code atau nama barang..." className="pl-9 bg-white" value={search} onChange={e => setSearch(e.target.value)} />
+            </div>
+            <Select value={kategoriFilter} onValueChange={setKategoriFilter}>
+              <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Semua">Semua Kategori</SelectItem>
+                {kategoris.map(k => <SelectItem key={k.id} value={k.nama}>{k.nama}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-[160px] bg-white"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Semua">Semua Status</SelectItem>
+                <SelectItem value="Normal">Normal</SelectItem>
+                <SelectItem value="Menipis">Menipis</SelectItem>
+                <SelectItem value="Habis">Habis</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div>
-            <p className="text-lg font-semibold text-slate-700">Laporan Barang</p>
-            <p className="text-sm text-muted-foreground mt-1">Halaman ini sedang dalam pengembangan.</p>
+          <Button variant="outline" className="text-green-700 border-green-200 hover:bg-green-50 w-full sm:w-auto shrink-0" onClick={handleExportExcel}>
+            <FileDown className="h-4 w-4 mr-2" /> Export Excel
+          </Button>
+        </div>
+
+        {/* Table */}
+        <Card className="shadow-sm overflow-hidden">
+          <CardHeader className="py-3 px-5 border-b bg-slate-50/80">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Menampilkan <span className="font-bold text-foreground">{filtered.length}</span> dari {total} item
+            </CardTitle>
+          </CardHeader>
+
+          {/* MOBILE */}
+          <div className="md:hidden divide-y">
+            {isLoading ? Array.from({length:4}).map((_,i) => (
+              <div key={i} className="p-4 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /></div>
+            )) : filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                <FileX className="h-10 w-10 mb-2 text-slate-300" />
+                <p className="font-medium text-slate-500">Tidak ada data</p>
+              </div>
+            ) : filtered.map(item => (
+              <div key={item.tsCode} className="p-4">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <p className="font-semibold text-sm text-slate-800 break-words leading-tight">{item.nama}</p>
+                  <StatusBadge status={item.status} />
+                </div>
+                <p className="text-xs font-mono text-muted-foreground mb-2">{item.tsCode} · {item.kategori}</p>
+                <div className="flex gap-4 text-xs text-slate-600">
+                  <span>Stok: <strong className={stockColor(item)}>{item.stok}</strong> {item.uom}</span>
+                  <span className="text-muted-foreground">Min: {item.safetyStok}</span>
+                  {item.binLoc && <span className="text-muted-foreground">{item.binLoc}</span>}
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg">
-            <Construction className="h-4 w-4 shrink-0" />
-            <span>Akan menampilkan rekapitulasi stok per barang dan kategori.</span>
+
+          {/* DESKTOP */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHeader className="bg-slate-50">
+                <TableRow>
+                  <TableHead className="w-8 text-center text-xs">#</TableHead>
+                  <TableHead className="whitespace-nowrap">TS Code</TableHead>
+                  <TableHead>MS Code</TableHead>
+                  <TableHead className="min-w-[260px]">Nama Barang</TableHead>
+                  <TableHead>Kategori</TableHead>
+                  <TableHead>BIN LOC</TableHead>
+                  <TableHead>UOM</TableHead>
+                  <TableHead className="text-right">Stok</TableHead>
+                  <TableHead className="text-right">Safety Stok</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? Array.from({length:6}).map((_,i) => (
+                  <TableRow key={i}>{Array.from({length:10}).map((_,j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}</TableRow>
+                )) : filtered.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={10} className="h-48 text-center">
+                      <div className="flex flex-col items-center justify-center text-muted-foreground gap-2">
+                        <FileX className="h-10 w-10 text-slate-300" />
+                        <p className="text-slate-500">Tidak ada data ditemukan</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : filtered.map((item, idx) => (
+                  <TableRow key={item.tsCode} className={item.stok === 0 ? 'bg-red-50/40' : item.stok <= item.safetyStok ? 'bg-amber-50/40' : ''}>
+                    <TableCell className="text-center text-xs text-muted-foreground">{idx + 1}</TableCell>
+                    <TableCell className="font-mono font-medium text-slate-600 whitespace-nowrap">{item.tsCode}</TableCell>
+                    <TableCell className="font-mono text-sm text-muted-foreground">{item.msCode || '—'}</TableCell>
+                    <TableCell className="font-medium text-slate-800">{item.nama}</TableCell>
+                    <TableCell className="text-sm">{item.kategori}</TableCell>
+                    <TableCell className="font-mono text-sm">{item.binLoc || '—'}</TableCell>
+                    <TableCell className="text-sm">{item.uom}</TableCell>
+                    <TableCell className={`text-right font-bold ${stockColor(item)}`}>{item.stok}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{item.safetyStok}</TableCell>
+                    <TableCell className="text-center"><StatusBadge status={item.status} /></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
-        </CardContent>
-      </Card>
+        </Card>
+      </div>
     </Layout>
   );
 }
