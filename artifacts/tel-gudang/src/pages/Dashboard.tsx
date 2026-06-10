@@ -11,7 +11,7 @@ export default function Dashboard() {
   const { currentUser, items, token } = useAppContext();
   const [todayMasuk, setTodayMasuk] = useState(0);
   const [todayKeluar, setTodayKeluar] = useState(0);
-  const [barData, setBarData] = useState<{ day: string; masuk: number; keluar: number }[]>([]);
+  const [barData, setBarData] = useState<{ day: string; date: string; tanggal: string; masuk: number; keluar: number; isToday: boolean }[]>([]);
   const [pieData, setPieData] = useState<{ name: string; value: number }[]>([]);
 
   useEffect(() => {
@@ -103,20 +103,73 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Transaksi Barang Masuk & Keluar (7 Hari Terakhir)</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">Transaksi Barang Masuk &amp; Keluar</CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">Minggu ini · Senin — Minggu</p>
           </CardHeader>
           <CardContent>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <BarChart data={barData} margin={{ top: 10, right: 10, left: -10, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                  <XAxis dataKey="day" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} />
-                  <Tooltip cursor={{fill: '#f3f4f6'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
-                  <Legend iconType="circle" />
-                  <Bar dataKey="masuk" name="Masuk" fill="#22c55e" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                  <Bar dataKey="keluar" name="Keluar" fill="#f97316" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                  <XAxis
+                    dataKey="day"
+                    axisLine={false}
+                    tickLine={false}
+                    interval={0}
+                    tick={(props) => {
+                      const { x, y, payload, index } = props;
+                      const entry = barData[index];
+                      const isToday = entry?.isToday;
+                      return (
+                        <g transform={`translate(${x},${y})`}>
+                          {isToday && (
+                            <rect x={-20} y={2} width={40} height={32} rx={6} fill="#f0fdf4" />
+                          )}
+                          <text
+                            x={0} y={0} dy={16}
+                            textAnchor="middle"
+                            fill={isToday ? '#16a34a' : '#374151'}
+                            fontSize={12}
+                            fontWeight={isToday ? 700 : 500}
+                          >
+                            {payload.value}
+                          </text>
+                          <text
+                            x={0} y={0} dy={30}
+                            textAnchor="middle"
+                            fill={isToday ? '#16a34a' : '#9ca3af'}
+                            fontSize={10}
+                            fontWeight={isToday ? 600 : 400}
+                          >
+                            {entry?.date}
+                          </text>
+                        </g>
+                      );
+                    }}
+                    height={48}
+                  />
+                  <YAxis axisLine={false} tickLine={false} allowDecimals={false} width={28} tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                  <Tooltip
+                    cursor={{ fill: '#f3f4f6' }}
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: 13 }}
+                    formatter={(value: number, name: string) => [value, name]}
+                    labelFormatter={(label, payload) => {
+                      const entry = payload?.[0]?.payload;
+                      return entry ? `${label}, ${entry.date}` : label;
+                    }}
+                  />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 4 }} />
+                  <Bar dataKey="masuk" name="Masuk" radius={[4, 4, 0, 0]} maxBarSize={36}>
+                    {barData.map((entry, index) => (
+                      <Cell key={index} fill={entry.isToday ? '#16a34a' : '#86efac'} />
+                    ))}
+                  </Bar>
+                  <Bar dataKey="keluar" name="Keluar" radius={[4, 4, 0, 0]} maxBarSize={36}>
+                    {barData.map((entry, index) => (
+                      <Cell key={index} fill={entry.isToday ? '#ea580c' : '#fdba74'} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
