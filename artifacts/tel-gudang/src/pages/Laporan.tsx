@@ -14,17 +14,21 @@ import { useAppContext } from '@/context/AppContext';
 
 interface TrxMasuk {
   id: number; nomor: string; jumlah: number; tanggal: string;
-  noPo: string | null; keterangan: string | null;
-  tsCode: string; namaBarang: string; petugas: string;
+  noPo: string | null; keterangan: string | null; createdAt: string;
+  tsCode: string; msCode: string | null; namaBarang: string;
+  kategori: string; uom: string; binLoc: string | null; petugas: string;
 }
 interface TrxKeluar {
   id: number; nomor: string; jumlah: number; tanggal: string;
-  keperluan: string; tujuan: string | null; keterangan: string | null;
-  tsCode: string; namaBarang: string; petugas: string;
+  keperluan: string; tujuan: string | null; keterangan: string | null; createdAt: string;
+  tsCode: string; msCode: string | null; namaBarang: string;
+  kategori: string; uom: string; binLoc: string | null; petugas: string;
 }
 interface CombinedRow {
-  key: string; nomor: string; tanggal: string; tsCode: string;
-  namaBarang: string; kategori: string; jenis: 'Masuk' | 'Keluar';
+  key: string; nomor: string; tanggal: string; createdAt: string;
+  tsCode: string; msCode: string | null; namaBarang: string;
+  kategori: string; uom: string; binLoc: string | null;
+  jenis: 'Masuk' | 'Keluar';
   jumlah: number; ref: string; keterangan: string | null; petugas: string;
 }
 
@@ -32,6 +36,11 @@ const PAGE_SIZE = 10;
 
 const HARI = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 const HARI_FULL = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+const fmtTime = (iso: string) => {
+  const d = new Date(iso);
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+};
 
 const fmt = (d: string) =>
   new Date(d + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -121,11 +130,11 @@ export default function Laporan() {
     if (applied.jenis !== 'Keluar') {
       for (const t of trxMasuk) {
         if (t.tanggal < applied.from || t.tanggal > applied.to) continue;
-        const kat = kategoriMap[t.tsCode] ?? '—';
-        if (applied.kategori !== 'Semua' && kat !== applied.kategori) continue;
+        if (applied.kategori !== 'Semua' && t.kategori !== applied.kategori) continue;
         rows.push({
-          key: `M${t.id}`, nomor: t.nomor, tanggal: t.tanggal,
-          tsCode: t.tsCode, namaBarang: t.namaBarang, kategori: kat,
+          key: `M${t.id}`, nomor: t.nomor, tanggal: t.tanggal, createdAt: t.createdAt,
+          tsCode: t.tsCode, msCode: t.msCode, namaBarang: t.namaBarang,
+          kategori: t.kategori || '—', uom: t.uom, binLoc: t.binLoc,
           jenis: 'Masuk', jumlah: t.jumlah,
           ref: t.noPo ?? '—', keterangan: t.keterangan, petugas: t.petugas,
         });
@@ -135,11 +144,11 @@ export default function Laporan() {
     if (applied.jenis !== 'Masuk') {
       for (const t of trxKeluar) {
         if (t.tanggal < applied.from || t.tanggal > applied.to) continue;
-        const kat = kategoriMap[t.tsCode] ?? '—';
-        if (applied.kategori !== 'Semua' && kat !== applied.kategori) continue;
+        if (applied.kategori !== 'Semua' && t.kategori !== applied.kategori) continue;
         rows.push({
-          key: `K${t.id}`, nomor: t.nomor, tanggal: t.tanggal,
-          tsCode: t.tsCode, namaBarang: t.namaBarang, kategori: kat,
+          key: `K${t.id}`, nomor: t.nomor, tanggal: t.tanggal, createdAt: t.createdAt,
+          tsCode: t.tsCode, msCode: t.msCode, namaBarang: t.namaBarang,
+          kategori: t.kategori || '—', uom: t.uom, binLoc: t.binLoc,
           jenis: 'Keluar', jumlah: t.jumlah,
           ref: t.tujuan ? `${t.keperluan} · ${t.tujuan}` : t.keperluan,
           keterangan: t.keterangan, petugas: t.petugas,
@@ -148,7 +157,7 @@ export default function Laporan() {
     }
 
     return rows.sort((a, b) => b.tanggal.localeCompare(a.tanggal));
-  }, [trxMasuk, trxKeluar, applied, kategoriMap]);
+  }, [trxMasuk, trxKeluar, applied]);
 
   // Summary stats (all computed from combinedRows in one pass)
   const stats = useMemo(() => {
@@ -249,14 +258,31 @@ export default function Laporan() {
   const handleExcel = () => {
     if (searchedRows.length === 0) { toast.error('Tidak ada data untuk diekspor'); return; }
     const wsData = [
-      ['No.', 'Nomor', 'Tanggal', 'TS Code', 'Nama Barang', 'Kategori', 'Jenis', 'Jumlah', 'Referensi', 'Petugas', 'Keterangan'],
+      [
+        'No.', 'Nomor Transaksi', 'Tanggal', 'Waktu Pencatatan',
+        'TS Code', 'MS Code', 'Nama Barang', 'Kategori', 'Satuan (UOM)', 'Bin Location',
+        'Jenis', 'Jumlah', 'Referensi / Keperluan', 'Keterangan', 'Petugas',
+      ],
       ...searchedRows.map((r, i) => [
-        i + 1, r.nomor, fmt(r.tanggal), r.tsCode, r.namaBarang,
-        r.kategori, r.jenis, r.jumlah, r.ref, r.petugas, r.keterangan ?? '',
+        i + 1,
+        r.nomor,
+        fmtWithDay(r.tanggal),
+        fmtTime(r.createdAt),
+        r.tsCode,
+        r.msCode ?? '',
+        r.namaBarang,
+        r.kategori,
+        r.uom,
+        r.binLoc ?? '',
+        r.jenis,
+        r.jumlah,
+        r.ref,
+        r.keterangan ?? '',
+        r.petugas,
       ]),
     ];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
-    ws['!cols'] = [4, 18, 14, 12, 30, 16, 8, 8, 24, 18, 20].map(w => ({ wch: w }));
+    ws['!cols'] = [4, 22, 24, 14, 12, 14, 45, 18, 10, 14, 8, 8, 28, 30, 22].map(w => ({ wch: w }));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Laporan Transaksi');
     XLSX.writeFile(wb, `Laporan_${applied.from}_${applied.to}.xlsx`);

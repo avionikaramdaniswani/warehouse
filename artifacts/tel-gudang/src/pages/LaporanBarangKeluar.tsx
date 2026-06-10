@@ -20,16 +20,30 @@ interface TransaksiKeluar {
   tujuan: string | null;
   tanggal: string;
   keterangan: string | null;
+  createdAt: string;
   tsCode: string;
+  msCode: string | null;
   namaBarang: string;
+  kategori: string;
+  uom: string;
+  binLoc: string | null;
   petugas: string;
 }
 
 const today = new Date().toISOString().slice(0, 10);
 const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10);
 
+const HARI_FULL = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const fmtTgl = (s: string) =>
-  new Date(s).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+  new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+const fmtTglHari = (s: string) => {
+  const dt = new Date(s + 'T00:00:00');
+  return `${HARI_FULL[dt.getDay()]}, ${dt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+};
+const fmtWaktu = (iso: string) => {
+  const d = new Date(iso);
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+};
 
 export default function LaporanBarangKeluar() {
   const { token } = useAppContext();
@@ -91,10 +105,15 @@ export default function LaporanBarangKeluar() {
     const rows = filtered.map((r, idx) => ({
       'No': idx + 1,
       'Nomor Transaksi': r.nomor,
-      'Tanggal': fmtTgl(r.tanggal),
+      'Tanggal': fmtTglHari(r.tanggal),
+      'Waktu Pencatatan': fmtWaktu(r.createdAt),
       'TS Code': r.tsCode,
+      'MS Code': r.msCode ?? '',
       'Nama Barang': r.namaBarang,
-      'Jumlah': r.jumlah,
+      'Kategori': r.kategori,
+      'Satuan (UOM)': r.uom,
+      'Bin Location': r.binLoc ?? '',
+      'Jumlah Keluar': r.jumlah,
       'Keperluan': r.keperluan,
       'Tujuan': r.tujuan ?? '',
       'Keterangan': r.keterangan ?? '',
@@ -102,8 +121,10 @@ export default function LaporanBarangKeluar() {
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     ws['!cols'] = [
-      { wch: 4 }, { wch: 20 }, { wch: 16 }, { wch: 10 }, { wch: 50 },
-      { wch: 8 }, { wch: 16 }, { wch: 22 }, { wch: 28 }, { wch: 20 },
+      { wch: 4 }, { wch: 22 }, { wch: 24 }, { wch: 14 },
+      { wch: 12 }, { wch: 14 }, { wch: 45 }, { wch: 18 },
+      { wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 16 },
+      { wch: 22 }, { wch: 30 }, { wch: 22 },
     ];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Barang Keluar');

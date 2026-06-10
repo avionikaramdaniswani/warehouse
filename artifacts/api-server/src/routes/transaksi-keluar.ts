@@ -45,7 +45,11 @@ router.get("/transaksi-keluar", authenticate, async (req, res) => {
       keterangan: transaksiKeluarTable.keterangan,
       createdAt: transaksiKeluarTable.createdAt,
       tsCode: itemsTable.tsCode,
+      msCode: itemsTable.msCode,
       namaBarang: itemsTable.nama,
+      kategori: itemsTable.kategori,
+      uom: itemsTable.uom,
+      binLoc: itemsTable.binLoc,
       petugas: usersTable.namaLengkap,
     })
     .from(transaksiKeluarTable)
