@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, FileDown, PackageCheck, Hash, Layers, CalendarDays, FileX } from 'lucide-react';
 import { toast } from 'sonner';
+import { PeriodePicker } from '@/components/PeriodePicker';
 
 interface TransaksiMasuk {
   id: number;
@@ -161,14 +162,11 @@ export default function LaporanBarangMasuk() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Cari nomor, TS Code, nama, petugas..." className="pl-9 bg-white" value={search} onChange={e => setSearch(e.target.value)} />
             </div>
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-muted-foreground whitespace-nowrap">Dari</label>
-              <Input type="date" className="bg-white w-40" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-muted-foreground whitespace-nowrap">s/d</label>
-              <Input type="date" className="bg-white w-40" value={dateTo} onChange={e => setDateTo(e.target.value)} />
-            </div>
+            <PeriodePicker
+              dateFrom={dateFrom}
+              dateTo={dateTo}
+              onChange={(from, to) => { setDateFrom(from); setDateTo(to); }}
+            />
           </div>
           <Button variant="outline" className="text-green-700 border-green-200 hover:bg-green-50 w-full sm:w-auto shrink-0" onClick={handleExportExcel}>
             <FileDown className="h-4 w-4 mr-2" /> Export Excel

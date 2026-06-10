@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, FileDown, PackageX, Layers, Hash, TrendingDown, FileX } from 'lucide-react';
 import { toast } from 'sonner';
+import { PeriodePicker } from '@/components/PeriodePicker';
 
 interface TransaksiKeluar {
   id: number;
@@ -189,14 +190,11 @@ export default function LaporanBarangKeluar() {
                 {keperluanOptions.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
               </SelectContent>
             </Select>
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-muted-foreground whitespace-nowrap">Dari</label>
-              <Input type="date" className="bg-white w-40" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-muted-foreground whitespace-nowrap">s/d</label>
-              <Input type="date" className="bg-white w-40" value={dateTo} onChange={e => setDateTo(e.target.value)} />
-            </div>
+            <PeriodePicker
+              dateFrom={dateFrom}
+              dateTo={dateTo}
+              onChange={(from, to) => { setDateFrom(from); setDateTo(to); }}
+            />
           </div>
           <Button variant="outline" className="text-green-700 border-green-200 hover:bg-green-50 w-full sm:w-auto shrink-0" onClick={handleExportExcel}>
             <FileDown className="h-4 w-4 mr-2" /> Export Excel
