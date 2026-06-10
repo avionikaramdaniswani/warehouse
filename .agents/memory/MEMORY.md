@@ -1,3 +1,4 @@
 - [Port conflict fix](port-conflict.md) — mockup sandbox takes port 8081; API must use 8082, Vite proxy must target 8082.
 - [Items backend](items-backend.md) — items table in DB, /api/items CRUD + PATCH stok, seeded 15 items; AppContext fetches from API on login.
 - [QR label print](qr-label-print.md) — SVG serialized via outerHTML from DOM element with known ID; print via window.open with injected HTML + auto-print script.
+- [Transaksi tables](transaksi-db.md) — transaksi_masuk & transaksi_keluar in DB; POST endpoints update stok atomically; AppContext no longer holds transaksi state (each page fetches own data).

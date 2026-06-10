@@ -28,19 +28,6 @@ export interface CurrentUser {
   loginTerakhir: string | null;
 }
 
-export interface Transaksi {
-  id: string;
-  waktu: string;
-  tsCode: string;
-  nama: string;
-  jumlah: number;
-  petugas: string;
-  kondisi?: string;
-  noPo?: string;
-  tujuan?: string;
-  keperluan?: string;
-}
-
 interface AppContextType {
   currentUser: CurrentUser | null;
   token: string | null;
@@ -50,10 +37,6 @@ interface AppContextType {
   setItems: (items: Item[]) => void;
   refreshItems: () => Promise<void>;
   itemsLoading: boolean;
-  transaksiMasuk: Transaksi[];
-  setTransaksiMasuk: (t: Transaksi[]) => void;
-  transaksiKeluar: Transaksi[];
-  setTransaksiKeluar: (t: Transaksi[]) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -84,8 +67,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
   const [items, setItems] = useState<Item[]>([]);
   const [itemsLoading, setItemsLoading] = useState(false);
-  const [transaksiMasuk, setTransaksiMasuk] = useState<Transaksi[]>([]);
-  const [transaksiKeluar, setTransaksiKeluar] = useState<Transaksi[]>([]);
 
   const refreshItems = useCallback(async (authToken?: string) => {
     const t = authToken ?? token;
@@ -134,8 +115,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider value={{
       currentUser, token, setAuth, clearAuth,
       items, setItems, refreshItems, itemsLoading,
-      transaksiMasuk, setTransaksiMasuk,
-      transaksiKeluar, setTransaksiKeluar,
     }}>
       {children}
     </AppContext.Provider>

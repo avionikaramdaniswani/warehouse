@@ -8,19 +8,30 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function Dashboard() {
-  const { currentUser, items, transaksiMasuk, transaksiKeluar } = useAppContext();
+  const { currentUser, items, token } = useAppContext();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [todayTransactions, setTodayTransactions] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    if (!token) return;
+    const today = new Date().toISOString().split('T')[0];
+    Promise.all([
+      fetch(`/api/transaksi-masuk?tanggal=${today}`, { headers: { Authorization: `Bearer ${token}` } }),
+      fetch(`/api/transaksi-keluar?tanggal=${today}`, { headers: { Authorization: `Bearer ${token}` } }),
+    ]).then(async ([r1, r2]) => {
+      const [m, k] = await Promise.all([r1.json(), r2.json()]);
+      setTodayTransactions((m?.length ?? 0) + (k?.length ?? 0));
+    }).catch(() => {});
+  }, [token]);
+
   const totalItems = items.length;
   const lowStockItems = items.filter(item => item.stok <= item.safetyStok);
   const totalCategories = new Set(items.map(i => i.kategori)).size;
-  const todayTransactions = transaksiMasuk.filter(t => t.waktu.startsWith(new Date().toISOString().split('T')[0])).length + 
-                           transaksiKeluar.filter(t => t.waktu.startsWith(new Date().toISOString().split('T')[0])).length;
 
   const barData = [
     { day: 'Sen', masuk: 15, keluar: 8 },
@@ -97,7 +108,7 @@ export default function Dashboard() {
           <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
             <div>
               <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Transaksi Hari Ini</p>
-              <h3 className="text-2xl sm:text-3xl font-bold">{todayTransactions || 12}</h3>
+              <h3 className="text-2xl sm:text-3xl font-bold">{todayTransactions}</h3>
             </div>
             <div className="p-2 sm:p-3 bg-green-100 text-green-600 rounded-full shrink-0">
               <Activity className="h-5 w-5 sm:h-6 sm:w-6" />

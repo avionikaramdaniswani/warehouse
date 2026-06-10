@@ -1,4 +1,5 @@
-import { pgTable, text, serial, integer, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean, date } from "drizzle-orm/pg-core";
+import { usersTable } from "./users";
 
 export const kategoriTable = pgTable("kategori", {
   id: serial("id").primaryKey(),
@@ -23,4 +24,30 @@ export const itemsTable = pgTable("items", {
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const transaksiMasukTable = pgTable("transaksi_masuk", {
+  id: serial("id").primaryKey(),
+  nomor: text("nomor").notNull().unique(),
+  itemId: integer("item_id").notNull().references(() => itemsTable.id),
+  userId: integer("user_id").notNull().references(() => usersTable.id),
+  jumlah: integer("jumlah").notNull(),
+  kondisi: text("kondisi").notNull().default("Baik Baru"),
+  tanggal: date("tanggal").notNull(),
+  noPo: text("no_po"),
+  keterangan: text("keterangan"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const transaksiKeluarTable = pgTable("transaksi_keluar", {
+  id: serial("id").primaryKey(),
+  nomor: text("nomor").notNull().unique(),
+  itemId: integer("item_id").notNull().references(() => itemsTable.id),
+  userId: integer("user_id").notNull().references(() => usersTable.id),
+  jumlah: integer("jumlah").notNull(),
+  keperluan: text("keperluan").notNull().default("Perbaikan"),
+  tujuan: text("tujuan"),
+  tanggal: date("tanggal").notNull(),
+  keterangan: text("keterangan"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

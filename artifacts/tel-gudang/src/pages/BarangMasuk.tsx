@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,11 +11,25 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import {
   Search, Plus, QrCode, PackagePlus, FileX,
-  CalendarDays, FileText, TrendingUp, Clock
+  CalendarDays, FileText, TrendingUp, Clock, Loader2
 } from 'lucide-react';
 import { useAppContext, Item } from '@/context/AppContext';
 import { toast } from 'sonner';
 import { QrScannerDialog } from '@/components/QrScannerDialog';
+
+interface TransaksiMasuk {
+  id: number;
+  nomor: string;
+  jumlah: number;
+  kondisi: string | null;
+  tanggal: string;
+  noPo: string | null;
+  keterangan: string | null;
+  createdAt: string;
+  tsCode: string;
+  namaBarang: string;
+  petugas: string;
+}
 
 const KONDISI_OPTIONS = ['Semua', 'Baik Baru', 'Baik Bekas', 'Rusak'];
 
@@ -25,8 +39,19 @@ const kondisiBadge: Record<string, string> = {
   'Rusak': 'bg-red-50 text-red-700 border-red-200',
 };
 
+function formatWaktu(iso: string): string {
+  const d = new Date(iso);
+  const tgl = d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const jam = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  return `${tgl} ${jam}`;
+}
+
 export default function BarangMasuk() {
-  const { items, setItems, transaksiMasuk, setTransaksiMasuk, currentUser, token } = useAppContext();
+  const { items, setItems, token } = useAppContext();
+
+  const [transaksi, setTransaksi] = useState<TransaksiMasuk[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const [search, setSearch] = useState('');
   const [filterKondisi, setFilterKondisi] = useState('Semua');
@@ -45,6 +70,28 @@ export default function BarangMasuk() {
     noPo: '',
     keterangan: '',
   });
+
+  const fetchTransaksi = useCallback(async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/transaksi-masuk', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data: TransaksiMasuk[] = await res.json();
+        setTransaksi(data);
+      }
+    } catch {
+      toast.error('Gagal memuat data transaksi');
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchTransaksi();
+  }, [fetchTransaksi]);
 
   const suggestions = items.filter(
     (item) =>
@@ -68,7 +115,7 @@ export default function BarangMasuk() {
   const handleQrScan = (tsCode: string) => {
     const found = items.find((i) => i.tsCode === tsCode);
     if (!found) {
-      toast.error(`Barang dengan kode "${tsCode}" tidak ditemukan dalam daftar`);
+      toast.error(`Barang dengan kode "${tsCode}" tidak ditemukan`);
       return;
     }
     setSelectedItem(found);
@@ -83,56 +130,57 @@ export default function BarangMasuk() {
       toast.error('Pilih barang dan masukkan jumlah yang valid');
       return;
     }
-    const jumlah = parseInt(formData.jumlah);
+    setSaving(true);
     try {
-      const res = await fetch(`/api/items/${selectedItem.tsCode}/stok`, {
-        method: 'PATCH',
+      const res = await fetch('/api/transaksi-masuk', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ delta: jumlah }),
+        body: JSON.stringify({
+          tsCode: selectedItem.tsCode,
+          jumlah: parseInt(formData.jumlah),
+          kondisi: formData.kondisi,
+          tanggal: formData.tanggal,
+          noPo: formData.noPo || undefined,
+          keterangan: formData.keterangan || undefined,
+        }),
       });
       if (!res.ok) {
         const err = await res.json();
-        toast.error(err.message ?? 'Gagal update stok');
+        toast.error(err.message ?? 'Gagal menyimpan penerimaan');
         return;
       }
-      const updated = await res.json();
-      setItems(items.map((item) => item.tsCode === selectedItem.tsCode ? { ...item, stok: updated.stok, status: updated.status } : item));
+      const result = await res.json();
+      setItems(items.map((item) =>
+        item.tsCode === selectedItem.tsCode
+          ? { ...item, stok: result.stokBaru, status: result.status ?? item.status }
+          : item
+      ));
+      toast.success(`Penerimaan ${result.nomor} berhasil disimpan`);
+      setFormOpen(false);
+      resetForm();
+      await fetchTransaksi();
     } catch {
       toast.error('Gagal terhubung ke server');
-      return;
+    } finally {
+      setSaving(false);
     }
-    setTransaksiMasuk([
-      {
-        id: `TRIN-${Date.now()}`,
-        waktu: `${formData.tanggal} ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`,
-        tsCode: selectedItem.tsCode,
-        nama: selectedItem.nama,
-        jumlah,
-        petugas: currentUser?.namaLengkap || 'Admin',
-        kondisi: formData.kondisi,
-        noPo: formData.noPo,
-      },
-      ...transaksiMasuk,
-    ]);
-    toast.success('Penerimaan barang berhasil disimpan');
-    setFormOpen(false);
-    resetForm();
   };
 
-  const filtered = transaksiMasuk.filter((trx) => {
+  const today = new Date().toISOString().split('T')[0];
+
+  const filtered = transaksi.filter((trx) => {
     const matchSearch =
       search.length === 0 ||
-      trx.nama.toLowerCase().includes(search.toLowerCase()) ||
+      trx.namaBarang.toLowerCase().includes(search.toLowerCase()) ||
       trx.tsCode.toLowerCase().includes(search.toLowerCase()) ||
-      (trx.noPo || '').toLowerCase().includes(search.toLowerCase());
+      (trx.noPo ?? '').toLowerCase().includes(search.toLowerCase()) ||
+      trx.nomor.toLowerCase().includes(search.toLowerCase());
     const matchKondisi = filterKondisi === 'Semua' || trx.kondisi === filterKondisi;
-    const matchTanggal = !filterTanggal || trx.waktu.startsWith(filterTanggal);
+    const matchTanggal = !filterTanggal || trx.tanggal === filterTanggal;
     return matchSearch && matchKondisi && matchTanggal;
   });
 
-  const totalHariIni = transaksiMasuk.filter((t) =>
-    t.waktu.startsWith(new Date().toISOString().split('T')[0])
-  ).length;
+  const totalHariIni = transaksi.filter((t) => t.tanggal === today).length;
 
   return (
     <Layout title="Penerimaan Barang Masuk">
@@ -146,24 +194,22 @@ export default function BarangMasuk() {
           </div>
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg px-4 py-2 text-sm font-medium">
             <Clock className="h-4 w-4" />
-            <span>{transaksiMasuk.length} total transaksi</span>
+            <span>{transaksi.length} total transaksi</span>
           </div>
         </div>
 
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
           <div className="flex flex-col sm:flex-row gap-2.5 flex-1 w-full sm:w-auto">
-            {/* Search */}
             <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Cari nama, TS Code, No. PO..."
+                placeholder="Cari nama, TS Code, No. PO, nomor..."
                 className="pl-9 bg-white h-9"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            {/* Filter Kondisi */}
             <Select value={filterKondisi} onValueChange={setFilterKondisi}>
               <SelectTrigger className="w-full sm:w-[160px] bg-white h-9 text-sm">
                 <SelectValue />
@@ -174,14 +220,12 @@ export default function BarangMasuk() {
                 ))}
               </SelectContent>
             </Select>
-            {/* Filter Tanggal */}
             <Input
               type="date"
               className="bg-white h-9 text-sm w-full sm:w-[160px]"
               value={filterTanggal}
               onChange={(e) => setFilterTanggal(e.target.value)}
             />
-            {/* Reset filter */}
             {(search || filterKondisi !== 'Semua' || filterTanggal) && (
               <Button
                 variant="ghost"
@@ -193,7 +237,6 @@ export default function BarangMasuk() {
               </Button>
             )}
           </div>
-          {/* Action buttons */}
           <div className="flex gap-2 w-full sm:w-auto">
             <Button
               className="flex-1 sm:flex-none h-9"
@@ -205,30 +248,36 @@ export default function BarangMasuk() {
           </div>
         </div>
 
-        {/* Result count */}
         {(search || filterKondisi !== 'Semua' || filterTanggal) && (
           <p className="text-sm text-muted-foreground -mt-2">
-            Menampilkan <strong>{filtered.length}</strong> dari {transaksiMasuk.length} transaksi
+            Menampilkan <strong>{filtered.length}</strong> dari {transaksi.length} transaksi
           </p>
         )}
 
-        {/* Table — Mobile card */}
+        {/* Mobile cards */}
         <div className="flex flex-col gap-2.5 md:hidden">
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-20 text-muted-foreground gap-2">
+              <Loader2 className="h-5 w-5 animate-spin" /><span className="text-sm">Memuat data...</span>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
               <FileX className="h-12 w-12 mb-3 text-slate-200" />
               <p className="font-medium text-slate-500">Tidak ada data</p>
               <p className="text-sm text-slate-400">Coba sesuaikan filter atau tambah penerimaan baru</p>
             </div>
-          ) : filtered.map((trx, idx) => (
-            <Card key={idx} className="p-4 border-slate-100 shadow-sm">
+          ) : filtered.map((trx) => (
+            <Card key={trx.id} className="p-4 border-slate-100 shadow-sm">
               <div className="flex items-start justify-between gap-2 mb-1.5">
-                <p className="font-semibold text-sm text-slate-800 leading-snug flex-1">{trx.nama}</p>
+                <div className="flex-1">
+                  <p className="font-semibold text-sm text-slate-800 leading-snug">{trx.namaBarang}</p>
+                  <p className="text-xs font-mono text-slate-400">{trx.nomor}</p>
+                </div>
                 <span className="font-mono text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded shrink-0">+{trx.jumlah}</span>
               </div>
               <p className="text-xs font-mono text-slate-400 mb-2">{trx.tsCode}</p>
               <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                <span>{trx.waktu}</span>
+                <span>{formatWaktu(trx.createdAt)}</span>
                 <span>·</span>
                 <span>{trx.petugas}</span>
                 {trx.noPo && <><span>·</span><span className="font-mono">{trx.noPo}</span></>}
@@ -238,12 +287,13 @@ export default function BarangMasuk() {
           ))}
         </div>
 
-        {/* Table — Desktop */}
+        {/* Desktop table */}
         <Card className="hidden md:block overflow-hidden border-slate-100 shadow-sm">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50 border-b border-slate-100">
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-32">Nomor</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-36">Waktu</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">TS Code</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500">Nama Barang</TableHead>
@@ -254,12 +304,21 @@ export default function BarangMasuk() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.length > 0 ? (
-                  filtered.map((trx, idx) => (
-                    <TableRow key={idx} className="hover:bg-emerald-50/30 transition-colors border-b border-slate-50">
-                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">{trx.waktu}</TableCell>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-40 text-center">
+                      <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                        <Loader2 className="h-5 w-5 animate-spin" /><span>Memuat data...</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : filtered.length > 0 ? (
+                  filtered.map((trx) => (
+                    <TableRow key={trx.id} className="hover:bg-emerald-50/30 transition-colors border-b border-slate-50">
+                      <TableCell className="font-mono text-xs text-slate-500">{trx.nomor}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">{formatWaktu(trx.createdAt)}</TableCell>
                       <TableCell className="font-mono text-sm text-slate-600">{trx.tsCode}</TableCell>
-                      <TableCell className="font-medium text-sm text-slate-800">{trx.nama}</TableCell>
+                      <TableCell className="font-medium text-sm text-slate-800">{trx.namaBarang}</TableCell>
                       <TableCell className="text-right">
                         <span className="font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-sm font-mono">+{trx.jumlah}</span>
                       </TableCell>
@@ -272,7 +331,7 @@ export default function BarangMasuk() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-56 text-center">
+                    <TableCell colSpan={8} className="h-56 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground">
                         <FileX className="h-10 w-10 mb-2 text-slate-200" />
                         <p className="font-medium text-slate-500">Tidak ada data penerimaan</p>
@@ -298,7 +357,6 @@ export default function BarangMasuk() {
           </DialogHeader>
 
           <div className="space-y-4 py-1">
-            {/* Cari barang */}
             <div className="space-y-1.5">
               <Label className="text-sm font-medium">Cari Barang <span className="text-red-500">*</span></Label>
               {!selectedItem ? (
@@ -386,16 +444,15 @@ export default function BarangMasuk() {
           </div>
 
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => { setFormOpen(false); resetForm(); }}>Batal</Button>
+            <Button variant="outline" onClick={() => { setFormOpen(false); resetForm(); }} disabled={saving}>Batal</Button>
             <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleSimpan}
-              disabled={!selectedItem || !formData.jumlah || parseInt(formData.jumlah) <= 0}>
-              Simpan Penerimaan
+              disabled={!selectedItem || !formData.jumlah || parseInt(formData.jumlah) <= 0 || saving}>
+              {saving ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Menyimpan...</> : 'Simpan Penerimaan'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* QR Scanner */}
       <QrScannerDialog
         open={qrOpen}
         onOpenChange={setQrOpen}
@@ -403,9 +460,8 @@ export default function BarangMasuk() {
         title="Scan QR Code — Barang Masuk"
       />
 
-      {/* Floating QR */}
       <button onClick={() => setQrOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-13 h-13 w-[52px] h-[52px] bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-50 w-[52px] h-[52px] bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
         title="Scan QR">
         <QrCode className="w-5 h-5" />
       </button>
