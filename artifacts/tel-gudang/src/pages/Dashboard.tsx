@@ -9,16 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 export default function Dashboard() {
   const { currentUser, items, token } = useAppContext();
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [todayMasuk, setTodayMasuk] = useState(0);
   const [todayKeluar, setTodayKeluar] = useState(0);
   const [barData, setBarData] = useState<{ day: string; masuk: number; keluar: number }[]>([]);
   const [pieData, setPieData] = useState<{ name: string; value: number }[]>([]);
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     if (!token) return;
@@ -53,18 +47,6 @@ export default function Dashboard() {
           <p className="text-muted-foreground text-xs sm:text-sm mt-0.5 hidden sm:block">
             Berikut adalah ringkasan inventaris gudang saat ini.
           </p>
-        </div>
-        <div className="bg-white px-3 py-2 rounded-lg border border-border shadow-sm flex flex-col items-end shrink-0">
-          <span className="text-[10px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider">WAKTU SISTEM</span>
-          <span className="text-sm sm:text-base font-bold text-primary font-mono tracking-tight whitespace-nowrap">
-            <span className="hidden sm:inline">
-              {currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}{' '}
-            </span>
-            <span className="sm:hidden">
-              {currentTime.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}{' '}
-            </span>
-            <span className="text-foreground">{currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-          </span>
         </div>
       </div>
 

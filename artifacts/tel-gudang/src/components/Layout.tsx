@@ -1,11 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
-import { Menu, X, Bell, Search, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Menu, X, Bell, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 export function Layout({ children, title }: { children: React.ReactNode, title: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden">
@@ -64,13 +69,12 @@ export function Layout({ children, title }: { children: React.ReactNode, title: 
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="relative hidden md:block">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Cari..."
-                className="w-64 pl-9 bg-secondary border-none"
-              />
+            <div className="hidden md:flex flex-col items-end bg-white px-3 py-1.5 rounded-lg border border-border shadow-sm">
+              <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">WAKTU SISTEM</span>
+              <span className="text-sm font-bold text-primary font-mono tracking-tight whitespace-nowrap">
+                {currentTime.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}{' '}
+                <span className="text-foreground">{currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+              </span>
             </div>
             <button className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors">
               <Bell className="h-5 w-5" />
