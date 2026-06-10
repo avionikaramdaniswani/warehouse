@@ -55,6 +55,12 @@ function rowBg(item: Item) {
   return '';
 }
 
+function stickyBg(item: Item) {
+  if (item.stok === 0) return 'bg-red-50/80';
+  if (item.stok <= item.safetyStok) return 'bg-amber-50/80';
+  return 'bg-white';
+}
+
 export default function MasterBarang() {
   const { items, setItems, token, currentUser } = useAppContext();
   const kategoris = useKategoris(token);
@@ -385,7 +391,7 @@ export default function MasterBarang() {
             <Table>
               <TableHeader className="bg-slate-100">
                 <TableRow>
-                  <TableHead className="w-[110px]">
+                  <TableHead className="sticky left-0 z-20 bg-slate-100 w-[120px] shadow-[2px_0_4px_-2px_rgba(0,0,0,0.12)]">
                     <div className="flex items-center gap-2 whitespace-nowrap">
                       {isSelectMode && (
                         <Checkbox checked={allFilteredSelected} onCheckedChange={toggleSelectAll} aria-label="Pilih semua" />
@@ -393,14 +399,14 @@ export default function MasterBarang() {
                       TS Code
                     </div>
                   </TableHead>
-                  <TableHead className="min-w-[250px]">Nama Barang</TableHead>
-                  <TableHead>Kategori</TableHead>
-                  <TableHead>BIN LOC</TableHead>
-                  <TableHead>UOM</TableHead>
-                  <TableHead className="text-right">Stok</TableHead>
-                  <TableHead className="text-right">Safety Stok</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
-                  <TableHead className="text-center">Aksi</TableHead>
+                  <TableHead className="min-w-[220px]">Nama Barang</TableHead>
+                  <TableHead className="min-w-[130px]">Kategori</TableHead>
+                  <TableHead className="min-w-[90px]">BIN LOC</TableHead>
+                  <TableHead className="min-w-[60px]">UOM</TableHead>
+                  <TableHead className="text-right min-w-[60px]">Stok</TableHead>
+                  <TableHead className="text-right min-w-[90px]">Safety Stok</TableHead>
+                  <TableHead className="text-center min-w-[90px]">Status</TableHead>
+                  <TableHead className="sticky right-0 z-20 bg-slate-100 text-center shadow-[-2px_0_4px_-2px_rgba(0,0,0,0.12)]">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -422,7 +428,7 @@ export default function MasterBarang() {
                   </TableRow>
                 ) : filteredItems.map((item) => (
                   <TableRow key={item.tsCode} className={rowBg(item)}>
-                    <TableCell className="font-mono font-medium text-slate-600">
+                    <TableCell className={`sticky left-0 z-10 font-mono font-medium text-slate-600 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.10)] ${stickyBg(item)}`}>
                       <div className="flex items-center gap-2 whitespace-nowrap">
                         {isSelectMode && (
                           <Checkbox
@@ -433,14 +439,16 @@ export default function MasterBarang() {
                         {item.tsCode}
                       </div>
                     </TableCell>
-                    <TableCell className="font-semibold text-slate-800">{item.nama}</TableCell>
+                    <TableCell className="font-semibold text-slate-800 max-w-[260px]">
+                      <span className="block truncate" title={item.nama}>{item.nama}</span>
+                    </TableCell>
                     <TableCell>{item.kategori}</TableCell>
                     <TableCell className="font-mono text-sm">{item.binLoc}</TableCell>
                     <TableCell>{item.uom}</TableCell>
                     <TableCell className={`text-right font-bold ${stockColor(item)}`}>{item.stok}</TableCell>
                     <TableCell className="text-right text-muted-foreground">{item.safetyStok}</TableCell>
                     <TableCell className="text-center"><StatusBadge status={item.status} /></TableCell>
-                    <TableCell>
+                    <TableCell className={`sticky right-0 z-10 shadow-[-2px_0_4px_-2px_rgba(0,0,0,0.10)] ${stickyBg(item)}`}>
                       <div className="flex justify-center gap-1">
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50"
                           onClick={() => { setSelectedItem(item); setDetailOpen(true); }}>
