@@ -140,6 +140,73 @@ router.patch("/items/:tsCode/stok", authenticate, authorize("admin", "operator")
   res.json(updated);
 });
 
+router.post("/items/import", authenticate, authorize("admin", "operator"), async (req, res) => {
+  const rowSchema = z.object({
+    tsCode: z.string().min(1).max(50),
+    msCode: z.string().optional(),
+    nama: z.string().min(1).max(255),
+    kategori: z.string().min(1),
+    binLoc: z.string().optional(),
+    uom: z.string().min(1).max(20).default("EA"),
+    stok: z.number().int().min(0).default(0),
+    safetyStok: z.number().int().min(0).default(5),
+  });
+
+  const bodySchema = z.object({ items: z.array(rowSchema).min(1).max(1000) });
+  const parsed = bodySchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ message: parsed.error.errors[0]?.message ?? "Data tidak valid" });
+    return;
+  }
+
+  const { items } = parsed.data;
+  let inserted = 0;
+  let skipped = 0;
+  const errors: { tsCode: string; reason: string }[] = [];
+
+  for (const item of items) {
+    try {
+      const existing = await db
+        .select({ id: itemsTable.id })
+        .from(itemsTable)
+        .where(eq(itemsTable.tsCode, item.tsCode))
+        .limit(1);
+
+      if (existing.length > 0) {
+        skipped++;
+        continue;
+      }
+
+      const { stok, safetyStok } = item;
+      await db.insert(itemsTable).values({
+        tsCode: item.tsCode,
+        msCode: item.msCode ?? null,
+        nama: item.nama,
+        kategori: item.kategori,
+        binLoc: item.binLoc ?? null,
+        uom: item.uom,
+        stok,
+        safetyStok,
+        status: computeStatus(stok, safetyStok),
+      });
+      inserted++;
+    } catch {
+      errors.push({ tsCode: item.tsCode, reason: "Gagal disimpan" });
+    }
+  }
+
+  if (inserted > 0) {
+    await logActivity(
+      req.user!.userId,
+      "IMPORT_ITEMS",
+      `Import barang: ${inserted} ditambahkan, ${skipped} dilewati`,
+      req
+    );
+  }
+
+  res.json({ inserted, skipped, errors });
+});
+
 router.delete("/items/:tsCode", authenticate, authorize("admin"), async (req, res) => {
   const { tsCode } = req.params;
 

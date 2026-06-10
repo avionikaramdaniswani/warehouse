@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare, Trash2 } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare, Trash2, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import {
@@ -22,6 +22,7 @@ import { ItemDetailModal } from '@/components/master-barang/ItemDetailModal';
 import { ItemFormModal } from '@/components/master-barang/ItemFormModal';
 import { ItemQRModal } from '@/components/master-barang/ItemQRModal';
 import { MobileItemSheet, SheetType } from '@/components/master-barang/MobileItemSheet';
+import { ImportExcelModal } from '@/components/master-barang/ImportExcelModal';
 
 interface KategoriOption { id: number; nama: string; }
 
@@ -81,6 +82,7 @@ export default function MasterBarang() {
   const [sheetType, setSheetType] = useState<SheetType | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const isAdmin = currentUser?.role === 'admin';
 
@@ -223,6 +225,13 @@ export default function MasterBarang() {
     toast.success('Barang baru berhasil ditambahkan');
   };
 
+  const handleImported = async () => {
+    try {
+      const res = await fetch('/api/items', { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) setItems(await res.json());
+    } catch { /* silent */ }
+  };
+
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -288,14 +297,17 @@ export default function MasterBarang() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto shrink-0">
+          <div className="flex gap-2 w-full sm:w-auto shrink-0 flex-wrap">
             {!isSelectMode && (
               <Button variant="outline" onClick={() => setIsSelectMode(true)} className="w-full sm:w-auto">
                 <CheckSquare className="mr-2 h-4 w-4" /> Pilih Item
               </Button>
             )}
+            <Button variant="outline" onClick={() => setImportOpen(true)} className="w-full sm:w-auto border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400">
+              <FileSpreadsheet className="mr-2 h-4 w-4" /> Import Excel
+            </Button>
             <Button onClick={() => setAddOpen(true)} className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" /> Tambah Barang Baru
+              <Plus className="mr-2 h-4 w-4" /> Tambah Barang
             </Button>
           </div>
         </div>
@@ -479,6 +491,12 @@ export default function MasterBarang() {
       </div>
 
       {/* Modals */}
+      <ImportExcelModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        token={token}
+        onImported={handleImported}
+      />
       <ItemDetailModal
         open={detailOpen}
         onClose={() => setDetailOpen(false)}
