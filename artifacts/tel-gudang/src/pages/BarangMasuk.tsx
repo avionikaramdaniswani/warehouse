@@ -11,6 +11,7 @@ import {
   Search, Plus, QrCode, PackagePlus, FileX,
   CalendarDays, FileText, TrendingUp, Clock, Loader2
 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAppContext, Item } from '@/context/AppContext';
 import { toast } from 'sonner';
 import { QrScannerDialog } from '@/components/QrScannerDialog';
@@ -44,6 +45,7 @@ export default function BarangMasuk() {
 
   const [search, setSearch] = useState('');
   const [filterTanggal, setFilterTanggal] = useState('');
+  const [filterKategori, setFilterKategori] = useState('Semua');
 
   const [formOpen, setFormOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
@@ -154,6 +156,10 @@ export default function BarangMasuk() {
 
   const today = new Date().toISOString().split('T')[0];
 
+  // Lookup tsCode → kategori dari data items
+  const kategoriByTsCode = Object.fromEntries(items.map((i) => [i.tsCode, i.kategori]));
+  const daftarKategori = ['Semua', ...Array.from(new Set(items.map((i) => i.kategori).filter(Boolean))).sort()];
+
   const filtered = transaksi.filter((trx) => {
     const matchSearch =
       search.length === 0 ||
@@ -162,7 +168,8 @@ export default function BarangMasuk() {
       (trx.noPo ?? '').toLowerCase().includes(search.toLowerCase()) ||
       trx.nomor.toLowerCase().includes(search.toLowerCase());
     const matchTanggal = !filterTanggal || trx.tanggal === filterTanggal;
-    return matchSearch && matchTanggal;
+    const matchKategori = filterKategori === 'Semua' || kategoriByTsCode[trx.tsCode] === filterKategori;
+    return matchSearch && matchTanggal && matchKategori;
   });
 
   const totalHariIni = transaksi.filter((t) => t.tanggal === today).length;
@@ -195,18 +202,28 @@ export default function BarangMasuk() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
+            <Select value={filterKategori} onValueChange={setFilterKategori}>
+              <SelectTrigger className="w-full sm:w-[170px] bg-white h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {daftarKategori.map((k) => (
+                  <SelectItem key={k} value={k}>{k === 'Semua' ? 'Semua Kategori' : k}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Input
               type="date"
               className="bg-white h-9 text-sm w-full sm:w-[160px]"
               value={filterTanggal}
               onChange={(e) => setFilterTanggal(e.target.value)}
             />
-            {(search || filterTanggal) && (
+            {(search || filterTanggal || filterKategori !== 'Semua') && (
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-9 text-muted-foreground hover:text-slate-800 shrink-0"
-                onClick={() => { setSearch(''); setFilterTanggal(''); }}
+                onClick={() => { setSearch(''); setFilterTanggal(''); setFilterKategori('Semua'); }}
               >
                 Reset
               </Button>
@@ -223,9 +240,10 @@ export default function BarangMasuk() {
           </div>
         </div>
 
-        {(search || filterTanggal) && (
+        {(search || filterTanggal || filterKategori !== 'Semua') && (
           <p className="text-sm text-muted-foreground -mt-2">
             Menampilkan <strong>{filtered.length}</strong> dari {transaksi.length} transaksi
+            {filterKategori !== 'Semua' && <span className="ml-1">· Kategori: <strong>{filterKategori}</strong></span>}
           </p>
         )}
 
