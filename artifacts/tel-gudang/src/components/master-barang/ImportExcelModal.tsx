@@ -50,18 +50,15 @@ function findHeaderRow(rows: unknown[][]): number {
   return 0;
 }
 
-function buildColMap(headers: unknown[]): Record<string, number> {
-  const map: Record<string, number> = {};
-  const used = new Set<number>();
+function buildColMap(headers: unknown[]): Record<string, number[]> {
+  const map: Record<string, number[]> = {};
 
   for (const [field, aliases] of Object.entries(COL_ALIASES)) {
+    map[field] = [];
     for (let idx = 0; idx < headers.length; idx++) {
-      if (used.has(idx)) continue;
       const h = norm(String(headers[idx] ?? ''));
       if (aliases.includes(h)) {
-        map[field] = idx;
-        used.add(idx);
-        break;
+        map[field].push(idx);
       }
     }
   }
@@ -78,10 +75,13 @@ function parseRows(sheet: XLSX.WorkSheet): { rows: ParsedRow[]; detectedHeaders:
   const detectedHeaders = headerRow.map((h) => String(h ?? '').trim()).filter(Boolean);
 
   const getStr = (dataRow: unknown[], field: string): string => {
-    const idx = colMap[field];
-    if (idx === undefined) return '';
-    const v = dataRow[idx];
-    return v == null ? '' : String(v).trim();
+    const indices = colMap[field] ?? [];
+    for (const idx of indices) {
+      const v = dataRow[idx];
+      const s = v == null ? '' : String(v).trim();
+      if (s !== '') return s;
+    }
+    return '';
   };
 
   const getNum = (dataRow: unknown[], field: string, def: number): number => {
