@@ -6,7 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, X } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, X, Printer } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -40,6 +41,89 @@ export default function MasterBarang() {
   const [statusFilter, setStatusFilter] = useState('Semua');
   const [isLoading, setIsLoading] = useState(true);
 
+  const [selectedForPrint, setSelectedForPrint] = useState<Set<string>>(new Set());
+
+  const toggleSelectForPrint = (tsCode: string) => {
+    setSelectedForPrint((prev) => {
+      const next = new Set(prev);
+      next.has(tsCode) ? next.delete(tsCode) : next.add(tsCode);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (allFilteredSelected) {
+      setSelectedForPrint((prev) => {
+        const next = new Set(prev);
+        filteredItems.forEach((i) => next.delete(i.tsCode));
+        return next;
+      });
+    } else {
+      setSelectedForPrint((prev) => {
+        const next = new Set(prev);
+        filteredItems.forEach((i) => next.add(i.tsCode));
+        return next;
+      });
+    }
+  };
+
+  const handleBatchPrint = () => {
+    const selected = items.filter((i) => selectedForPrint.has(i.tsCode));
+    if (selected.length === 0) return;
+
+    const labelHtmls = selected.map((item) => {
+      const container = document.getElementById(`qr-batch-${item.tsCode}`);
+      const svgEl = container?.querySelector('svg');
+      let svgHtml = '';
+      if (svgEl) {
+        const clone = svgEl.cloneNode(true) as SVGElement;
+        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        svgHtml = clone.outerHTML;
+      }
+      const namaShort = item.nama.length > 90 ? item.nama.slice(0, 90) + '…' : item.nama;
+      return `<div class="label">
+  <div class="hdr">
+    <div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div>
+    <div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div>
+  </div>
+  <div class="qr">${svgHtml}</div>
+  <div class="ts">${item.tsCode}</div>
+  <div class="nama">${namaShort}</div>
+  <div class="divider"></div>
+  <div class="row"><span>Kategori</span><span class="val">${item.kategori || '—'}</span></div>
+  <div class="row"><span>BIN LOC</span><span class="val">${item.binLoc || '—'}</span></div>
+  <div class="row"><span>UOM</span><span class="val">${item.uom}</span></div>
+</div>`;
+    });
+
+    const win = window.open('', '_blank', 'width=860,height=960');
+    if (!win) { toast.error('Popup diblokir — izinkan popup di browser lalu coba lagi'); return; }
+    win.document.write(`<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<title>Label Batch — ${selected.length} Barang</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  @page{size:A4 portrait;margin:0}
+  body{padding:8mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm;font-family:'Courier New',Courier,monospace;background:#fff;align-content:start}
+  .label{border:1px solid #444;padding:4mm;overflow:hidden;page-break-inside:avoid;break-inside:avoid}
+  .hdr{text-align:center;border-bottom:1px solid #999;padding-bottom:2mm;margin-bottom:2mm}
+  .co{font-size:5.5pt;font-weight:bold;letter-spacing:.3px}
+  .sub{font-size:4.5pt;color:#555;margin-top:.5mm}
+  .qr{text-align:center;margin:1.5mm 0}
+  .qr svg{width:40mm!important;height:40mm!important;display:inline-block}
+  .ts{text-align:center;font-size:13pt;font-weight:bold;letter-spacing:2px;margin:1mm 0}
+  .nama{text-align:center;font-size:5.5pt;font-weight:bold;margin:0 1mm 1.5mm;line-height:1.4;word-wrap:break-word}
+  .divider{border-top:1px dashed #bbb;margin:1.5mm 0}
+  .row{display:flex;justify-content:space-between;font-size:5.5pt;padding:.4mm 0}
+  .val{font-weight:bold}
+</style>
+</head><body>
+${labelHtmls.join('\n')}
+<script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}<\/script>
+</body></html>`);
+    win.document.close();
+  };
+
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -71,6 +155,9 @@ export default function MasterBarang() {
     const matchesStatus = statusFilter === 'Semua' || item.status === statusFilter;
     return matchesSearch && matchesCategory && matchesStatus;
   });
+
+  const allFilteredSelected =
+    filteredItems.length > 0 && filteredItems.every((i) => selectedForPrint.has(i.tsCode));
 
   const handleOpenEdit = (item: Item) => {
     setSelectedItem(item);
@@ -249,6 +336,15 @@ export default function MasterBarang() {
 
   return (
     <Layout title="Master Data Barang">
+      {/* Hidden QR codes for batch print — rendered off-screen so SVGs are in DOM */}
+      <div className="sr-only" aria-hidden>
+        {Array.from(selectedForPrint).map((tsCode) => (
+          <div key={tsCode} id={`qr-batch-${tsCode}`}>
+            <QRCodeSVG value={tsCode} size={160} />
+          </div>
+        ))}
+      </div>
+
       <div className="flex flex-col gap-4">
 
         {/* Filters */}
@@ -287,6 +383,31 @@ export default function MasterBarang() {
           </Button>
         </div>
 
+        {/* Selection action bar */}
+        {selectedForPrint.size > 0 && (
+          <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-lg px-4 py-2.5 flex-wrap">
+            <span className="text-sm font-medium text-primary flex-1">
+              {selectedForPrint.size} barang dipilih
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs"
+              onClick={() => setSelectedForPrint(new Set())}
+            >
+              Batal Pilih
+            </Button>
+            <Button
+              size="sm"
+              className="h-8 text-xs bg-primary hover:bg-primary/90"
+              onClick={handleBatchPrint}
+            >
+              <Printer className="h-3.5 w-3.5 mr-1.5" />
+              Cetak {selectedForPrint.size} Label
+            </Button>
+          </div>
+        )}
+
         {/* MOBILE: Card View */}
         <div className="flex flex-col gap-2.5 md:hidden">
           {isLoading ? (
@@ -304,9 +425,16 @@ export default function MasterBarang() {
               <Card key={item.tsCode} className={`border shadow-sm ${cardBg(item)}`}>
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-sm text-slate-800 leading-tight">{item.nama}</p>
-                      <p className="text-xs font-mono text-muted-foreground mt-0.5">{item.tsCode}</p>
+                    <div className="flex items-start gap-2.5 min-w-0">
+                      <Checkbox
+                        className="mt-0.5 shrink-0"
+                        checked={selectedForPrint.has(item.tsCode)}
+                        onCheckedChange={() => toggleSelectForPrint(item.tsCode)}
+                      />
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-slate-800 leading-tight">{item.nama}</p>
+                        <p className="text-xs font-mono text-muted-foreground mt-0.5">{item.tsCode}</p>
+                      </div>
                     </div>
                     <StatusBadge status={item.status} />
                   </div>
@@ -337,6 +465,13 @@ export default function MasterBarang() {
             <Table>
               <TableHeader className="bg-slate-100">
                 <TableRow>
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={allFilteredSelected}
+                      onCheckedChange={toggleSelectAll}
+                      aria-label="Pilih semua"
+                    />
+                  </TableHead>
                   <TableHead className="w-[100px]">TS Code</TableHead>
                   <TableHead className="min-w-[250px]">Nama Barang</TableHead>
                   <TableHead>Kategori</TableHead>
@@ -352,12 +487,12 @@ export default function MasterBarang() {
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
-                      {Array.from({ length: 9 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}
+                      {Array.from({ length: 10 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}
                     </TableRow>
                   ))
                 ) : filteredItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-64 text-center">
+                    <TableCell colSpan={10} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground">
                         <FileX className="h-12 w-12 mb-2 text-slate-300" />
                         <p className="text-lg font-medium text-slate-500">Tidak ada data ditemukan</p>
@@ -371,6 +506,12 @@ export default function MasterBarang() {
                       key={item.tsCode}
                       className={item.stok === 0 ? 'bg-red-50/50 hover:bg-red-50' : item.stok <= item.safetyStok ? 'bg-amber-50/50 hover:bg-amber-50' : ''}
                     >
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedForPrint.has(item.tsCode)}
+                          onCheckedChange={() => toggleSelectForPrint(item.tsCode)}
+                        />
+                      </TableCell>
                       <TableCell className="font-mono font-medium text-slate-600">{item.tsCode}</TableCell>
                       <TableCell className="font-semibold text-slate-800">{item.nama}</TableCell>
                       <TableCell>{item.kategori}</TableCell>
