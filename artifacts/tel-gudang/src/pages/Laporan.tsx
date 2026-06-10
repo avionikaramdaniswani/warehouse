@@ -172,7 +172,7 @@ export default function Laporan() {
             {dummyReportData.map((row, idx) => (
               <div key={idx} className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-1.5">
-                  <p className="font-semibold text-sm text-slate-800 leading-tight">{row.nama}</p>
+                  <p className="font-semibold text-sm text-slate-800 leading-tight break-words">{row.nama}</p>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className={`px-2 py-0.5 rounded text-xs font-bold ${row.jenis === 'IN' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
                       {row.jenis === 'IN' ? 'Masuk' : 'Keluar'}

@@ -441,7 +441,7 @@ ${labelHtmls.join('\n')}
                         />
                       )}
                       <div className="min-w-0">
-                        <p className="font-semibold text-sm text-slate-800 leading-tight">{item.nama}</p>
+                        <p className="font-semibold text-sm text-slate-800 leading-tight break-words">{item.nama}</p>
                         <p className="text-xs font-mono text-muted-foreground mt-0.5">{item.tsCode}</p>
                       </div>
                     </div>
