@@ -181,15 +181,15 @@ export default function Dashboard() {
             <CardTitle>Distribusi Stok per Kategori</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] w-full flex items-center justify-center">
+            <div className="h-[220px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={pieData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={80}
-                    outerRadius={110}
+                    innerRadius={60}
+                    outerRadius={88}
                     paddingAngle={2}
                     dataKey="value"
                     stroke="none"
@@ -199,9 +199,19 @@ export default function Dashboard() {
                     ))}
                   </Pie>
                   <Tooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
-                  <Legend layout="vertical" verticalAlign="middle" align="right" iconType="circle" />
                 </PieChart>
               </ResponsiveContainer>
+            </div>
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-2 px-2">
+              {pieData.map((entry, index) => (
+                <div key={entry.name} className="flex items-center gap-1.5 min-w-0">
+                  <span
+                    className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  />
+                  <span className="text-xs text-slate-600 truncate">{entry.name}</span>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
