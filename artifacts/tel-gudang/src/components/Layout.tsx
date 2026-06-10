@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
-import { Menu, X, Bell, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Menu, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 export function Layout({ children, title }: { children: React.ReactNode, title: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -76,10 +76,6 @@ export function Layout({ children, title }: { children: React.ReactNode, title: 
                 <span className="text-foreground">{currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
               </span>
             </div>
-            <button className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full border-2 border-white"></span>
-            </button>
           </div>
         </header>
 

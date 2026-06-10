@@ -31,7 +31,7 @@ const createSchema = z.object({
 });
 
 router.get("/transaksi-masuk", authenticate, async (req, res) => {
-  const { search, tanggal } = req.query as Record<string, string>;
+  const { search, tanggal, tsCode: tsCodeFilter } = req.query as Record<string, string>;
 
   const rows = await db
     .select({
@@ -65,6 +65,9 @@ router.get("/transaksi-masuk", authenticate, async (req, res) => {
         r.tsCode.toLowerCase().includes(q) ||
         (r.noPo ?? "").toLowerCase().includes(q)
     );
+  }
+  if (tsCodeFilter) {
+    result = result.filter((r: Row) => r.tsCode === tsCodeFilter);
   }
   if (tanggal) {
     result = result.filter((r: Row) => r.tanggal === tanggal);
