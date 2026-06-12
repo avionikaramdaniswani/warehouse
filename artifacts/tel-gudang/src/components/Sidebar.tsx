@@ -54,7 +54,7 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
 
   const navLinkClass = (active: boolean) =>
     cn(
-      'flex items-center rounded-md transition-colors text-sm font-medium',
+      'flex items-center rounded-md transition-colors text-sm font-medium cursor-pointer',
       collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
       active
         ? 'bg-primary text-primary-foreground'
@@ -125,7 +125,7 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
                 <button
                   onClick={() => setLaporanOpen((v) => !v)}
                   className={cn(
-                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors text-sm font-medium',
+                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors text-sm font-medium cursor-pointer',
                     laporanActive
                       ? 'bg-primary/10 text-primary'
                       : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -148,7 +148,7 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
                           key={item.href}
                           href={item.href}
                           className={cn(
-                            'flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-colors text-sm',
+                            'flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-colors text-sm cursor-pointer',
                             isActive
                               ? 'bg-primary text-primary-foreground font-medium'
                               : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -190,7 +190,7 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
                 <TooltipTrigger asChild>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center justify-center p-2 w-full text-sidebar-foreground/80 hover:text-white hover:bg-sidebar-accent rounded-md transition-colors"
+                    className="flex items-center justify-center p-2 w-full text-sidebar-foreground/80 hover:text-white hover:bg-sidebar-accent rounded-md transition-colors cursor-pointer"
                   >
                     <LogOut className="h-4 w-4" />
                   </button>
@@ -213,7 +213,7 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-sidebar-foreground/80 hover:text-white hover:bg-sidebar-accent rounded-md transition-colors"
+                className="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-sidebar-foreground/80 hover:text-white hover:bg-sidebar-accent rounded-md transition-colors cursor-pointer"
               >
                 <LogOut className="h-4 w-4" />
                 Keluar
