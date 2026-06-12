@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Layout } from '@/components/Layout';
 import { useAppContext, Item } from '@/context/AppContext';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare, Trash2, FileSpreadsheet } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import {
@@ -24,7 +24,24 @@ import { ItemQRModal } from '@/components/master-barang/ItemQRModal';
 import { MobileItemSheet, SheetType } from '@/components/master-barang/MobileItemSheet';
 import { ImportExcelModal } from '@/components/master-barang/ImportExcelModal';
 
+const PAGE_SIZE = 50;
+
 interface KategoriOption { id: number; nama: string; }
+
+function mapRow(row: Record<string, unknown>): Item {
+  return {
+    id: row.id as number,
+    tsCode: (row.tsCode ?? row.ts_code) as string,
+    msCode: ((row.msCode ?? row.ms_code) as string) ?? '',
+    nama: row.nama as string,
+    kategori: (row.kategori as string) ?? '',
+    binLoc: ((row.binLoc ?? row.bin_loc) as string) ?? '',
+    uom: (row.uom as string) ?? 'EA',
+    stok: row.stok as number,
+    safetyStok: ((row.safetyStok ?? row.safety_stok) as number) ?? 5,
+    status: (row.status as string) ?? 'Normal',
+  };
+}
 
 function useKategoris(token: string | null) {
   const [kategoris, setKategoris] = useState<KategoriOption[]>([]);
@@ -63,12 +80,17 @@ function stickyBg(item: Item) {
 }
 
 export default function MasterBarang() {
-  const { items, setItems, token, currentUser } = useAppContext();
+  const { token, currentUser, refreshItems } = useAppContext();
   const kategoris = useKategoris(token);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('Semua');
   const [statusFilter, setStatusFilter] = useState('Semua');
+
+  const [pageItems, setPageItems] = useState<Item[]>([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
   const [isSelectMode, setIsSelectMode] = useState(false);
@@ -86,24 +108,52 @@ export default function MasterBarang() {
 
   const isAdmin = currentUser?.role === 'admin';
 
+  const fetchPage = useCallback(async (
+    page: number,
+    search: string,
+    kategori: string,
+    status: string,
+  ) => {
+    if (!token) return;
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: String(PAGE_SIZE) });
+      if (search) params.set('search', search);
+      if (kategori !== 'Semua') params.set('kategori', kategori);
+      if (status !== 'Semua') params.set('status', status);
+
+      const res = await fetch(`/api/items?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setPageItems((json.data as Record<string, unknown>[]).map(mapRow));
+        setTotal(json.total as number);
+        setTotalPages(json.totalPages as number);
+        setCurrentPage(page);
+      }
+    } catch { /* silent */ }
+    finally { setIsLoading(false); }
+  }, [token]);
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
-    const t = setTimeout(() => setIsLoading(false), 400);
-    return () => clearTimeout(t);
-  }, []);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchPage(1, searchTerm, categoryFilter, statusFilter);
+    }, searchTerm ? 300 : 0);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [searchTerm, categoryFilter, statusFilter, fetchPage]);
 
-  const filteredItems = items.filter((item) => {
-    const q = searchTerm.toLowerCase();
-    const matchSearch =
-      item.nama.toLowerCase().includes(q) ||
-      item.tsCode.toLowerCase().includes(q) ||
-      (item.msCode ?? '').toLowerCase().includes(q);
-    const matchCat = categoryFilter === 'Semua' || item.kategori === categoryFilter;
-    const matchStatus = statusFilter === 'Semua' || item.status === statusFilter;
-    return matchSearch && matchCat && matchStatus;
-  });
+  const goToPage = (p: number) => {
+    if (p < 1 || p > totalPages) return;
+    setSelectedForPrint(new Set());
+    fetchPage(p, searchTerm, categoryFilter, statusFilter);
+  };
 
-  const allFilteredSelected =
-    filteredItems.length > 0 && filteredItems.every((i) => selectedForPrint.has(i.tsCode));
+  const allPageSelected =
+    pageItems.length > 0 && pageItems.every((i) => selectedForPrint.has(i.tsCode));
 
   const toggleSelect = (tsCode: string) =>
     setSelectedForPrint((prev) => {
@@ -115,15 +165,15 @@ export default function MasterBarang() {
   const toggleSelectAll = () =>
     setSelectedForPrint((prev) => {
       const next = new Set(prev);
-      if (allFilteredSelected) filteredItems.forEach((i) => next.delete(i.tsCode));
-      else filteredItems.forEach((i) => next.add(i.tsCode));
+      if (allPageSelected) pageItems.forEach((i) => next.delete(i.tsCode));
+      else pageItems.forEach((i) => next.add(i.tsCode));
       return next;
     });
 
   const exitSelectMode = () => { setIsSelectMode(false); setSelectedForPrint(new Set()); };
 
   const handleBatchPrint = () => {
-    const selected = items.filter((i) => selectedForPrint.has(i.tsCode));
+    const selected = pageItems.filter((i) => selectedForPrint.has(i.tsCode));
     if (selected.length === 0) return;
     const labelHtmls = selected.map((item) => {
       const svgEl = document.getElementById(`qr-batch-${item.tsCode}`)?.querySelector('svg');
@@ -183,16 +233,10 @@ export default function MasterBarang() {
       toast.error(err.message ?? 'Gagal menyimpan perubahan');
       throw new Error('save failed');
     }
-    const u = await res.json();
-    const mapped: Item = {
-      id: u.id, tsCode: u.tsCode ?? u.ts_code, msCode: u.msCode ?? u.ms_code ?? '',
-      nama: u.nama, kategori: u.kategori ?? '', binLoc: u.binLoc ?? u.bin_loc ?? '',
-      uom: u.uom ?? 'EA', stok: u.stok, safetyStok: u.safetyStok ?? u.safety_stok ?? 5,
-      status: u.status ?? 'Normal',
-    };
-    setItems(items.map((i) => (i.tsCode === mapped.tsCode ? mapped : i)));
     setEditOpen(false);
     toast.success('Data barang berhasil diperbarui');
+    fetchPage(currentPage, searchTerm, categoryFilter, statusFilter);
+    refreshItems();
   };
 
   const handleSaveAdd = async (data: Partial<Item>) => {
@@ -213,23 +257,15 @@ export default function MasterBarang() {
       toast.error(err.message ?? 'Gagal menambah barang');
       throw new Error('save failed');
     }
-    const c = await res.json();
-    const newItem: Item = {
-      id: c.id, tsCode: c.tsCode ?? c.ts_code, msCode: c.msCode ?? c.ms_code ?? '',
-      nama: c.nama, kategori: c.kategori ?? '', binLoc: c.binLoc ?? c.bin_loc ?? '',
-      uom: c.uom ?? 'EA', stok: c.stok, safetyStok: c.safetyStok ?? c.safety_stok ?? 5,
-      status: c.status ?? 'Normal',
-    };
-    setItems([newItem, ...items]);
     setAddOpen(false);
     toast.success('Barang baru berhasil ditambahkan');
+    fetchPage(1, searchTerm, categoryFilter, statusFilter);
+    refreshItems();
   };
 
   const handleImported = async () => {
-    try {
-      const res = await fetch('/api/items', { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) setItems(await res.json());
-    } catch { /* silent */ }
+    fetchPage(1, searchTerm, categoryFilter, statusFilter);
+    refreshItems();
   };
 
   const handleDelete = async () => {
@@ -245,15 +281,20 @@ export default function MasterBarang() {
         toast.error(err.message ?? 'Gagal menghapus barang');
         return;
       }
-      setItems(items.filter((i) => i.tsCode !== deleteTarget.tsCode));
       toast.success(`Barang "${deleteTarget.nama}" berhasil dihapus`);
       setDeleteTarget(null);
+      const newPage = pageItems.length === 1 && currentPage > 1 ? currentPage - 1 : currentPage;
+      fetchPage(newPage, searchTerm, categoryFilter, statusFilter);
+      refreshItems();
     } catch {
       toast.error('Gagal terhubung ke server');
     } finally {
       setDeleting(false);
     }
   };
+
+  const startEntry = total === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const endEntry = Math.min(currentPage * PAGE_SIZE, total);
 
   return (
     <Layout title="Master Data Barang">
@@ -337,13 +378,13 @@ export default function MasterBarang() {
             Array.from({ length: 4 }).map((_, i) => (
               <Card key={i}><CardContent className="p-4 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /><Skeleton className="h-3 w-1/3" /></CardContent></Card>
             ))
-          ) : filteredItems.length === 0 ? (
+          ) : pageItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <FileX className="h-12 w-12 mb-2 text-slate-300" />
               <p className="font-medium text-slate-500">Tidak ada data ditemukan</p>
               <p className="text-sm">Coba sesuaikan filter pencarian.</p>
             </div>
-          ) : filteredItems.map((item) => (
+          ) : pageItems.map((item) => (
             <Card key={item.tsCode} className={`border shadow-sm ${cardBg(item)}`}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -406,7 +447,7 @@ export default function MasterBarang() {
                   <TableHead className="sticky left-0 z-20 bg-slate-100 w-[120px] shadow-[2px_0_4px_-2px_rgba(0,0,0,0.12)]">
                     <div className="flex items-center gap-2 whitespace-nowrap">
                       {isSelectMode && (
-                        <Checkbox checked={allFilteredSelected} onCheckedChange={toggleSelectAll} aria-label="Pilih semua" />
+                        <Checkbox checked={allPageSelected} onCheckedChange={toggleSelectAll} aria-label="Pilih semua" />
                       )}
                       TS Code
                     </div>
@@ -423,12 +464,12 @@ export default function MasterBarang() {
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
+                  Array.from({ length: 8 }).map((_, i) => (
                     <TableRow key={i}>
                       {Array.from({ length: 9 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}
                     </TableRow>
                   ))
-                ) : filteredItems.length === 0 ? (
+                ) : pageItems.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={9} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground">
@@ -438,7 +479,7 @@ export default function MasterBarang() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : filteredItems.map((item) => (
+                ) : pageItems.map((item) => (
                   <TableRow key={item.tsCode} className={rowBg(item)}>
                     <TableCell className={`sticky left-0 z-10 font-mono font-medium text-slate-600 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.10)] ${stickyBg(item)}`}>
                       <div className="flex items-center gap-2 whitespace-nowrap">
@@ -488,6 +529,39 @@ export default function MasterBarang() {
             </Table>
           </div>
         </Card>
+
+        {/* Pagination bar */}
+        {!isLoading && total > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
+            <p className="text-sm text-muted-foreground order-2 sm:order-1">
+              Menampilkan <span className="font-medium text-foreground">{startEntry}–{endEntry}</span> dari <span className="font-medium text-foreground">{total}</span> data
+            </p>
+            <div className="flex items-center gap-2 order-1 sm:order-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 px-3"
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" /> Sebelumnya
+              </Button>
+              <span className="text-sm font-medium px-2 tabular-nums">
+                {currentPage} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 px-3"
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+              >
+                Berikutnya <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* Modals */}
@@ -536,25 +610,23 @@ export default function MasterBarang() {
         }}
       />
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteTarget} onOpenChange={(v) => { if (!v) setDeleteTarget(null); }}>
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Barang?</AlertDialogTitle>
+            <AlertDialogTitle>Hapus Barang</AlertDialogTitle>
             <AlertDialogDescription>
-              Barang <span className="font-semibold text-foreground">"{deleteTarget?.nama}"</span>{' '}
-              dengan TS Code <span className="font-mono font-semibold text-foreground">{deleteTarget?.tsCode}</span>{' '}
-              akan dihapus dari sistem. Tindakan ini tidak dapat dibatalkan.
+              Yakin ingin menghapus <strong>{deleteTarget?.nama}</strong>? Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={deleting}>Batal</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90 text-white"
               onClick={handleDelete}
               disabled={deleting}
+              className="bg-red-600 hover:bg-red-700"
             >
-              {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+              {deleting ? 'Menghapus…' : 'Hapus'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

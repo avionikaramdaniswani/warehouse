@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { itemsTable } from "@workspace/db/schema";
-import { eq, asc, and, inArray } from "drizzle-orm";
+import { eq, asc, and, inArray, ilike, or, lte, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 import { authenticate } from "../middlewares/authenticate.js";
 import { authorize } from "../middlewares/authorize.js";
@@ -28,7 +28,58 @@ const itemSchema = z.object({
 
 const updateItemSchema = itemSchema.omit({ tsCode: true }).partial();
 
-router.get("/items", authenticate, async (_req, res) => {
+router.get("/items", authenticate, async (req, res) => {
+  const pageParam = req.query.page as string | undefined;
+
+  // — Paginated mode (saat page param ada) —
+  if (pageParam !== undefined) {
+    const page = Math.max(1, parseInt(pageParam) || 1);
+    const limit = Math.min(200, Math.max(1, parseInt(req.query.limit as string) || 50));
+    const search = ((req.query.search as string) ?? "").trim();
+    const kategori = (req.query.kategori as string) ?? "";
+    const statusQ = (req.query.status as string) ?? "";
+
+    const conditions: ReturnType<typeof eq>[] = [eq(itemsTable.isActive, true) as ReturnType<typeof eq>];
+    if (search) {
+      conditions.push(
+        or(
+          ilike(itemsTable.nama, `%${search}%`),
+          ilike(itemsTable.tsCode, `%${search}%`),
+          ilike(itemsTable.msCode, `%${search}%`)
+        ) as ReturnType<typeof eq>
+      );
+    }
+    if (kategori && kategori !== "Semua") {
+      conditions.push(eq(itemsTable.kategori, kategori) as ReturnType<typeof eq>);
+    }
+    if (statusQ === "Habis") {
+      conditions.push(eq(itemsTable.stok, 0) as ReturnType<typeof eq>);
+    } else if (statusQ === "Menipis") {
+      conditions.push(and(gt(itemsTable.stok, 0), lte(itemsTable.stok, itemsTable.safetyStok)) as ReturnType<typeof eq>);
+    } else if (statusQ === "Normal") {
+      conditions.push(gt(itemsTable.stok, itemsTable.safetyStok) as ReturnType<typeof eq>);
+    }
+
+    const where = and(...conditions);
+    const [{ total }] = await db
+      .select({ total: sql<number>`count(*)::int` })
+      .from(itemsTable)
+      .where(where);
+
+    const rows = await db
+      .select()
+      .from(itemsTable)
+      .where(where)
+      .orderBy(asc(itemsTable.nama))
+      .limit(limit)
+      .offset((page - 1) * limit);
+
+    const data = rows.map((r) => ({ ...r, status: computeStatus(r.stok, r.safetyStok) }));
+    res.json({ data, total, page, limit, totalPages: Math.ceil(total / limit) });
+    return;
+  }
+
+  // — Full list mode (backward-compat untuk AppContext) —
   const rows = await db
     .select()
     .from(itemsTable)
