@@ -159,7 +159,7 @@ export default function MasterBarang() {
   }, [searchTerm, categoryFilter, statusFilter, fetchPage]);
 
   const goToPage = (p: number) => {
-    if (p < 1 || p > totalPages) return;
+    if (p < 1 || p > totalPages || p === currentPage) return;
     setSelectedForPrint(new Set());
     fetchPage(p, searchTerm, categoryFilter, statusFilter);
   };
@@ -574,7 +574,7 @@ export default function MasterBarang() {
                     key={item}
                     variant={item === currentPage ? 'default' : 'outline'}
                     size="sm"
-                    className={`h-8 w-8 p-0 tabular-nums ${item === currentPage ? 'pointer-events-none' : ''}`}
+                    className="h-8 w-8 p-0 tabular-nums"
                     onClick={() => goToPage(item)}
                   >
                     {item}
