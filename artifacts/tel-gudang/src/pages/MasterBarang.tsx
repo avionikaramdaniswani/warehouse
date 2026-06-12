@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import {
@@ -25,6 +25,18 @@ import { MobileItemSheet, SheetType } from '@/components/master-barang/MobileIte
 import { ImportExcelModal } from '@/components/master-barang/ImportExcelModal';
 
 const PAGE_SIZE = 50;
+
+function getPageRange(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | 'ellipsis')[] = [1];
+  if (current > 3) pages.push('ellipsis');
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (current < total - 2) pages.push('ellipsis');
+  pages.push(total);
+  return pages;
+}
 
 interface KategoriOption { id: number; nama: string; }
 
@@ -534,29 +546,52 @@ export default function MasterBarang() {
         {!isLoading && total > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
             <p className="text-sm text-muted-foreground order-2 sm:order-1">
-              Menampilkan <span className="font-medium text-foreground">{startEntry}–{endEntry}</span> dari <span className="font-medium text-foreground">{total}</span> data
+              Menampilkan{' '}
+              <span className="font-medium text-foreground">{startEntry}–{endEntry}</span>{' '}
+              dari <span className="font-medium text-foreground">{total}</span> data
             </p>
-            <div className="flex items-center gap-2 order-1 sm:order-2">
+            <div className="flex items-center gap-1 order-1 sm:order-2">
+              {/* Prev */}
               <Button
                 variant="outline"
                 size="sm"
-                className="h-8 px-3"
+                className="h-8 w-8 p-0"
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage <= 1}
+                aria-label="Halaman sebelumnya"
               >
-                <ChevronLeft className="h-4 w-4 mr-1" /> Sebelumnya
+                <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm font-medium px-2 tabular-nums">
-                {currentPage} / {totalPages}
-              </span>
+
+              {/* Page numbers */}
+              {getPageRange(currentPage, totalPages).map((item, idx) =>
+                item === 'ellipsis' ? (
+                  <span key={`e-${idx}`} className="h-8 w-8 flex items-center justify-center text-muted-foreground">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </span>
+                ) : (
+                  <Button
+                    key={item}
+                    variant={item === currentPage ? 'default' : 'outline'}
+                    size="sm"
+                    className={`h-8 w-8 p-0 tabular-nums ${item === currentPage ? 'pointer-events-none' : ''}`}
+                    onClick={() => goToPage(item)}
+                  >
+                    {item}
+                  </Button>
+                )
+              )}
+
+              {/* Next */}
               <Button
                 variant="outline"
                 size="sm"
-                className="h-8 px-3"
+                className="h-8 w-8 p-0"
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage >= totalPages}
+                aria-label="Halaman berikutnya"
               >
-                Berikutnya <ChevronRight className="h-4 w-4 ml-1" />
+                <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
