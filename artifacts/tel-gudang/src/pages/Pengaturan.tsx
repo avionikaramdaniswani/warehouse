@@ -400,7 +400,7 @@ export default function Pengaturan() {
                       <CardTitle className="flex items-center gap-2 text-base">
                         <Tag className="w-4 h-4 text-primary" /> Kelola Kategori Barang
                       </CardTitle>
-                      <CardDescription className="mt-1">Kategori ini digunakan pada halaman Master Barang.</CardDescription>
+                      <CardDescription className="mt-1">Kategori ini digunakan pada halaman Daftar Barang.</CardDescription>
                     </div>
                     <Button size="sm" className="bg-primary hover:bg-primary/90 shrink-0" onClick={openAdd}>
                       <Plus className="w-4 h-4 mr-1" /> Tambah

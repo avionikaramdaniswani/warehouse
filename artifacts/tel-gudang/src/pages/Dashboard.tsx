@@ -338,7 +338,7 @@ export default function Dashboard() {
             </CardTitle>
             {lowStockItems.length > 5 && (
               <Link
-                href="/items"
+                href="/barang"
                 className="text-xs text-red-600 hover:text-red-800 font-medium underline underline-offset-2"
               >
                 Lihat semua ({lowStockItems.length})
@@ -421,10 +421,10 @@ export default function Dashboard() {
               {lowStockItems.length > 5 && (
                 <div className="border-t px-4 py-3 text-center">
                   <Link
-                    href="/items"
-                    className="text-sm text-red-600 hover:text-red-800 font-medium"
+                    href="/barang"
+                    className="text-sm text-red-600 hover:text-red-800 font-medium cursor-pointer"
                   >
-                    + {lowStockItems.length - 5} item lainnya · Lihat semua di halaman Barang
+                    + {lowStockItems.length - 5} item lainnya · Lihat semua di halaman Daftar Barang
                   </Link>
                 </div>
               )}

@@ -309,7 +309,7 @@ export default function MasterBarang() {
   const endEntry = Math.min(currentPage * PAGE_SIZE, total);
 
   return (
-    <Layout title="Master Data Barang">
+    <Layout title="Daftar Barang">
       {/* Hidden QR codes for batch print */}
       <div className="sr-only" aria-hidden>
         {Array.from(selectedForPrint).map((tsCode) => (

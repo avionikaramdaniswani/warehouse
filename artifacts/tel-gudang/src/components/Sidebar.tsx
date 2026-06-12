@@ -24,7 +24,7 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
 
   const topNavItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/barang', label: 'Master Barang', icon: Package },
+    { href: '/barang', label: 'Daftar Barang', icon: Package },
     { href: '/barang-masuk', label: 'Barang Masuk', icon: PackageCheck },
     { href: '/barang-keluar', label: 'Barang Keluar', icon: PackageX },
   ];
