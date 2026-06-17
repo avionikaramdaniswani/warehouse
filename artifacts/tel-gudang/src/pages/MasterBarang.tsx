@@ -220,7 +220,7 @@ export default function MasterBarang() {
   body{padding:8mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm;font-family:'Courier New',Courier,monospace;background:#fff;align-content:start}
   .label{border:1.5px solid #333;padding:3mm 4mm;overflow:hidden;page-break-inside:avoid;break-inside:avoid;border-radius:1mm}
   .hdr{text-align:center;border-bottom:1px solid #ccc;padding-bottom:1.5mm;margin-bottom:2mm;background:#f5f5f5;margin:-3mm -4mm 2mm;padding:2mm 4mm 1.5mm;border-radius:1mm 1mm 0 0}
-  .co{font-size:5.5pt;font-weight:bold;letter-spacing:.3px;color:#111}.sub{font-size:4pt;color:#666;margin-top:.3mm}
+  .co{font-size:7.5pt;font-weight:bold;letter-spacing:.3px;color:#111}.sub{font-size:5.5pt;color:#555;margin-top:.4mm}
   .body{display:flex;gap:3mm;align-items:center}
   .qr{flex-shrink:0}.qr svg{width:30mm!important;height:30mm!important;display:block}
   .info{flex:1;min-width:0}
