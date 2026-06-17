@@ -154,44 +154,44 @@ export function ItemQRModal({ open, onClose, item }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <DialogContent className="sm:max-w-sm p-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-2">
-          <DialogTitle className="text-lg">Label QR Code</DialogTitle>
+      <DialogContent className="sm:max-w-[340px] p-0 overflow-hidden">
+        <DialogHeader className="px-5 pt-5 pb-1">
+          <DialogTitle className="text-base">Label QR Code</DialogTitle>
         </DialogHeader>
 
         {item && (
-          <div className="px-6 py-2 flex justify-center">
+          <div className="px-5 py-2 flex justify-center">
             <div
               id="qr-single-preview"
-              className="w-full max-w-[260px] border border-slate-200 rounded-xl overflow-hidden shadow-sm"
+              className="w-full border border-slate-200 rounded-lg overflow-hidden shadow-sm"
             >
-              {/* Header hijau — seragam dengan sidebar & login */}
-              <div className="bg-[#1B3A2D] px-4 py-2 text-center">
-                <p className="font-mono font-bold text-[8px] tracking-wide text-white leading-tight">
+              {/* Header hijau */}
+              <div className="bg-[#1B3A2D] px-3 py-1.5 text-center">
+                <p className="font-mono font-bold text-[7.5px] tracking-wide text-white leading-tight">
                   PT TANJUNGENIM LESTARI PULP &amp; PAPER
                 </p>
-                <p className="text-[7px] text-white/60 mt-0.5 tracking-wide">
+                <p className="text-[6.5px] text-white/60 mt-0.5 tracking-wide">
                   TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT
                 </p>
               </div>
 
               {/* QR + info */}
-              <div className="bg-white px-5 py-4 flex flex-col items-center">
-                <QRCodeSVG value={item.tsCode} size={148} level="M" />
+              <div className="bg-white px-4 py-3 flex flex-col items-center">
+                <QRCodeSVG value={item.tsCode} size={120} level="M" />
 
-                <p className="font-mono font-bold text-xl tracking-[0.2em] mt-3 mb-0.5 text-black">
+                <p className="font-mono font-bold text-lg tracking-[0.2em] mt-2 mb-0.5 text-black">
                   {item.tsCode}
                 </p>
-                <p className="text-[10px] font-semibold text-slate-600 text-center leading-snug mb-3 px-2">
+                <p className="text-[9.5px] font-semibold text-slate-600 text-center leading-snug mb-2.5 px-1">
                   {item.nama}
                 </p>
 
-                <div className="w-full border-t border-slate-200 pt-2.5 space-y-1.5">
-                  <div className="flex justify-between items-center text-[11px]">
+                <div className="w-full border-t border-slate-200 pt-2 space-y-1">
+                  <div className="flex justify-between items-center text-[10.5px]">
                     <span className="text-slate-500">MS Code</span>
                     <span className="font-mono font-bold text-slate-900">{item.msCode || '—'}</span>
                   </div>
-                  <div className="flex justify-between items-center text-[11px]">
+                  <div className="flex justify-between items-center text-[10.5px]">
                     <span className="text-slate-500">BIN LOC</span>
                     <span className="font-mono font-bold text-slate-900">{item.binLoc || '—'}</span>
                   </div>
@@ -201,13 +201,13 @@ export function ItemQRModal({ open, onClose, item }: Props) {
           </div>
         )}
 
-        <p className="text-center text-[11px] text-slate-400 px-6 pb-1">
+        <p className="text-center text-[10px] text-slate-400 px-5 pb-1">
           Klik "Cetak Label" untuk membuka dialog cetak browser
         </p>
 
-        <DialogFooter className="px-6 pb-5 pt-2 flex-row gap-2 justify-center sm:justify-center">
-          <Button variant="outline" onClick={onClose} className="min-w-[90px]">Batal</Button>
-          <Button className="bg-[#1B3A2D] hover:bg-[#244d3b] text-white min-w-[120px]" onClick={handlePrint}>
+        <DialogFooter className="px-5 pb-4 pt-1 flex-row gap-2 justify-center sm:justify-center">
+          <Button variant="outline" size="sm" onClick={onClose} className="min-w-[80px]">Batal</Button>
+          <Button size="sm" className="bg-[#1B3A2D] hover:bg-[#244d3b] text-white min-w-[110px]" onClick={handlePrint}>
             Cetak Label
           </Button>
         </DialogFooter>
