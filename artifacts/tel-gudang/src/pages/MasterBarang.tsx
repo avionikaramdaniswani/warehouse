@@ -195,16 +195,19 @@ export default function MasterBarang() {
         clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         svgHtml = clone.outerHTML;
       }
-      const nama = item.nama.length > 90 ? item.nama.slice(0, 90) + '…' : item.nama;
+      const nama = item.nama.length > 80 ? item.nama.slice(0, 80) + '…' : item.nama;
       return `<div class="label">
   <div class="hdr"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div>
-  <div class="qr">${svgHtml}</div>
-  <div class="ts">${item.tsCode}</div>
-  <div class="nama">${nama}</div>
-  <div class="divider"></div>
-  <div class="row"><span>Kategori</span><span class="val">${item.kategori || '—'}</span></div>
-  <div class="row"><span>BIN LOC</span><span class="val">${item.binLoc || '—'}</span></div>
-  <div class="row"><span>UOM</span><span class="val">${item.uom}</span></div>
+  <div class="body">
+    <div class="qr">${svgHtml}</div>
+    <div class="info">
+      <div class="ts">${item.tsCode}</div>
+      <div class="nama">${nama}</div>
+      <div class="divider"></div>
+      <div class="row"><span class="lbl">MS Code</span><span class="val">${item.msCode || '—'}</span></div>
+      <div class="row"><span class="lbl">BIN LOC</span><span class="val">${item.binLoc || '—'}</span></div>
+    </div>
+  </div>
 </div>`;
     });
     const win = window.open('', '_blank', 'width=860,height=960');
@@ -215,14 +218,17 @@ export default function MasterBarang() {
   *{margin:0;padding:0;box-sizing:border-box}
   @page{size:A4 portrait;margin:0}
   body{padding:8mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm;font-family:'Courier New',Courier,monospace;background:#fff;align-content:start}
-  .label{border:1px solid #444;padding:4mm;overflow:hidden;page-break-inside:avoid;break-inside:avoid}
-  .hdr{text-align:center;border-bottom:1px solid #999;padding-bottom:2mm;margin-bottom:2mm}
-  .co{font-size:5.5pt;font-weight:bold;letter-spacing:.3px}.sub{font-size:4.5pt;color:#555;margin-top:.5mm}
-  .qr{text-align:center;margin:.8mm 0}.qr svg{width:30mm!important;height:30mm!important;display:inline-block}
-  .ts{text-align:center;font-size:11pt;font-weight:bold;letter-spacing:2px;margin:.5mm 0}
-  .nama{text-align:center;font-size:5pt;font-weight:bold;margin:0 1mm 1mm;line-height:1.3;word-wrap:break-word}
-  .divider{border-top:1px dashed #bbb;margin:1mm 0}
-  .row{display:flex;justify-content:space-between;font-size:5pt;padding:.3mm 0}.val{font-weight:bold}
+  .label{border:1.5px solid #333;padding:3mm 4mm;overflow:hidden;page-break-inside:avoid;break-inside:avoid;border-radius:1mm}
+  .hdr{text-align:center;border-bottom:1px solid #ccc;padding-bottom:1.5mm;margin-bottom:2mm;background:#f5f5f5;margin:-3mm -4mm 2mm;padding:2mm 4mm 1.5mm;border-radius:1mm 1mm 0 0}
+  .co{font-size:5.5pt;font-weight:bold;letter-spacing:.3px;color:#111}.sub{font-size:4pt;color:#666;margin-top:.3mm}
+  .body{display:flex;gap:3mm;align-items:center}
+  .qr{flex-shrink:0}.qr svg{width:30mm!important;height:30mm!important;display:block}
+  .info{flex:1;min-width:0}
+  .ts{font-size:10.5pt;font-weight:bold;letter-spacing:1.5px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nama{font-size:4.8pt;color:#333;line-height:1.35;word-wrap:break-word;margin-top:.5mm;margin-bottom:1.5mm}
+  .divider{border-top:1px solid #ddd;margin-bottom:1.5mm}
+  .row{display:flex;justify-content:space-between;align-items:baseline;font-size:5.2pt;padding:.35mm 0;gap:2mm}
+  .lbl{color:#666;flex-shrink:0}.val{font-weight:bold;color:#000;text-align:right;word-break:break-all}
 </style>
 </head><body>${labelHtmls.join('\n')}
 <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}<\/script>
