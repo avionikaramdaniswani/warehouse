@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import * as XLSX from 'xlsx';
+import { exportStyledExcel } from '@/lib/excel-export';
 import { Layout } from '@/components/Layout';
 import { useAppContext } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -89,15 +89,13 @@ export default function LaporanBarang() {
       'Safety Stok': item.safetyStok,
       'Status': item.status,
     }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    ws['!cols'] = [
-      { wch: 4 }, { wch: 10 }, { wch: 12 }, { wch: 55 },
-      { wch: 20 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 10 },
-    ];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Laporan Barang');
     const tanggal = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'2-digit', year:'numeric' }).replace(/\//g, '-');
-    XLSX.writeFile(wb, `Laporan_Barang_${tanggal}.xlsx`);
+    exportStyledExcel({
+      rows,
+      colWidths: [4, 10, 12, 55, 20, 12, 8, 8, 12, 10],
+      sheetName: 'Laporan Barang',
+      fileName: `Laporan_Barang_${tanggal}.xlsx`,
+    });
     toast.success(`Berhasil mengekspor ${filtered.length} data`);
   };
 

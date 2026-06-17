@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import * as XLSX from 'xlsx';
+import { exportStyledExcel } from '@/lib/excel-export';
 import { Layout } from '@/components/Layout';
 import { useAppContext } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -109,15 +109,13 @@ export default function LaporanPengguna() {
       'Tanggal Gabung': fmtDate(u.tanggalGabung),
       'Login Terakhir': fmtDateTime(u.loginTerakhir),
     }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    ws['!cols'] = [
-      { wch: 4 }, { wch: 10 }, { wch: 22 }, { wch: 28 }, { wch: 10 },
-      { wch: 18 }, { wch: 20 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 18 }, { wch: 22 },
-    ];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Laporan Pengguna');
     const tanggal = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'2-digit', year:'numeric' }).replace(/\//g, '-');
-    XLSX.writeFile(wb, `Laporan_Pengguna_${tanggal}.xlsx`);
+    exportStyledExcel({
+      rows,
+      colWidths: [4, 10, 22, 28, 10, 18, 20, 14, 14, 12, 18, 22],
+      sheetName: 'Laporan Pengguna',
+      fileName: `Laporan_Pengguna_${tanggal}.xlsx`,
+    });
     toast.success(`Berhasil mengekspor ${filtered.length} data`);
   };
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import * as XLSX from 'xlsx';
+import { exportStyledExcel } from '@/lib/excel-export';
 import { Layout } from '@/components/Layout';
 import { useAppContext } from '@/context/AppContext';
 import { PeriodePicker } from '@/components/PeriodePicker';
@@ -153,15 +153,13 @@ export default function RiwayatAktivitas() {
       'Detail': r.detail ?? '',
       'IP Address': r.ipAddress ?? '',
     }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    ws['!cols'] = [
-      { wch: 4 }, { wch: 22 }, { wch: 22 }, { wch: 10 }, { wch: 10 },
-      { wch: 18 }, { wch: 50 }, { wch: 16 },
-    ];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Riwayat Aktivitas');
     const tgl = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
-    XLSX.writeFile(wb, `Riwayat_Aktivitas_${tgl}.xlsx`);
+    exportStyledExcel({
+      rows,
+      colWidths: [4, 22, 22, 10, 10, 18, 50, 16],
+      sheetName: 'Riwayat Aktivitas',
+      fileName: `Riwayat_Aktivitas_${tgl}.xlsx`,
+    });
     toast.success(`Berhasil mengekspor ${filtered.length} log`);
   };
 

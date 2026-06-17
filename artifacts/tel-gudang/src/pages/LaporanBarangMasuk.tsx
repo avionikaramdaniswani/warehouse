@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import * as XLSX from 'xlsx';
+import { exportStyledExcel } from '@/lib/excel-export';
 import { Layout } from '@/components/Layout';
 import { useAppContext } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -102,17 +102,13 @@ export default function LaporanBarangMasuk() {
       'Keterangan': r.keterangan ?? '',
       'Petugas': r.petugas,
     }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    ws['!cols'] = [
-      { wch: 4 }, { wch: 22 }, { wch: 24 }, { wch: 14 },
-      { wch: 12 }, { wch: 14 }, { wch: 45 }, { wch: 18 },
-      { wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 18 },
-      { wch: 30 }, { wch: 22 },
-    ];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Barang Masuk');
     const tgl = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
-    XLSX.writeFile(wb, `Laporan_Barang_Masuk_${tgl}.xlsx`);
+    exportStyledExcel({
+      rows,
+      colWidths: [4, 22, 24, 14, 12, 14, 45, 18, 10, 14, 10, 18, 30, 22],
+      sheetName: 'Barang Masuk',
+      fileName: `Laporan_Barang_Masuk_${tgl}.xlsx`,
+    });
     toast.success(`Berhasil mengekspor ${filtered.length} data`);
   };
 

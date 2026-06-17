@@ -78,6 +78,7 @@
     "@types/qrcode.react": "^3.0.0",
     "html5-qrcode": "^2.3.8",
     "qrcode.react": "^4.2.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xlsx-js-style": "^1.2.0"
   }
 }

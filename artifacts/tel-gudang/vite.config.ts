@@ -54,7 +54,7 @@ export default defineConfig({
     dedupe: ["react", "react-dom"],
   },
   optimizeDeps: {
-    include: ["react", "react-dom", "react-day-picker", "@radix-ui/react-popover", "xlsx"],
+    include: ["react", "react-dom", "react-day-picker", "@radix-ui/react-popover", "xlsx-js-style"],
   },
   root: path.resolve(import.meta.dirname),
   build: {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import * as XLSX from 'xlsx';
+import { exportStyledExcelAOA } from '@/lib/excel-export';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -281,11 +281,12 @@ export default function Laporan() {
         r.petugas,
       ]),
     ];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    ws['!cols'] = [4, 22, 24, 14, 12, 14, 45, 18, 10, 14, 8, 8, 28, 30, 22].map(w => ({ wch: w }));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Laporan Transaksi');
-    XLSX.writeFile(wb, `Laporan_${applied.from}_${applied.to}.xlsx`);
+    exportStyledExcelAOA({
+      data: wsData,
+      colWidths: [4, 22, 24, 14, 12, 14, 45, 18, 10, 14, 8, 8, 28, 30, 22],
+      sheetName: 'Laporan Transaksi',
+      fileName: `Laporan_${applied.from}_${applied.to}.xlsx`,
+    });
     toast.success(`Berhasil mengekspor ${searchedRows.length} baris ke Excel`);
   };
 
