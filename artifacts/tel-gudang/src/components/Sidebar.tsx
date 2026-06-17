@@ -92,11 +92,22 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
       >
         {/* Logo area */}
         {!collapsed && (
-          <div className="px-4 py-4 flex flex-col items-center gap-2 border-b border-sidebar-border">
-            <TeLLogo size="md" />
-            <div className="text-center leading-tight">
-              <p className="font-bold text-sm tracking-tight">Townsite Warehouse</p>
-              <p className="text-[10px] text-sidebar-foreground/50 uppercase tracking-wider">Materials Management System</p>
+          <div className="relative overflow-hidden border-b border-sidebar-border">
+            <div
+              className="absolute inset-0 opacity-[0.07]"
+              style={{
+                backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+                backgroundSize: '22px 22px',
+              }}
+            />
+            <div className="relative px-4 pt-5 pb-4 flex flex-col items-center gap-3">
+              <TeLLogo size="md" />
+              <div className="text-center">
+                <p className="font-bold text-[13px] tracking-tight leading-tight">Townsite Warehouse</p>
+                <p className="text-[8.5px] text-sidebar-foreground/45 uppercase tracking-[0.15em] mt-0.5">
+                  Materials Management System
+                </p>
+              </div>
             </div>
           </div>
         )}
