@@ -224,11 +224,11 @@ export default function MasterBarang() {
   .body{display:flex;gap:3mm;align-items:center}
   .qr{flex-shrink:0}.qr svg{width:30mm!important;height:30mm!important;display:block}
   .info{flex:1;min-width:0}
-  .ts{font-size:10.5pt;font-weight:bold;letter-spacing:1.5px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .nama{font-size:4.8pt;color:#333;line-height:1.35;word-wrap:break-word;margin-top:.5mm;margin-bottom:1.5mm}
-  .divider{border-top:1px solid #ddd;margin-bottom:1.5mm}
-  .row{display:flex;justify-content:space-between;align-items:baseline;font-size:5.2pt;padding:.35mm 0;gap:2mm}
-  .lbl{color:#666;flex-shrink:0}.val{font-weight:bold;color:#000;text-align:right;word-break:break-all}
+  .ts{font-size:14pt;font-weight:bold;letter-spacing:1px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
+  .nama{font-size:6pt;color:#333;line-height:1.35;word-wrap:break-word;margin-top:1mm;margin-bottom:2mm}
+  .divider{border-top:1px solid #ddd;margin-bottom:2mm}
+  .row{display:flex;justify-content:space-between;align-items:baseline;padding:.5mm 0;gap:2mm}
+  .lbl{font-size:6pt;color:#777;flex-shrink:0}.val{font-size:7.5pt;font-weight:bold;color:#000;text-align:right;word-break:break-all}
 </style>
 </head><body>${labelHtmls.join('\n')}
 <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}<\/script>
