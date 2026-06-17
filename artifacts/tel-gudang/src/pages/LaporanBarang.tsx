@@ -9,8 +9,22 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatusBadge } from '@/components/StatusBadge';
-import { Search, FileDown, Package, CheckCircle2, AlertTriangle, XCircle, FileX } from 'lucide-react';
+import { Search, FileDown, Package, CheckCircle2, AlertTriangle, XCircle, FileX, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
+
+const PAGE_SIZE = 50;
+
+function getPageRange(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | 'ellipsis')[] = [1];
+  if (current > 3) pages.push('ellipsis');
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (current < total - 2) pages.push('ellipsis');
+  pages.push(total);
+  return pages;
+}
 
 interface KategoriOption { id: number; nama: string; }
 
@@ -22,6 +36,7 @@ export default function LaporanBarang() {
   const [search, setSearch] = useState('');
   const [kategoriFilter, setKategoriFilter] = useState('Semua');
   const [statusFilter, setStatusFilter] = useState('Semua');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!token) return;
@@ -43,6 +58,17 @@ export default function LaporanBarang() {
     const matchStatus = statusFilter === 'Semua' || item.status === statusFilter;
     return matchSearch && matchKat && matchStatus;
   }), [items, search, kategoriFilter, statusFilter]);
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => { setCurrentPage(1); }, [search, kategoriFilter, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const startEntry = filtered.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
+  const endEntry = Math.min(safePage * PAGE_SIZE, filtered.length);
+  const pageItems = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  const goToPage = (p: number) => setCurrentPage(Math.max(1, Math.min(p, totalPages)));
 
   const total = items.length;
   const normal = items.filter(i => i.status === 'Normal').length;
@@ -171,7 +197,14 @@ export default function LaporanBarang() {
         <Card className="shadow-sm overflow-hidden">
           <CardHeader className="py-3 px-5 border-b bg-slate-50/80">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Menampilkan <span className="font-bold text-foreground">{filtered.length}</span> dari {total} item
+              Menampilkan{' '}
+              <span className="font-bold text-foreground">
+                {filtered.length === 0 ? 0 : `${startEntry}–${endEntry}`}
+              </span>{' '}
+              dari <span className="font-bold text-foreground">{filtered.length}</span> item
+              {filtered.length !== total && (
+                <span className="text-muted-foreground"> (difilter dari {total})</span>
+              )}
             </CardTitle>
           </CardHeader>
 
@@ -179,12 +212,12 @@ export default function LaporanBarang() {
           <div className="md:hidden divide-y">
             {isLoading ? Array.from({length:4}).map((_,i) => (
               <div key={i} className="p-4 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /></div>
-            )) : filtered.length === 0 ? (
+            )) : pageItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
                 <FileX className="h-10 w-10 mb-2 text-slate-300" />
                 <p className="font-medium text-slate-500">Tidak ada data</p>
               </div>
-            ) : filtered.map(item => (
+            ) : pageItems.map(item => (
               <div key={item.tsCode} className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <p className="font-semibold text-sm text-slate-800 break-words leading-tight">{item.nama}</p>
@@ -220,7 +253,7 @@ export default function LaporanBarang() {
               <TableBody>
                 {isLoading ? Array.from({length:6}).map((_,i) => (
                   <TableRow key={i}>{Array.from({length:10}).map((_,j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}</TableRow>
-                )) : filtered.length === 0 ? (
+                )) : pageItems.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={10} className="h-48 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground gap-2">
@@ -229,9 +262,9 @@ export default function LaporanBarang() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : filtered.map((item, idx) => (
+                ) : pageItems.map((item, idx) => (
                   <TableRow key={item.tsCode} className={item.stok === 0 ? 'bg-red-50/40' : item.stok <= item.safetyStok ? 'bg-amber-50/40' : ''}>
-                    <TableCell className="text-center text-xs text-muted-foreground">{idx + 1}</TableCell>
+                    <TableCell className="text-center text-xs text-muted-foreground">{startEntry + idx}</TableCell>
                     <TableCell className="font-mono font-medium text-slate-600 whitespace-nowrap">{item.tsCode}</TableCell>
                     <TableCell className="font-mono text-sm text-muted-foreground">{item.msCode || '—'}</TableCell>
                     <TableCell className="font-medium text-slate-800">{item.nama}</TableCell>
@@ -247,6 +280,59 @@ export default function LaporanBarang() {
             </Table>
           </div>
         </Card>
+
+        {/* Pagination bar */}
+        {!isLoading && filtered.length > PAGE_SIZE && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
+            <p className="text-sm text-muted-foreground order-2 sm:order-1">
+              Menampilkan{' '}
+              <span className="font-medium text-foreground">{startEntry}–{endEntry}</span>{' '}
+              dari <span className="font-medium text-foreground">{filtered.length}</span> data
+            </p>
+            <div className="flex items-center gap-1 order-1 sm:order-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => goToPage(safePage - 1)}
+                disabled={safePage <= 1}
+                aria-label="Halaman sebelumnya"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+
+              {getPageRange(safePage, totalPages).map((p, idx) =>
+                p === 'ellipsis' ? (
+                  <span key={`e-${idx}`} className="h-8 w-8 flex items-center justify-center text-muted-foreground">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </span>
+                ) : (
+                  <Button
+                    key={p}
+                    variant={p === safePage ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-8 w-8 p-0 tabular-nums"
+                    onClick={() => goToPage(p)}
+                  >
+                    {p}
+                  </Button>
+                )
+              )}
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => goToPage(safePage + 1)}
+                disabled={safePage >= totalPages}
+                aria-label="Halaman berikutnya"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
       </div>
     </Layout>
   );
