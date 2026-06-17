@@ -218,11 +218,11 @@ export default function MasterBarang() {
   .label{border:1px solid #444;padding:4mm;overflow:hidden;page-break-inside:avoid;break-inside:avoid}
   .hdr{text-align:center;border-bottom:1px solid #999;padding-bottom:2mm;margin-bottom:2mm}
   .co{font-size:5.5pt;font-weight:bold;letter-spacing:.3px}.sub{font-size:4.5pt;color:#555;margin-top:.5mm}
-  .qr{text-align:center;margin:1.5mm 0}.qr svg{width:40mm!important;height:40mm!important;display:inline-block}
-  .ts{text-align:center;font-size:13pt;font-weight:bold;letter-spacing:2px;margin:1mm 0}
-  .nama{text-align:center;font-size:5.5pt;font-weight:bold;margin:0 1mm 1.5mm;line-height:1.4;word-wrap:break-word}
-  .divider{border-top:1px dashed #bbb;margin:1.5mm 0}
-  .row{display:flex;justify-content:space-between;font-size:5.5pt;padding:.4mm 0}.val{font-weight:bold}
+  .qr{text-align:center;margin:.8mm 0}.qr svg{width:30mm!important;height:30mm!important;display:inline-block}
+  .ts{text-align:center;font-size:11pt;font-weight:bold;letter-spacing:2px;margin:.5mm 0}
+  .nama{text-align:center;font-size:5pt;font-weight:bold;margin:0 1mm 1mm;line-height:1.3;word-wrap:break-word}
+  .divider{border-top:1px dashed #bbb;margin:1mm 0}
+  .row{display:flex;justify-content:space-between;font-size:5pt;padding:.3mm 0}.val{font-weight:bold}
 </style>
 </head><body>${labelHtmls.join('\n')}
 <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}<\/script>
