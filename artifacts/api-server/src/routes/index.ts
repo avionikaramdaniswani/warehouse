@@ -8,6 +8,7 @@ import transaksiMasukRouter from "./transaksi-masuk.js";
 import transaksiKeluarRouter from "./transaksi-keluar.js";
 import dashboardRouter from "./dashboard.js";
 import activityRouter from "./activity.js";
+import binRouter from "./bin.js";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(transaksiMasukRouter);
 router.use(transaksiKeluarRouter);
 router.use(dashboardRouter);
 router.use(activityRouter);
+router.use(binRouter);
 
 export default router;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Layout } from '@/components/Layout';
 import { useAppContext, Item } from '@/context/AppContext';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,6 +23,7 @@ import { ItemFormModal } from '@/components/master-barang/ItemFormModal';
 import { ItemQRModal } from '@/components/master-barang/ItemQRModal';
 import { MobileItemSheet, SheetType } from '@/components/master-barang/MobileItemSheet';
 import { ImportExcelModal } from '@/components/master-barang/ImportExcelModal';
+import { PrintModeDialog } from '@/components/master-barang/PrintModeDialog';
 
 const PAGE_SIZE = 50;
 
@@ -119,6 +120,17 @@ export default function MasterBarang() {
   const [importOpen, setImportOpen] = useState(false);
 
   const isAdmin = currentUser?.role === 'admin';
+
+  const [printModeOpen, setPrintModeOpen] = useState(false);
+
+  const selectedBinLocs = useMemo(() => {
+    const bins = new Set<string>();
+    for (const tsCode of selectedForPrint) {
+      const item = pageItems.find((i) => i.tsCode === tsCode);
+      if (item?.binLoc) bins.add(item.binLoc);
+    }
+    return bins;
+  }, [selectedForPrint, pageItems]);
 
   const fetchPage = useCallback(async (
     page: number,
@@ -236,6 +248,70 @@ export default function MasterBarang() {
     win.document.close();
   };
 
+  const handleBinPrint = () => {
+    const selected = pageItems.filter((i) => selectedForPrint.has(i.tsCode));
+    const binMap = new Map<string, Item[]>();
+    for (const item of selected) {
+      if (!item.binLoc) continue;
+      if (!binMap.has(item.binLoc)) binMap.set(item.binLoc, []);
+      binMap.get(item.binLoc)!.push(item);
+    }
+    if (binMap.size === 0) {
+      toast.error('Item yang dipilih tidak memiliki BIN LOC');
+      return;
+    }
+    const labelHtmls = Array.from(binMap.entries()).map(([binLoc, items]) => {
+      const safeId = binLoc.replace(/[^a-zA-Z0-9]/g, '_');
+      const svgEl = document.getElementById(`qr-bin-${safeId}`)?.querySelector('svg');
+      let svgHtml = '';
+      if (svgEl) {
+        const clone = svgEl.cloneNode(true) as SVGElement;
+        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        svgHtml = clone.outerHTML;
+      }
+      const itemRows = items.slice(0, 5).map(i =>
+        `<div class="item-row"><span class="item-ts">${i.tsCode}</span><span class="item-nama">${i.nama.length > 52 ? i.nama.slice(0, 52) + '…' : i.nama}</span></div>`
+      ).join('');
+      const more = items.length > 5 ? `<div class="item-more">+ ${items.length - 5} item lainnya dalam slot ini</div>` : '';
+      return `<div class="label">
+  <div class="hdr"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div>
+  <div class="body">
+    <div class="qr">${svgHtml}</div>
+    <div class="bin-name">${binLoc}</div>
+    <div class="scan-hint">SCAN QR UNTUK MELIHAT ISI SLOT</div>
+    <div class="divider"></div>
+    <div class="items">${itemRows}${more}</div>
+  </div>
+</div>`;
+    });
+    const win = window.open('', '_blank', 'width=600,height=800');
+    if (!win) { toast.error('Popup diblokir — izinkan popup di browser lalu coba lagi'); return; }
+    win.document.write(`<!DOCTYPE html><html><head>
+<meta charset="UTF-8"><title>Label BIN LOC — ${binMap.size} slot</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  @page{size:A4 portrait;margin:0}
+  body{padding:8mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm;font-family:'Courier New',Courier,monospace;background:#fff;align-content:start}
+  .label{border:2px solid #1B3A2D;overflow:hidden;page-break-inside:avoid;break-inside:avoid;border-radius:2mm}
+  .hdr{text-align:center;background:#1B3A2D;padding:2mm 4mm 1.5mm}
+  .co{font-size:7.5pt;font-weight:bold;letter-spacing:.3px;color:#fff}.sub{font-size:5.5pt;color:rgba(255,255,255,.6);margin-top:.4mm}
+  .body{padding:3mm 4mm 4mm;display:flex;flex-direction:column;align-items:center}
+  .qr{margin-bottom:2mm}.qr svg{width:42mm!important;height:42mm!important;display:block}
+  .bin-name{font-size:18pt;font-weight:bold;letter-spacing:2px;color:#1B3A2D;text-align:center;margin-bottom:1mm}
+  .scan-hint{font-size:5.5pt;letter-spacing:.8px;color:#888;text-align:center;margin-bottom:2.5mm}
+  .divider{border-top:1px solid #ddd;width:100%;margin-bottom:2.5mm}
+  .items{width:100%}
+  .item-row{display:flex;gap:2mm;font-size:6pt;padding:.5mm 0;border-bottom:1px solid #f0f0f0}
+  .item-ts{font-weight:bold;color:#1B3A2D;flex-shrink:0;white-space:nowrap;min-width:14mm}
+  .item-nama{color:#555;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item-more{font-size:6pt;color:#999;text-align:center;margin-top:1mm;font-style:italic}
+</style>
+</head><body>${labelHtmls.join('\n')}
+<script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}<\/script>
+</body></html>`);
+    win.document.close();
+  };
+
   const handleSaveEdit = async (data: Partial<Item>) => {
     if (!data.tsCode) return;
     const res = await fetch(`/api/items/${data.tsCode}`, {
@@ -323,6 +399,11 @@ export default function MasterBarang() {
             <QRCodeSVG value={tsCode} size={160} />
           </div>
         ))}
+        {Array.from(selectedBinLocs).map((binLoc) => (
+          <div key={`bin-${binLoc}`} id={`qr-bin-${binLoc.replace(/[^a-zA-Z0-9]/g, '_')}`}>
+            <QRCodeSVG value={`${window.location.origin}/bin/${encodeURIComponent(binLoc)}`} size={240} />
+          </div>
+        ))}
       </div>
 
       <div className="flex flex-col gap-4">
@@ -382,7 +463,7 @@ export default function MasterBarang() {
               size="sm"
               className="h-8 text-xs bg-primary hover:bg-primary/90"
               disabled={selectedForPrint.size === 0}
-              onClick={handleBatchPrint}
+              onClick={() => setPrintModeOpen(true)}
             >
               <Printer className="h-3.5 w-3.5 mr-1.5" />
               Cetak {selectedForPrint.size > 0 ? `${selectedForPrint.size} ` : ''}Label
@@ -606,6 +687,15 @@ export default function MasterBarang() {
       </div>
 
       {/* Modals */}
+      <PrintModeDialog
+        open={printModeOpen}
+        onClose={() => setPrintModeOpen(false)}
+        selectedCount={selectedForPrint.size}
+        onSelectMode={(mode) => {
+          if (mode === 'item') handleBatchPrint();
+          else handleBinPrint();
+        }}
+      />
       <ImportExcelModal
         open={importOpen}
         onClose={() => setImportOpen(false)}

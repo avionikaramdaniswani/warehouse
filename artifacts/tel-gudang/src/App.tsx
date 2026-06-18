@@ -7,6 +7,7 @@ import { AppProvider, useAppContext } from "@/context/AppContext";
 
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/Login";
+import BinPage from "@/pages/BinPage";
 import Dashboard from "@/pages/Dashboard";
 import MasterBarang from "@/pages/MasterBarang";
 import BarangMasuk from "@/pages/BarangMasuk";
@@ -38,7 +39,8 @@ function Router() {
     <Switch>
       <Route path="/" component={() => <Redirect to="/login" />} />
       <Route path="/login" component={Login} />
-      
+      <Route path="/bin/:binLoc" component={BinPage} />
+
       <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/barang" component={() => <ProtectedRoute component={MasterBarang} />} />
       <Route path="/barang-masuk" component={() => <ProtectedRoute component={BarangMasuk} />} />
