@@ -53,7 +53,9 @@ export default function LaporanBarang() {
     const matchSearch = !q ||
       item.nama.toLowerCase().includes(q) ||
       item.tsCode.toLowerCase().includes(q) ||
-      (item.msCode ?? '').toLowerCase().includes(q);
+      (item.msCode ?? '').toLowerCase().includes(q) ||
+      (item.binLoc ?? '').toLowerCase().includes(q) ||
+      item.kategori.toLowerCase().includes(q);
     const matchKat = kategoriFilter === 'Semua' || item.kategori === kategoriFilter;
     const matchStatus = statusFilter === 'Semua' || item.status === statusFilter;
     return matchSearch && matchKat && matchStatus;
@@ -167,7 +169,7 @@ export default function LaporanBarang() {
           <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full">
             <div className="relative max-w-sm w-full">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Cari TS Code atau nama barang..." className="pl-9 bg-white" value={search} onChange={e => setSearch(e.target.value)} />
+              <Input placeholder="Cari TS Code, nama, BIN LOC, kategori..." className="pl-9 bg-white" value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <Select value={kategoriFilter} onValueChange={setKategoriFilter}>
               <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>

@@ -333,7 +333,7 @@ export default function MasterBarang() {
             <div className="relative max-w-sm w-full">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Cari nama barang atau TS Code..."
+                placeholder="Cari nama, TS Code, BIN LOC, kategori..."
                 className="pl-9 w-full bg-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

@@ -45,7 +45,9 @@ router.get("/items", authenticate, async (req, res) => {
         or(
           ilike(itemsTable.nama, `%${search}%`),
           ilike(itemsTable.tsCode, `%${search}%`),
-          ilike(itemsTable.msCode, `%${search}%`)
+          ilike(itemsTable.msCode, `%${search}%`),
+          ilike(itemsTable.binLoc, `%${search}%`),
+          ilike(itemsTable.kategori, `%${search}%`)
         ) as ReturnType<typeof eq>
       );
     }

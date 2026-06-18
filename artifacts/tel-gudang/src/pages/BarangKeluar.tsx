@@ -99,11 +99,17 @@ export default function BarangKeluar() {
   }, [fetchTransaksi]);
 
   const suggestions = items.filter(
-    (item) =>
-      searchItem.length > 1 &&
-      (item.nama.toLowerCase().includes(searchItem.toLowerCase()) ||
-        item.tsCode.toLowerCase().includes(searchItem.toLowerCase()))
-  ).slice(0, 6);
+    (item) => {
+      if (searchItem.length < 2) return false;
+      const q = searchItem.toLowerCase();
+      return (
+        item.nama.toLowerCase().includes(q) ||
+        item.tsCode.toLowerCase().includes(q) ||
+        (item.binLoc ?? '').toLowerCase().includes(q) ||
+        item.kategori.toLowerCase().includes(q)
+      );
+    }
+  ).slice(0, 8);
 
   const handleSelectItem = (item: Item) => {
     setSelectedItem(item);
