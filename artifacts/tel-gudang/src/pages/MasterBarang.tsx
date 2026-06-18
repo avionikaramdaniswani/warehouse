@@ -93,7 +93,7 @@ function stickyBg(item: Item) {
 }
 
 export default function MasterBarang() {
-  const { token, currentUser, refreshItems } = useAppContext();
+  const { token, currentUser, refreshItems, items } = useAppContext();
   const kategoris = useKategoris(token);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -249,13 +249,20 @@ export default function MasterBarang() {
   };
 
   const handleBinPrint = () => {
-    const selected = pageItems.filter((i) => selectedForPrint.has(i.tsCode));
-    const binMap = new Map<string, Item[]>();
-    for (const item of selected) {
-      if (!item.binLoc) continue;
-      if (!binMap.has(item.binLoc)) binMap.set(item.binLoc, []);
-      binMap.get(item.binLoc)!.push(item);
+    // Collect unique BIN LOCs from selected items
+    const uniqueBins = new Set<string>();
+    for (const tsCode of selectedForPrint) {
+      const item = pageItems.find((i) => i.tsCode === tsCode) ?? items.find((i) => i.tsCode === tsCode);
+      if (item?.binLoc) uniqueBins.add(item.binLoc);
     }
+
+    // Build map with ALL items per bin (from full items list, not just selected)
+    const binMap = new Map<string, Item[]>();
+    for (const binLoc of uniqueBins) {
+      const binItems = items.filter((i) => i.binLoc === binLoc);
+      if (binItems.length > 0) binMap.set(binLoc, binItems);
+    }
+
     if (binMap.size === 0) {
       toast.error('Item yang dipilih tidak memiliki BIN LOC');
       return;

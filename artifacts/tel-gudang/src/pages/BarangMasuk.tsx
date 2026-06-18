@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAppContext, Item } from '@/context/AppContext';
 import { toast } from 'sonner';
 import { QrScannerDialog } from '@/components/QrScannerDialog';
+import { BinItemSelectDialog } from '@/components/BinItemSelectDialog';
 
 interface TransaksiMasuk {
   id: number;
@@ -49,6 +50,9 @@ export default function BarangMasuk() {
 
   const [formOpen, setFormOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
+  const [binSelectOpen, setBinSelectOpen] = useState(false);
+  const [binSelectLoc, setBinSelectLoc] = useState('');
+  const [binSelectItems, setBinSelectItems] = useState<Item[]>([]);
 
   const [searchItem, setSearchItem] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -107,10 +111,37 @@ export default function BarangMasuk() {
     setFormData({ jumlah: '', tanggal: new Date().toISOString().split('T')[0], noPo: '', keterangan: '' });
   };
 
-  const handleQrScan = (tsCode: string) => {
-    const found = items.find((i) => i.tsCode === tsCode);
+  const handleQrScan = (scanned: string) => {
+    // Deteksi QR BIN LOC (URL seperti https://…/bin/TS-B.03)
+    if (scanned.includes('/bin/')) {
+      try {
+        const pathPart = scanned.includes('://') ? new URL(scanned).pathname : scanned;
+        const binLoc = decodeURIComponent(pathPart.split('/bin/')[1] ?? '').trim();
+        if (binLoc) {
+          const binItems = items.filter((i) => i.binLoc === binLoc);
+          if (binItems.length === 0) {
+            toast.error(`Tidak ada barang di BIN LOC "${binLoc}"`);
+            return;
+          }
+          if (binItems.length === 1) {
+            setSelectedItem(binItems[0]);
+            setSearchItem('');
+            setShowSuggestions(false);
+            if (!formOpen) setFormOpen(true);
+            toast.success(`Barang terdeteksi dari BIN ${binLoc}: ${binItems[0].nama}`);
+            return;
+          }
+          setBinSelectLoc(binLoc);
+          setBinSelectItems(binItems);
+          setBinSelectOpen(true);
+          return;
+        }
+      } catch { /* tidak valid sebagai URL — lanjut ke pencarian TS Code */ }
+    }
+    // Fallback: cari berdasarkan TS Code
+    const found = items.find((i) => i.tsCode === scanned);
     if (!found) {
-      toast.error(`Barang dengan kode "${tsCode}" tidak ditemukan`);
+      toast.error(`Barang dengan kode "${scanned}" tidak ditemukan`);
       return;
     }
     setSelectedItem(found);
@@ -118,6 +149,14 @@ export default function BarangMasuk() {
     setShowSuggestions(false);
     if (!formOpen) setFormOpen(true);
     toast.success(`Barang terdeteksi: ${found.nama}`);
+  };
+
+  const handleBinItemSelect = (item: Item) => {
+    setSelectedItem(item);
+    setSearchItem('');
+    setShowSuggestions(false);
+    if (!formOpen) setFormOpen(true);
+    toast.success(`Dipilih dari BIN ${binSelectLoc}: ${item.nama}`);
   };
 
   const handleSimpan = async () => {
@@ -439,6 +478,14 @@ export default function BarangMasuk() {
         onOpenChange={setQrOpen}
         onScan={handleQrScan}
         title="Scan QR Code — Barang Masuk"
+      />
+
+      <BinItemSelectDialog
+        open={binSelectOpen}
+        binLoc={binSelectLoc}
+        items={binSelectItems}
+        onSelect={handleBinItemSelect}
+        onClose={() => setBinSelectOpen(false)}
       />
 
       <button onClick={() => setQrOpen(true)}
