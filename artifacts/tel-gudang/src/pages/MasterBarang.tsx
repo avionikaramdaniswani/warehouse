@@ -196,16 +196,31 @@ export default function MasterBarang() {
 
   const exitSelectMode = () => { setIsSelectMode(false); setSelectedForPrint(new Set()); };
 
-  const handleBatchPrint = () => {
+  const fetchLogoBase64 = async (): Promise<string> => {
+    try {
+      const res = await fetch(`${window.location.origin}/tel-logo-official.png`);
+      const blob = await res.blob();
+      return await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+    } catch {
+      return '';
+    }
+  };
+
+  const handleBatchPrint = async () => {
     // Use full items list — not pageItems — so selections from other pages/filters are included
     const selected = items.filter((i) => selectedForPrint.has(i.tsCode));
     if (selected.length === 0) return;
-    const telLogoSvg = `<svg class="logo" viewBox="0 0 72 42" xmlns="http://www.w3.org/2000/svg"><rect width="72" height="42" rx="4" fill="white"/><ellipse cx="36" cy="21" rx="33" ry="18" fill="white" stroke="#e8801a" stroke-width="2.5"/><text x="36" y="27" font-family="Arial Black,Impact,sans-serif" font-size="18" font-weight="900" fill="#e8801a" text-anchor="middle" letter-spacing="-1">TeL</text></svg>`;
+    const logoDataUri = await fetchLogoBase64();
+    const logoTag = logoDataUri ? `<img src="${logoDataUri}" class="logo" alt="TEL">` : '';
     const labelHtmls = selected.map((item) => {
       const nama = item.nama.length > 80 ? item.nama.slice(0, 80) + '…' : item.nama;
       const safeId = item.tsCode.replace(/[^a-zA-Z0-9]/g, '_');
       return `<div class="label">
-  <div class="hdr">${telLogoSvg}<div class="hdr-text"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div></div>
+  <div class="hdr">${logoTag}<div class="hdr-text"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div></div>
   <div class="body">
     <div class="qr" id="qr-${safeId}" data-qr="${item.tsCode}"></div>
     <div class="info">
@@ -254,7 +269,7 @@ window.onload=function(){
     win.document.close();
   };
 
-  const handleBinPrint = () => {
+  const handleBinPrint = async () => {
     // Collect unique BIN LOCs from selected items
     const uniqueBins = new Set<string>();
     for (const tsCode of selectedForPrint) {
@@ -273,7 +288,8 @@ window.onload=function(){
       toast.error('Item yang dipilih tidak memiliki BIN LOC');
       return;
     }
-    const telLogoSvg = `<svg class="logo" viewBox="0 0 72 42" xmlns="http://www.w3.org/2000/svg"><rect width="72" height="42" rx="4" fill="white"/><ellipse cx="36" cy="21" rx="33" ry="18" fill="white" stroke="#e8801a" stroke-width="2.5"/><text x="36" y="27" font-family="Arial Black,Impact,sans-serif" font-size="18" font-weight="900" fill="#e8801a" text-anchor="middle" letter-spacing="-1">TeL</text></svg>`;
+    const logoDataUri = await fetchLogoBase64();
+    const logoTag = logoDataUri ? `<img src="${logoDataUri}" class="logo" alt="TEL">` : '';
     const labelHtmls = Array.from(binMap.entries()).map(([binLoc, binItems]) => {
       const safeId = binLoc.replace(/[^a-zA-Z0-9]/g, '_');
       const binUrl = `${window.location.origin}/bin/${encodeURIComponent(binLoc)}`;
@@ -282,7 +298,7 @@ window.onload=function(){
       ).join('');
       const more = binItems.length > 12 ? `<div class="item-more">+${binItems.length - 12} lainnya</div>` : '';
       return `<div class="label">
-  <div class="hdr">${telLogoSvg}<div class="hdr-text"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div></div>
+  <div class="hdr">${logoTag}<div class="hdr-text"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div></div>
   <div class="body">
     <div class="qr" id="qr-${safeId}" data-qr="${binUrl}"></div>
     <div class="bin-name">${binLoc}</div>
