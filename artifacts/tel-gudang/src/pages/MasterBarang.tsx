@@ -197,21 +197,16 @@ export default function MasterBarang() {
   const exitSelectMode = () => { setIsSelectMode(false); setSelectedForPrint(new Set()); };
 
   const handleBatchPrint = () => {
-    const selected = pageItems.filter((i) => selectedForPrint.has(i.tsCode));
+    // Use full items list — not pageItems — so selections from other pages/filters are included
+    const selected = items.filter((i) => selectedForPrint.has(i.tsCode));
     if (selected.length === 0) return;
     const labelHtmls = selected.map((item) => {
-      const svgEl = document.getElementById(`qr-batch-${item.tsCode}`)?.querySelector('svg');
-      let svgHtml = '';
-      if (svgEl) {
-        const clone = svgEl.cloneNode(true) as SVGElement;
-        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        svgHtml = clone.outerHTML;
-      }
       const nama = item.nama.length > 80 ? item.nama.slice(0, 80) + '…' : item.nama;
+      const safeId = item.tsCode.replace(/[^a-zA-Z0-9]/g, '_');
       return `<div class="label">
   <div class="hdr"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div>
   <div class="body">
-    <div class="qr">${svgHtml}</div>
+    <div class="qr" id="qr-${safeId}" data-qr="${item.tsCode}"></div>
     <div class="info">
       <div class="ts">${item.tsCode}</div>
       <div class="nama">${nama}</div>
@@ -234,7 +229,7 @@ export default function MasterBarang() {
   .hdr{text-align:center;background:#f5f5f5;margin:-2mm -3mm 1.5mm;padding:1.5mm 3mm 1mm;border-radius:1mm 1mm 0 0;border-bottom:1px solid #ccc}
   .co{font-size:7pt;font-weight:bold;letter-spacing:.3px;color:#111}.sub{font-size:5pt;color:#555;margin-top:.3mm}
   .body{display:flex;gap:2.5mm;align-items:center}
-  .qr{flex-shrink:0}.qr svg{width:26mm!important;height:26mm!important;display:block}
+  .qr{flex-shrink:0;width:26mm;height:26mm}.qr img,.qr canvas{width:26mm!important;height:26mm!important;display:block}
   .info{flex:1;min-width:0}
   .ts{font-size:13pt;font-weight:bold;letter-spacing:1px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
   .nama{font-size:5.5pt;color:#333;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:.8mm;margin-bottom:1.5mm}
@@ -243,7 +238,15 @@ export default function MasterBarang() {
   .lbl{font-size:5.5pt;color:#777;flex-shrink:0}.val{font-size:7pt;font-weight:bold;color:#000;text-align:right;word-break:break-all}
 </style>
 </head><body>${labelHtmls.join('\n')}
-<script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}<\/script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+<script>
+window.onload=function(){
+  document.querySelectorAll('[data-qr]').forEach(function(el){
+    new QRCode(el,{text:el.getAttribute('data-qr'),width:98,height:98,correctLevel:QRCode.CorrectLevel.M});
+  });
+  setTimeout(function(){window.print();setTimeout(function(){window.close();},1500);},800);
+};
+<\/script>
 </body></html>`);
     win.document.close();
   };
@@ -267,23 +270,17 @@ export default function MasterBarang() {
       toast.error('Item yang dipilih tidak memiliki BIN LOC');
       return;
     }
-    const labelHtmls = Array.from(binMap.entries()).map(([binLoc, items]) => {
+    const labelHtmls = Array.from(binMap.entries()).map(([binLoc, binItems]) => {
       const safeId = binLoc.replace(/[^a-zA-Z0-9]/g, '_');
-      const svgEl = document.getElementById(`qr-bin-${safeId}`)?.querySelector('svg');
-      let svgHtml = '';
-      if (svgEl) {
-        const clone = svgEl.cloneNode(true) as SVGElement;
-        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        svgHtml = clone.outerHTML;
-      }
-      const itemRows = items.slice(0, 12).map(i =>
+      const binUrl = `${window.location.origin}/bin/${encodeURIComponent(binLoc)}`;
+      const itemRows = binItems.slice(0, 12).map(i =>
         `<span class="item-ts">${i.tsCode}</span>`
       ).join('');
-      const more = items.length > 12 ? `<div class="item-more">+${items.length - 12} lainnya</div>` : '';
+      const more = binItems.length > 12 ? `<div class="item-more">+${binItems.length - 12} lainnya</div>` : '';
       return `<div class="label">
   <div class="hdr"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div>
   <div class="body">
-    <div class="qr">${svgHtml}</div>
+    <div class="qr" id="qr-${safeId}" data-qr="${binUrl}"></div>
     <div class="bin-name">${binLoc}</div>
     <div class="scan-hint">SCAN QR UNTUK MELIHAT ISI SLOT</div>
     <div class="divider"></div>
@@ -303,7 +300,7 @@ export default function MasterBarang() {
   .hdr{text-align:center;background:#1B3A2D;padding:1.5mm 3mm 1mm}
   .co{font-size:7pt;font-weight:bold;letter-spacing:.3px;color:#fff}.sub{font-size:5pt;color:rgba(255,255,255,.6);margin-top:.3mm}
   .body{padding:2mm 3mm 3mm;display:flex;flex-direction:column;align-items:center}
-  .qr{margin-bottom:1.5mm}.qr svg{width:30mm!important;height:30mm!important;display:block}
+  .qr{margin-bottom:1.5mm;width:30mm;height:30mm}.qr img,.qr canvas{width:30mm!important;height:30mm!important;display:block}
   .bin-name{font-size:15pt;font-weight:bold;letter-spacing:2px;color:#1B3A2D;text-align:center;margin-bottom:.8mm}
   .scan-hint{font-size:5pt;letter-spacing:.8px;color:#888;text-align:center;margin-bottom:2mm}
   .divider{border-top:1px solid #ddd;width:100%;margin-bottom:1.5mm}
@@ -312,7 +309,15 @@ export default function MasterBarang() {
   .item-more{width:100%;font-size:5pt;color:#999;margin-top:.8mm;font-style:italic;text-align:center}
 </style>
 </head><body>${labelHtmls.join('\n')}
-<script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}<\/script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+<script>
+window.onload=function(){
+  document.querySelectorAll('[data-qr]').forEach(function(el){
+    new QRCode(el,{text:el.getAttribute('data-qr'),width:113,height:113,correctLevel:QRCode.CorrectLevel.M});
+  });
+  setTimeout(function(){window.print();setTimeout(function(){window.close();},1500);},800);
+};
+<\/script>
 </body></html>`);
     win.document.close();
   };
