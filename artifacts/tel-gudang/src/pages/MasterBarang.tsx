@@ -229,18 +229,18 @@ export default function MasterBarang() {
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   @page{size:A4 portrait;margin:0}
-  body{padding:8mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm;font-family:'Courier New',Courier,monospace;background:#fff;align-content:start}
-  .label{border:1.5px solid #333;padding:3mm 4mm;overflow:hidden;page-break-inside:avoid;break-inside:avoid;border-radius:1mm}
-  .hdr{text-align:center;border-bottom:1px solid #ccc;padding-bottom:1.5mm;margin-bottom:2mm;background:#f5f5f5;margin:-3mm -4mm 2mm;padding:2mm 4mm 1.5mm;border-radius:1mm 1mm 0 0}
-  .co{font-size:7.5pt;font-weight:bold;letter-spacing:.3px;color:#111}.sub{font-size:5.5pt;color:#555;margin-top:.4mm}
-  .body{display:flex;gap:3mm;align-items:center}
-  .qr{flex-shrink:0}.qr svg{width:30mm!important;height:30mm!important;display:block}
+  body{padding:6mm;display:grid;grid-template-columns:1fr 1fr;gap:3mm;font-family:'Courier New',Courier,monospace;background:#fff;align-content:start}
+  .label{border:1.5px solid #333;padding:2mm 3mm;overflow:hidden;page-break-inside:avoid;break-inside:avoid;border-radius:1mm}
+  .hdr{text-align:center;background:#f5f5f5;margin:-2mm -3mm 1.5mm;padding:1.5mm 3mm 1mm;border-radius:1mm 1mm 0 0;border-bottom:1px solid #ccc}
+  .co{font-size:7pt;font-weight:bold;letter-spacing:.3px;color:#111}.sub{font-size:5pt;color:#555;margin-top:.3mm}
+  .body{display:flex;gap:2.5mm;align-items:center}
+  .qr{flex-shrink:0}.qr svg{width:26mm!important;height:26mm!important;display:block}
   .info{flex:1;min-width:0}
-  .ts{font-size:14pt;font-weight:bold;letter-spacing:1px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
-  .nama{font-size:6pt;color:#333;line-height:1.35;word-wrap:break-word;margin-top:1mm;margin-bottom:2mm}
-  .divider{border-top:1px solid #ddd;margin-bottom:2mm}
-  .row{display:flex;justify-content:space-between;align-items:baseline;padding:.5mm 0;gap:2mm}
-  .lbl{font-size:6pt;color:#777;flex-shrink:0}.val{font-size:7.5pt;font-weight:bold;color:#000;text-align:right;word-break:break-all}
+  .ts{font-size:13pt;font-weight:bold;letter-spacing:1px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
+  .nama{font-size:5.5pt;color:#333;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:.8mm;margin-bottom:1.5mm}
+  .divider{border-top:1px solid #ddd;margin-bottom:1.5mm}
+  .row{display:flex;justify-content:space-between;align-items:baseline;padding:.3mm 0;gap:2mm}
+  .lbl{font-size:5.5pt;color:#777;flex-shrink:0}.val{font-size:7pt;font-weight:bold;color:#000;text-align:right;word-break:break-all}
 </style>
 </head><body>${labelHtmls.join('\n')}
 <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}<\/script>
@@ -298,18 +298,18 @@ export default function MasterBarang() {
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   @page{size:A4 portrait;margin:0}
-  body{padding:8mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm;font-family:'Courier New',Courier,monospace;background:#fff;align-content:start}
+  body{padding:6mm;display:grid;grid-template-columns:1fr 1fr;gap:3mm;font-family:'Courier New',Courier,monospace;background:#fff;align-content:start}
   .label{border:2px solid #1B3A2D;overflow:hidden;page-break-inside:avoid;break-inside:avoid;border-radius:2mm}
-  .hdr{text-align:center;background:#1B3A2D;padding:2mm 4mm 1.5mm}
-  .co{font-size:7.5pt;font-weight:bold;letter-spacing:.3px;color:#fff}.sub{font-size:5.5pt;color:rgba(255,255,255,.6);margin-top:.4mm}
-  .body{padding:3mm 4mm 4mm;display:flex;flex-direction:column;align-items:center}
-  .qr{margin-bottom:2mm}.qr svg{width:42mm!important;height:42mm!important;display:block}
-  .bin-name{font-size:18pt;font-weight:bold;letter-spacing:2px;color:#1B3A2D;text-align:center;margin-bottom:1mm}
-  .scan-hint{font-size:5.5pt;letter-spacing:.8px;color:#888;text-align:center;margin-bottom:2.5mm}
-  .divider{border-top:1px solid #ddd;width:100%;margin-bottom:2mm}
-  .items{width:100%;display:flex;flex-wrap:wrap;gap:1.5mm}
-  .item-ts{font-size:6.5pt;font-weight:bold;color:#1B3A2D;background:#e8f5ee;border:1px solid #b2d8c0;border-radius:.8mm;padding:.8mm 1.5mm;white-space:nowrap}
-  .item-more{width:100%;font-size:5.5pt;color:#999;margin-top:1mm;font-style:italic;text-align:center}
+  .hdr{text-align:center;background:#1B3A2D;padding:1.5mm 3mm 1mm}
+  .co{font-size:7pt;font-weight:bold;letter-spacing:.3px;color:#fff}.sub{font-size:5pt;color:rgba(255,255,255,.6);margin-top:.3mm}
+  .body{padding:2mm 3mm 3mm;display:flex;flex-direction:column;align-items:center}
+  .qr{margin-bottom:1.5mm}.qr svg{width:30mm!important;height:30mm!important;display:block}
+  .bin-name{font-size:15pt;font-weight:bold;letter-spacing:2px;color:#1B3A2D;text-align:center;margin-bottom:.8mm}
+  .scan-hint{font-size:5pt;letter-spacing:.8px;color:#888;text-align:center;margin-bottom:2mm}
+  .divider{border-top:1px solid #ddd;width:100%;margin-bottom:1.5mm}
+  .items{width:100%;display:flex;flex-wrap:wrap;gap:1.2mm}
+  .item-ts{font-size:6pt;font-weight:bold;color:#1B3A2D;background:#e8f5ee;border:1px solid #b2d8c0;border-radius:.8mm;padding:.6mm 1.2mm;white-space:nowrap}
+  .item-more{width:100%;font-size:5pt;color:#999;margin-top:.8mm;font-style:italic;text-align:center}
 </style>
 </head><body>${labelHtmls.join('\n')}
 <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}<\/script>
