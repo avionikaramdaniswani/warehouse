@@ -37,6 +37,8 @@ const COL_ALIASES: Record<string, string[]> = {
   safetyStok: ['safety stok', 'safety stock', 'safety', 'min stok', 'minimum stock', 'min stock', 'min qty'],
 };
 
+const ALL_COLS = ['TS Code', 'MS Code', 'Nama Barang', 'Kategori', 'Bin Loc', 'UOM', 'Stok', 'Safety Stok'];
+
 const KATEGORI_NORMALIZE: Record<string, string> = {
   'civil': 'Civil',
   'civil material': 'Civil Material',
