@@ -200,11 +200,12 @@ export default function MasterBarang() {
     // Use full items list — not pageItems — so selections from other pages/filters are included
     const selected = items.filter((i) => selectedForPrint.has(i.tsCode));
     if (selected.length === 0) return;
+    const logoUrl = `${window.location.origin}/tel-logo-transparent.png`;
     const labelHtmls = selected.map((item) => {
       const nama = item.nama.length > 80 ? item.nama.slice(0, 80) + '…' : item.nama;
       const safeId = item.tsCode.replace(/[^a-zA-Z0-9]/g, '_');
       return `<div class="label">
-  <div class="hdr"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div>
+  <div class="hdr"><img src="${logoUrl}" class="logo" alt="TEL"><div class="hdr-text"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div></div>
   <div class="body">
     <div class="qr" id="qr-${safeId}" data-qr="${item.tsCode}"></div>
     <div class="info">
@@ -226,8 +227,10 @@ export default function MasterBarang() {
   @page{size:A4 portrait;margin:0}
   body{padding:6mm;display:grid;grid-template-columns:1fr 1fr;gap:3mm;font-family:'Courier New',Courier,monospace;background:#fff;align-content:start}
   .label{border:1.5px solid #333;padding:2mm 3mm;overflow:hidden;page-break-inside:avoid;break-inside:avoid;border-radius:1mm}
-  .hdr{text-align:center;background:#f5f5f5;margin:-2mm -3mm 1.5mm;padding:1.5mm 3mm 1mm;border-radius:1mm 1mm 0 0;border-bottom:1px solid #ccc}
-  .co{font-size:7pt;font-weight:bold;letter-spacing:.3px;color:#111}.sub{font-size:5pt;color:#555;margin-top:.3mm}
+  .hdr{display:flex;align-items:center;gap:2mm;background:#1B3A2D;margin:-2mm -3mm 1.5mm;padding:1.5mm 3mm 1mm;border-radius:1mm 1mm 0 0}
+  .logo{height:7mm;width:auto;flex-shrink:0;display:block}
+  .hdr-text{flex:1;text-align:center}
+  .co{font-size:7pt;font-weight:bold;letter-spacing:.3px;color:#fff}.sub{font-size:5pt;color:rgba(255,255,255,.65);margin-top:.3mm}
   .body{display:flex;gap:2.5mm;align-items:center}
   .qr{flex-shrink:0;width:26mm;height:26mm}.qr img,.qr canvas{width:26mm!important;height:26mm!important;display:block}
   .info{flex:1;min-width:0}
@@ -270,6 +273,7 @@ window.onload=function(){
       toast.error('Item yang dipilih tidak memiliki BIN LOC');
       return;
     }
+    const logoUrl = `${window.location.origin}/tel-logo-transparent.png`;
     const labelHtmls = Array.from(binMap.entries()).map(([binLoc, binItems]) => {
       const safeId = binLoc.replace(/[^a-zA-Z0-9]/g, '_');
       const binUrl = `${window.location.origin}/bin/${encodeURIComponent(binLoc)}`;
@@ -278,7 +282,7 @@ window.onload=function(){
       ).join('');
       const more = binItems.length > 12 ? `<div class="item-more">+${binItems.length - 12} lainnya</div>` : '';
       return `<div class="label">
-  <div class="hdr"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div>
+  <div class="hdr"><img src="${logoUrl}" class="logo" alt="TEL"><div class="hdr-text"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div></div>
   <div class="body">
     <div class="qr" id="qr-${safeId}" data-qr="${binUrl}"></div>
     <div class="bin-name">${binLoc}</div>
@@ -297,8 +301,10 @@ window.onload=function(){
   @page{size:A4 portrait;margin:0}
   body{padding:6mm;display:grid;grid-template-columns:1fr 1fr;gap:3mm;font-family:'Courier New',Courier,monospace;background:#fff;align-content:start}
   .label{border:2px solid #1B3A2D;overflow:hidden;page-break-inside:avoid;break-inside:avoid;border-radius:2mm}
-  .hdr{text-align:center;background:#1B3A2D;padding:1.5mm 3mm 1mm}
-  .co{font-size:7pt;font-weight:bold;letter-spacing:.3px;color:#fff}.sub{font-size:5pt;color:rgba(255,255,255,.6);margin-top:.3mm}
+  .hdr{display:flex;align-items:center;gap:2mm;background:#1B3A2D;padding:1.5mm 3mm 1mm}
+  .logo{height:7mm;width:auto;flex-shrink:0;display:block}
+  .hdr-text{flex:1;text-align:center}
+  .co{font-size:7pt;font-weight:bold;letter-spacing:.3px;color:#fff}.sub{font-size:5pt;color:rgba(255,255,255,.65);margin-top:.3mm}
   .body{padding:2mm 3mm 3mm;display:flex;flex-direction:column;align-items:center}
   .qr{margin-bottom:1.5mm;width:30mm;height:30mm}.qr img,.qr canvas{width:30mm!important;height:30mm!important;display:block}
   .bin-name{font-size:15pt;font-weight:bold;letter-spacing:2px;color:#1B3A2D;text-align:center;margin-bottom:.8mm}
