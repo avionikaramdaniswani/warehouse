@@ -276,10 +276,10 @@ export default function MasterBarang() {
         clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         svgHtml = clone.outerHTML;
       }
-      const itemRows = items.slice(0, 5).map(i =>
-        `<div class="item-row"><span class="item-ts">${i.tsCode}</span><span class="item-nama">${i.nama.length > 52 ? i.nama.slice(0, 52) + '…' : i.nama}</span></div>`
+      const itemRows = items.slice(0, 12).map(i =>
+        `<span class="item-ts">${i.tsCode}</span>`
       ).join('');
-      const more = items.length > 5 ? `<div class="item-more">+ ${items.length - 5} item lainnya dalam slot ini</div>` : '';
+      const more = items.length > 12 ? `<div class="item-more">+${items.length - 12} lainnya</div>` : '';
       return `<div class="label">
   <div class="hdr"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div>
   <div class="body">
@@ -306,12 +306,10 @@ export default function MasterBarang() {
   .qr{margin-bottom:2mm}.qr svg{width:42mm!important;height:42mm!important;display:block}
   .bin-name{font-size:18pt;font-weight:bold;letter-spacing:2px;color:#1B3A2D;text-align:center;margin-bottom:1mm}
   .scan-hint{font-size:5.5pt;letter-spacing:.8px;color:#888;text-align:center;margin-bottom:2.5mm}
-  .divider{border-top:1px solid #ddd;width:100%;margin-bottom:2.5mm}
-  .items{width:100%}
-  .item-row{display:flex;gap:2mm;font-size:6pt;padding:.5mm 0;border-bottom:1px solid #f0f0f0}
-  .item-ts{font-weight:bold;color:#1B3A2D;flex-shrink:0;white-space:nowrap;min-width:14mm}
-  .item-nama{color:#555;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .item-more{font-size:6pt;color:#999;text-align:center;margin-top:1mm;font-style:italic}
+  .divider{border-top:1px solid #ddd;width:100%;margin-bottom:2mm}
+  .items{width:100%;display:flex;flex-wrap:wrap;gap:1.5mm}
+  .item-ts{font-size:6.5pt;font-weight:bold;color:#1B3A2D;background:#e8f5ee;border:1px solid #b2d8c0;border-radius:.8mm;padding:.8mm 1.5mm;white-space:nowrap}
+  .item-more{width:100%;font-size:5.5pt;color:#999;margin-top:1mm;font-style:italic;text-align:center}
 </style>
 </head><body>${labelHtmls.join('\n')}
 <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);}<\/script>
