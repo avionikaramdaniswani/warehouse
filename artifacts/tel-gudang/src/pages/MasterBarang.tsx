@@ -293,18 +293,19 @@ window.onload=function(){
     const labelHtmls = Array.from(binMap.entries()).map(([binLoc, binItems]) => {
       const safeId = binLoc.replace(/[^a-zA-Z0-9]/g, '_');
       const binUrl = `${window.location.origin}/bin/${encodeURIComponent(binLoc)}`;
-      const itemRows = binItems.slice(0, 12).map(i =>
-        `<span class="item-ts">${i.tsCode}</span>`
+      const itemRows = binItems.slice(0, 16).map(i =>
+        `<div class="item-row"><span class="item-ts">${i.tsCode}</span><span class="item-ms">${i.msCode || '—'}</span></div>`
       ).join('');
-      const more = binItems.length > 12 ? `<div class="item-more">+${binItems.length - 12} lainnya</div>` : '';
+      const more = binItems.length > 16 ? `<div class="item-more">+${binItems.length - 16} lainnya</div>` : '';
       return `<div class="label">
   <div class="hdr">${logoTag}<div class="hdr-text"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div></div>
   <div class="body">
-    <div class="qr" id="qr-${safeId}" data-qr="${binUrl}"></div>
-    <div class="bin-name">${binLoc}</div>
-    <div class="scan-hint">SCAN QR UNTUK MELIHAT ISI SLOT</div>
-    <div class="divider"></div>
-    <div class="items">${itemRows}${more}</div>
+    <div class="col-qr"><div class="qr" id="qr-${safeId}" data-qr="${binUrl}"></div></div>
+    <div class="col-info">
+      <div class="bin-name">${binLoc}</div>
+      <div class="divider"></div>
+      <div class="items">${itemRows}${more}</div>
+    </div>
   </div>
 </div>`;
     });
@@ -321,14 +322,17 @@ window.onload=function(){
   .logo{height:7mm;width:auto;flex-shrink:0;display:block}
   .hdr-text{flex:1;text-align:center}
   .co{font-size:7pt;font-weight:bold;letter-spacing:.3px;color:#fff !important}.sub{font-size:5pt;color:rgba(255,255,255,.75) !important;margin-top:.3mm}
-  .body{padding:2mm 3mm 3mm;display:flex;flex-direction:column;align-items:center}
-  .qr{margin-bottom:1.5mm;width:30mm;height:30mm}.qr img,.qr canvas{width:30mm!important;height:30mm!important;display:block}
-  .bin-name{font-size:15pt;font-weight:bold;letter-spacing:2px;color:#1B3A2D;text-align:center;margin-bottom:.8mm}
-  .scan-hint{font-size:5pt;letter-spacing:.8px;color:#888;text-align:center;margin-bottom:2mm}
-  .divider{border-top:1px solid #ddd;width:100%;margin-bottom:1.5mm}
-  .items{width:100%;display:flex;flex-wrap:wrap;gap:1.2mm}
-  .item-ts{font-size:6pt;font-weight:bold;color:#1B3A2D;background:#e8f5ee;border:1px solid #b2d8c0;border-radius:.8mm;padding:.6mm 1.2mm;white-space:nowrap}
-  .item-more{width:100%;font-size:5pt;color:#999;margin-top:.8mm;font-style:italic;text-align:center}
+  .body{padding:2mm 3mm 3mm;display:flex;gap:3mm;align-items:flex-start}
+  .col-qr{flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .qr{width:32mm;height:32mm}.qr img,.qr canvas{width:32mm!important;height:32mm!important;display:block}
+  .col-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1.5mm}
+  .bin-name{font-size:16pt;font-weight:bold;letter-spacing:2px;color:#1B3A2D;line-height:1.1}
+  .divider{border-top:1.5px solid #ddd;width:100%}
+  .items{display:flex;flex-direction:column;gap:.8mm}
+  .item-row{display:flex;gap:2mm;align-items:baseline}
+  .item-ts{font-size:6.5pt;font-weight:bold;color:#1B3A2D;white-space:nowrap}
+  .item-ms{font-size:5.5pt;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item-more{font-size:5pt;color:#999;font-style:italic}
 </style>
 </head><body>${labelHtmls.join('\n')}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
