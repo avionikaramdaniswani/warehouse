@@ -25,7 +25,7 @@ import { MobileItemSheet, SheetType } from '@/components/master-barang/MobileIte
 import { ImportExcelModal } from '@/components/master-barang/ImportExcelModal';
 import { PrintModeDialog } from '@/components/master-barang/PrintModeDialog';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE_OPTIONS = [50, 100, 150, 200, 300, 400, 500];
 
 function getPageRange(current: number, total: number): (number | 'ellipsis')[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
@@ -104,6 +104,7 @@ export default function MasterBarang() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
   const [isLoading, setIsLoading] = useState(true);
 
   const [isSelectMode, setIsSelectMode] = useState(false);
@@ -137,11 +138,12 @@ export default function MasterBarang() {
     search: string,
     kategori: string,
     status: string,
+    limit = 50,
   ) => {
     if (!token) return;
     setIsLoading(true);
     try {
-      const params = new URLSearchParams({ page: String(page), limit: String(PAGE_SIZE) });
+      const params = new URLSearchParams({ page: String(page), limit: String(limit) });
       if (search) params.set('search', search);
       if (kategori !== 'Semua') params.set('kategori', kategori);
       if (status !== 'Semua') params.set('status', status);
@@ -165,7 +167,7 @@ export default function MasterBarang() {
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      fetchPage(1, searchTerm, categoryFilter, statusFilter);
+      fetchPage(1, searchTerm, categoryFilter, statusFilter, pageSize);
     }, searchTerm ? 300 : 0);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [searchTerm, categoryFilter, statusFilter, fetchPage]);
@@ -173,7 +175,13 @@ export default function MasterBarang() {
   const goToPage = (p: number) => {
     if (p < 1 || p > totalPages || p === currentPage) return;
     setSelectedForPrint(new Set());
-    fetchPage(p, searchTerm, categoryFilter, statusFilter);
+    fetchPage(p, searchTerm, categoryFilter, statusFilter, pageSize);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setSelectedForPrint(new Set());
+    fetchPage(1, searchTerm, categoryFilter, statusFilter, newSize);
   };
 
   const allPageSelected =
@@ -365,7 +373,7 @@ window.onload=function(){
     }
     setEditOpen(false);
     toast.success('Data barang berhasil diperbarui');
-    fetchPage(currentPage, searchTerm, categoryFilter, statusFilter);
+    fetchPage(currentPage, searchTerm, categoryFilter, statusFilter, pageSize);
     refreshItems();
   };
 
@@ -389,12 +397,12 @@ window.onload=function(){
     }
     setAddOpen(false);
     toast.success('Barang baru berhasil ditambahkan');
-    fetchPage(1, searchTerm, categoryFilter, statusFilter);
+    fetchPage(1, searchTerm, categoryFilter, statusFilter, pageSize);
     refreshItems();
   };
 
   const handleImported = async () => {
-    fetchPage(1, searchTerm, categoryFilter, statusFilter);
+    fetchPage(1, searchTerm, categoryFilter, statusFilter, pageSize);
     refreshItems();
   };
 
@@ -414,7 +422,7 @@ window.onload=function(){
       toast.success(`Barang "${deleteTarget.nama}" berhasil dihapus`);
       setDeleteTarget(null);
       const newPage = pageItems.length === 1 && currentPage > 1 ? currentPage - 1 : currentPage;
-      fetchPage(newPage, searchTerm, categoryFilter, statusFilter);
+      fetchPage(newPage, searchTerm, categoryFilter, statusFilter, pageSize);
       refreshItems();
     } catch {
       toast.error('Gagal terhubung ke server');
@@ -423,8 +431,8 @@ window.onload=function(){
     }
   };
 
-  const startEntry = total === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
-  const endEntry = Math.min(currentPage * PAGE_SIZE, total);
+  const startEntry = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const endEntry = Math.min(currentPage * pageSize, total);
 
   return (
     <Layout title="Daftar Barang">
@@ -668,11 +676,23 @@ window.onload=function(){
         {/* Pagination bar */}
         {!isLoading && total > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
-            <p className="text-sm text-muted-foreground order-2 sm:order-1">
-              Menampilkan{' '}
-              <span className="font-medium text-foreground">{startEntry}–{endEntry}</span>{' '}
-              dari <span className="font-medium text-foreground">{total}</span> data
-            </p>
+            <div className="flex items-center gap-2 order-2 sm:order-1">
+              <p className="text-sm text-muted-foreground">
+                Menampilkan{' '}
+                <span className="font-medium text-foreground">{startEntry}–{endEntry}</span>{' '}
+                dari <span className="font-medium text-foreground">{total}</span> data
+              </p>
+              <select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                className="text-sm border rounded-md px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                aria-label="Jumlah data per halaman"
+              >
+                {PAGE_SIZE_OPTIONS.map((n) => (
+                  <option key={n} value={n}>{n} / hal</option>
+                ))}
+              </select>
+            </div>
             <div className="flex items-center gap-1 order-1 sm:order-2">
               {/* Prev */}
               <Button
