@@ -32,7 +32,7 @@ interface CombinedRow {
   jumlah: number; ref: string; keterangan: string | null; petugas: string;
 }
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE_OPTIONS_LAPORAN = [10, 25, 50, 100, 150, 200, 300];
 
 const HARI = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 const HARI_FULL = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -93,6 +93,9 @@ export default function Laporan() {
   // Table UI state
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+
+  useEffect(() => { setPage(1); }, [search, pageSize]);
 
   // Fetch all data once
   useEffect(() => {
@@ -235,11 +238,11 @@ export default function Laporan() {
     );
   }, [combinedRows, search]);
 
-  const totalPages = Math.max(1, Math.ceil(searchedRows.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(searchedRows.length / pageSize));
   const safePageRef = useRef(page);
   const safePage = Math.min(page, totalPages);
   if (safePageRef.current !== safePage) safePageRef.current = safePage;
-  const pageRows = searchedRows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const pageRows = searchedRows.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   const labelPeriode = applied.from === applied.to
     ? fmt(applied.from)
@@ -531,9 +534,15 @@ export default function Laporan() {
 
               {/* Pagination */}
               <div className="p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-slate-500">
-                <span>
-                  {Math.min((safePage - 1) * PAGE_SIZE + 1, searchedRows.length)}–{Math.min(safePage * PAGE_SIZE, searchedRows.length)} dari {searchedRows.length.toLocaleString('id-ID')} baris
-                </span>
+                <div className="flex items-center gap-2">
+                  <span>
+                    {searchedRows.length === 0 ? '0' : Math.min((safePage - 1) * pageSize + 1, searchedRows.length)}–{Math.min(safePage * pageSize, searchedRows.length)} dari {searchedRows.length.toLocaleString('id-ID')} baris
+                  </span>
+                  <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}
+                    className="text-sm border rounded-md px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
+                    {PAGE_SIZE_OPTIONS_LAPORAN.map(n => <option key={n} value={n}>{n} / hal</option>)}
+                  </select>
+                </div>
                 <div className="flex items-center gap-1">
                   <Button variant="outline" size="sm" disabled={safePage <= 1} onClick={() => setPage(p => p - 1)}>
                     <ChevronLeft className="h-4 w-4" />

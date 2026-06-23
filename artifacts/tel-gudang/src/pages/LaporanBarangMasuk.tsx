@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, FileDown, PackageCheck, Hash, Layers, CalendarDays, FileX } from 'lucide-react';
+import { Search, FileDown, PackageCheck, Hash, Layers, CalendarDays, FileX, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 import { PeriodePicker } from '@/components/PeriodePicker';
 
@@ -26,6 +26,17 @@ interface TransaksiMasuk {
   uom: string;
   binLoc: string | null;
   petugas: string;
+}
+
+const PAGE_SIZE_OPTIONS = [50, 100, 150, 200, 300, 400, 500];
+function getPageRange(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | 'ellipsis')[] = [1];
+  if (current > 3) pages.push('ellipsis');
+  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i);
+  if (current < total - 2) pages.push('ellipsis');
+  pages.push(total);
+  return pages;
 }
 
 const today = new Date().toISOString().slice(0, 10);
@@ -51,6 +62,8 @@ export default function LaporanBarangMasuk() {
   const [search, setSearch] = useState('');
   const [dateFrom, setDateFrom] = useState(firstOfMonth);
   const [dateTo, setDateTo] = useState(today);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
 
   useEffect(() => {
     if (!token) return;
@@ -61,6 +74,8 @@ export default function LaporanBarangMasuk() {
       .catch(() => toast.error('Gagal memuat data transaksi masuk'))
       .finally(() => setIsLoading(false));
   }, [token]);
+
+  useEffect(() => { setCurrentPage(1); }, [search, dateFrom, dateTo, pageSize]);
 
   const filtered = useMemo(() => {
     const from = dateFrom ? new Date(dateFrom) : null;
@@ -83,6 +98,12 @@ export default function LaporanBarangMasuk() {
   const totalQty = filtered.reduce((s, r) => s + r.jumlah, 0);
   const avgQty = totalTransaksi > 0 ? Math.round(totalQty / totalTransaksi) : 0;
   const denganPo = filtered.filter(r => r.noPo).length;
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageItems = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const startEntry = filtered.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const endEntry = Math.min(safePage * pageSize, filtered.length);
 
   const handleExportExcel = () => {
     if (filtered.length === 0) { toast.error('Tidak ada data untuk diekspor'); return; }
@@ -208,7 +229,7 @@ export default function LaporanBarangMasuk() {
                 <FileX className="h-10 w-10 text-slate-300" />
                 <p className="font-medium text-slate-500">Tidak ada data</p>
               </div>
-            ) : filtered.map(row => (
+            ) : pageItems.map(row => (
               <div key={row.id} className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <div>
@@ -256,9 +277,9 @@ export default function LaporanBarangMasuk() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : filtered.map((row, idx) => (
+                ) : pageItems.map((row, idx) => (
                   <TableRow key={row.id}>
-                    <TableCell className="text-center text-xs text-muted-foreground">{idx + 1}</TableCell>
+                    <TableCell className="text-center text-xs text-muted-foreground">{startEntry + idx}</TableCell>
                     <TableCell className="font-mono text-sm font-medium text-slate-700 whitespace-nowrap">{row.nomor}</TableCell>
                     <TableCell className="text-sm whitespace-nowrap">{fmtTgl(row.tanggal)}</TableCell>
                     <TableCell className="font-mono text-sm text-slate-600 whitespace-nowrap">{row.tsCode}</TableCell>
@@ -273,6 +294,30 @@ export default function LaporanBarangMasuk() {
             </Table>
           </div>
         </Card>
+
+        {/* Pagination bar */}
+        {!isLoading && filtered.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
+            <div className="flex items-center gap-2 order-2 sm:order-1">
+              <p className="text-sm text-muted-foreground">
+                Menampilkan <span className="font-medium text-foreground">{startEntry}–{endEntry}</span>{' '}
+                dari <span className="font-medium text-foreground">{totalTransaksi}</span> transaksi
+              </p>
+              <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
+                className="text-sm border rounded-md px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
+                {PAGE_SIZE_OPTIONS.map(n => <option key={n} value={n}>{n} / hal</option>)}
+              </select>
+            </div>
+            <div className="flex items-center gap-1 order-1 sm:order-2">
+              <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={safePage <= 1}><ChevronLeft className="h-4 w-4" /></Button>
+              {getPageRange(safePage, totalPages).map((p, idx) => p === 'ellipsis'
+                ? <span key={`e${idx}`} className="h-8 w-8 flex items-center justify-center text-muted-foreground"><MoreHorizontal className="h-4 w-4" /></span>
+                : <Button key={p} variant={p === safePage ? 'default' : 'outline'} size="sm" className="h-8 w-8 p-0 tabular-nums" onClick={() => setCurrentPage(p)}>{p}</Button>
+              )}
+              <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={safePage >= totalPages}><ChevronRight className="h-4 w-4" /></Button>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
