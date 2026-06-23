@@ -15,8 +15,8 @@ interface Props {
 }
 
 function statusBadge(item: Item) {
-  if (item.stok === 0) return <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Habis</Badge>;
-  if (item.stok <= item.safetyStok) return <Badge className="text-[10px] px-1.5 py-0 bg-amber-500 hover:bg-amber-500">Menipis</Badge>;
+  if (item.stok === 0) return <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Critical</Badge>;
+  if (item.stok <= item.safetyStok) return <Badge className="text-[10px] px-1.5 py-0 bg-amber-500 hover:bg-amber-500">Warning</Badge>;
   return <Badge className="text-[10px] px-1.5 py-0 bg-emerald-600 hover:bg-emerald-600">Normal</Badge>;
 }
 

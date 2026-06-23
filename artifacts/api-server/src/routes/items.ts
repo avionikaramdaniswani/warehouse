@@ -10,8 +10,8 @@ import { logActivity } from "../lib/activity.js";
 const router = Router();
 
 function computeStatus(stok: number, safetyStok: number): string {
-  if (stok === 0) return "Habis";
-  if (stok <= safetyStok) return "Menipis";
+  if (stok === 0) return "Critical";
+  if (stok <= safetyStok) return "Warning";
   return "Normal";
 }
 
@@ -54,9 +54,9 @@ router.get("/items", authenticate, async (req, res) => {
     if (kategori && kategori !== "Semua") {
       conditions.push(eq(itemsTable.kategori, kategori) as ReturnType<typeof eq>);
     }
-    if (statusQ === "Habis") {
+    if (statusQ === "Critical") {
       conditions.push(eq(itemsTable.stok, 0) as ReturnType<typeof eq>);
-    } else if (statusQ === "Menipis") {
+    } else if (statusQ === "Warning") {
       conditions.push(and(gt(itemsTable.stok, 0), lte(itemsTable.stok, itemsTable.safetyStok)) as ReturnType<typeof eq>);
     } else if (statusQ === "Normal") {
       conditions.push(gt(itemsTable.stok, itemsTable.safetyStok) as ReturnType<typeof eq>);

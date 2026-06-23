@@ -478,8 +478,8 @@ window.onload=function(){
               <SelectContent>
                 <SelectItem value="Semua">Semua Status</SelectItem>
                 <SelectItem value="Normal">Normal</SelectItem>
-                <SelectItem value="Menipis">Menipis</SelectItem>
-                <SelectItem value="Habis">Habis</SelectItem>
+                <SelectItem value="Warning">Warning</SelectItem>
+                <SelectItem value="Critical">Critical</SelectItem>
               </SelectContent>
             </Select>
           </div>

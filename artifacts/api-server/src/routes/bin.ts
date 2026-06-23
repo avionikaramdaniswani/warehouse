@@ -6,8 +6,8 @@ import { eq, and, asc } from "drizzle-orm";
 const router = Router();
 
 function computeStatus(stok: number, safetyStok: number): string {
-  if (stok === 0) return "Habis";
-  if (stok <= safetyStok) return "Menipis";
+  if (stok === 0) return "Critical";
+  if (stok <= safetyStok) return "Warning";
   return "Normal";
 }
 

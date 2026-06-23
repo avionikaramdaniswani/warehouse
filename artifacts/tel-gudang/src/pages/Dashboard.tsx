@@ -130,7 +130,7 @@ export default function Dashboard() {
             <div>
               {isLoading ? <StatSkeleton /> : (
                 <>
-                  <p className="text-xs sm:text-sm font-medium text-red-600 mb-1">Stok Menipis</p>
+                  <p className="text-xs sm:text-sm font-medium text-red-600 mb-1">Warning Stock</p>
                   <h3 className="text-2xl sm:text-3xl font-bold text-red-700">{lowStockItems.length}</h3>
                 </>
               )}
@@ -329,7 +329,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-red-700 flex items-center gap-2">
               <PackageMinus className="h-5 w-5" />
-              Barang Stok Menipis
+              Warning Stock
               {!isLoading && lowStockItems.length > 0 && (
                 <span className="ml-1 text-xs font-normal bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
                   {lowStockItems.length} item

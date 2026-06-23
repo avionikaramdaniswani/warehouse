@@ -76,8 +76,8 @@ export default function LaporanBarang() {
 
   const total = items.length;
   const normal = items.filter(i => i.status === 'Normal').length;
-  const menipis = items.filter(i => i.status === 'Menipis').length;
-  const habis = items.filter(i => i.status === 'Habis').length;
+  const menipis = items.filter(i => i.status === 'Warning').length;
+  const habis = items.filter(i => i.status === 'Critical').length;
 
   const handleExportExcel = () => {
     if (filtered.length === 0) { toast.error('Tidak ada data untuk diekspor'); return; }
@@ -145,7 +145,7 @@ export default function LaporanBarang() {
                   <AlertTriangle className="h-5 w-5 text-amber-500" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground font-medium uppercase">Menipis</p>
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Warning</p>
                   {isLoading ? <Skeleton className="h-7 w-12 mt-1" /> : <p className="text-2xl font-bold font-mono text-amber-600">{menipis}</p>}
                 </div>
               </div>
@@ -158,7 +158,7 @@ export default function LaporanBarang() {
                   <XCircle className="h-5 w-5 text-red-500" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground font-medium uppercase">Habis</p>
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Critical</p>
                   {isLoading ? <Skeleton className="h-7 w-12 mt-1" /> : <p className="text-2xl font-bold font-mono text-red-600">{habis}</p>}
                 </div>
               </div>
@@ -185,8 +185,8 @@ export default function LaporanBarang() {
               <SelectContent>
                 <SelectItem value="Semua">Semua Status</SelectItem>
                 <SelectItem value="Normal">Normal</SelectItem>
-                <SelectItem value="Menipis">Menipis</SelectItem>
-                <SelectItem value="Habis">Habis</SelectItem>
+                <SelectItem value="Warning">Warning</SelectItem>
+                <SelectItem value="Critical">Critical</SelectItem>
               </SelectContent>
             </Select>
           </div>

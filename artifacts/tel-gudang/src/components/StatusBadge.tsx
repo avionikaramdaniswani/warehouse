@@ -12,10 +12,10 @@ export function StatusBadge({ status }: StatusBadgeProps) {
     case 'Aktif':
       colorClass = 'bg-green-500 hover:bg-green-600 text-white';
       break;
-    case 'Menipis':
+    case 'Warning':
       colorClass = 'bg-amber-500 hover:bg-amber-600 text-white';
       break;
-    case 'Habis':
+    case 'Critical':
     case 'Admin':
       colorClass = 'bg-red-500 hover:bg-red-600 text-white';
       break;

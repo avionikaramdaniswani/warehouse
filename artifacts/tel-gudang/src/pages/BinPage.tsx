@@ -14,14 +14,14 @@ interface BinItem {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  if (status === 'Habis') return (
+  if (status === 'Critical') return (
     <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded px-1.5 py-0.5">
-      <XCircle className="w-3 h-3" /> Habis
+      <XCircle className="w-3 h-3" /> Critical
     </span>
   );
-  if (status === 'Menipis') return (
+  if (status === 'Warning') return (
     <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
-      <AlertTriangle className="w-3 h-3" /> Menipis
+      <AlertTriangle className="w-3 h-3" /> Warning
     </span>
   );
   return (
@@ -54,8 +54,8 @@ export default function BinPage() {
   }, [binLoc]);
 
   const normal = items.filter(i => i.status === 'Normal').length;
-  const menipis = items.filter(i => i.status === 'Menipis').length;
-  const habis = items.filter(i => i.status === 'Habis').length;
+  const menipis = items.filter(i => i.status === 'Warning').length;
+  const habis = items.filter(i => i.status === 'Critical').length;
 
   return (
     <div className="min-h-screen bg-[#0f2419] flex flex-col">
@@ -86,11 +86,11 @@ export default function BinPage() {
                 <p className="text-xl font-bold text-green-600">{normal}</p>
               </div>
               <div className="py-3 text-center">
-                <p className="text-[10px] text-slate-400 uppercase font-semibold">Menipis</p>
+                <p className="text-[10px] text-slate-400 uppercase font-semibold">Warning</p>
                 <p className="text-xl font-bold text-amber-500">{menipis}</p>
               </div>
               <div className="py-3 text-center">
-                <p className="text-[10px] text-slate-400 uppercase font-semibold">Habis</p>
+                <p className="text-[10px] text-slate-400 uppercase font-semibold">Critical</p>
                 <p className="text-xl font-bold text-red-500">{habis}</p>
               </div>
             </div>
@@ -136,8 +136,8 @@ export default function BinPage() {
                 <div
                   key={item.tsCode}
                   className={`bg-white rounded-xl p-4 shadow-sm border-l-4 ${
-                    item.status === 'Habis' ? 'border-red-400' :
-                    item.status === 'Menipis' ? 'border-amber-400' :
+                    item.status === 'Critical' ? 'border-red-400' :
+                    item.status === 'Warning' ? 'border-amber-400' :
                     'border-green-400'
                   }`}
                 >
