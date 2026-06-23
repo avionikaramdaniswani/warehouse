@@ -485,7 +485,7 @@ window.onload=function(){
             </Select>
           </div>
           <div className="flex gap-2 w-full sm:w-auto shrink-0 flex-wrap">
-            {!isSelectMode && (
+            {!isSelectMode && canEdit && (
               <Button variant="outline" onClick={() => setIsSelectMode(true)} className="w-full sm:w-auto">
                 <CheckSquare className="mr-2 h-4 w-4" /> Pilih Item
               </Button>
@@ -779,6 +779,7 @@ window.onload=function(){
         open={qrOpen}
         onClose={() => setQrOpen(false)}
         item={selectedItem}
+        canPrint={canEdit}
       />
       <ItemFormModal
         mode="edit"
@@ -803,6 +804,7 @@ window.onload=function(){
         token={token}
         kategoris={kategoris}
         onClose={() => setSheetType(null)}
+        canPrint={canEdit}
         onSaveEdit={async (data) => {
           await handleSaveEdit(data);
         }}

@@ -9,9 +9,10 @@ interface Props {
   open: boolean;
   onClose: () => void;
   item: Item | null;
+  canPrint?: boolean;
 }
 
-export function ItemQRModal({ open, onClose, item }: Props) {
+export function ItemQRModal({ open, onClose, item, canPrint = true }: Props) {
   const handlePrintBin = () => {
     if (!item?.binLoc) {
       toast.error('Item ini tidak memiliki BIN LOC');
@@ -273,34 +274,40 @@ export function ItemQRModal({ open, onClose, item }: Props) {
           </div>
         )}
 
-        <p className="text-center text-[10px] text-slate-400 px-5 pb-1">
-          Klik "Cetak Label" untuk membuka dialog cetak browser
-        </p>
+        {canPrint && (
+          <p className="text-center text-[10px] text-slate-400 px-5 pb-1">
+            Klik "Cetak Label" untuk membuka dialog cetak browser
+          </p>
+        )}
 
         <DialogFooter className="px-5 pb-4 pt-1 flex-col gap-2 sm:flex-col">
-          <div className="flex gap-2 justify-center">
-            <Button
-              size="sm"
-              className="bg-[#1B3A2D] hover:bg-[#244d3b] text-white flex-1"
-              onClick={handlePrint}
-            >
-              Label Item
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-[#1B3A2D] text-[#1B3A2D] hover:bg-green-50 flex-1"
-              onClick={handlePrintBin}
-              disabled={!item?.binLoc}
-              title={!item?.binLoc ? 'Item tidak memiliki BIN LOC' : `Cetak label untuk slot ${item.binLoc}`}
-            >
-              <MapPin className="h-3.5 w-3.5 mr-1.5" />
-              Label BIN
-            </Button>
-          </div>
-          <p className="text-center text-[10px] text-slate-400">
-            <strong>Label Item</strong> = QR TS Code · <strong>Label BIN</strong> = QR slot rak
-          </p>
+          {canPrint && (
+            <>
+              <div className="flex gap-2 justify-center">
+                <Button
+                  size="sm"
+                  className="bg-[#1B3A2D] hover:bg-[#244d3b] text-white flex-1"
+                  onClick={handlePrint}
+                >
+                  Label Item
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-[#1B3A2D] text-[#1B3A2D] hover:bg-green-50 flex-1"
+                  onClick={handlePrintBin}
+                  disabled={!item?.binLoc}
+                  title={!item?.binLoc ? 'Item tidak memiliki BIN LOC' : `Cetak label untuk slot ${item.binLoc}`}
+                >
+                  <MapPin className="h-3.5 w-3.5 mr-1.5" />
+                  Label BIN
+                </Button>
+              </div>
+              <p className="text-center text-[10px] text-slate-400">
+                <strong>Label Item</strong> = QR TS Code · <strong>Label BIN</strong> = QR slot rak
+              </p>
+            </>
+          )}
           <Button variant="ghost" size="sm" onClick={onClose} className="w-full text-slate-500">Tutup</Button>
         </DialogFooter>
       </DialogContent>

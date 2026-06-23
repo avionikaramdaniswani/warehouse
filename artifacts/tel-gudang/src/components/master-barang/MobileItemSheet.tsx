@@ -23,6 +23,7 @@ interface TrxRow {
 export type SheetType = 'detail' | 'edit' | 'qr';
 
 interface Props {
+  canPrint?: boolean;
   type: SheetType | null;
   item: Item | null;
   token: string | null;
@@ -37,7 +38,7 @@ function stockColor(item: Item) {
   return 'text-foreground';
 }
 
-export function MobileItemSheet({ type, item, token, kategoris, onClose, onSaveEdit }: Props) {
+export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrint = true, onSaveEdit }: Props) {
   const [formData, setFormData] = useState<Partial<Item>>({});
   const [saving, setSaving] = useState(false);
   const [history, setHistory] = useState<TrxRow[]>([]);
@@ -311,14 +312,18 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, onSaveE
                   </div>
                 </div>
               </div>
-              <p className="text-xs text-slate-400 -mt-2 text-center">
-                Klik "Cetak Label" untuk membuka dialog cetak browser
-              </p>
+              {canPrint && (
+                <p className="text-xs text-slate-400 -mt-2 text-center">
+                  Klik "Cetak Label" untuk membuka dialog cetak browser
+                </p>
+              )}
               <div className="flex gap-2 w-full pb-2">
-                <Button variant="outline" className="flex-1" onClick={onClose}>Batal</Button>
-                <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={handlePrint}>
-                  Cetak Label
-                </Button>
+                <Button variant="outline" className={canPrint ? 'flex-1' : 'w-full'} onClick={onClose}>Tutup</Button>
+                {canPrint && (
+                  <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={handlePrint}>
+                    Cetak Label
+                  </Button>
+                )}
               </div>
             </div>
           )}
