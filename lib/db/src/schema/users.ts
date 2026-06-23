@@ -6,7 +6,7 @@ import {
   timestamp,
   integer,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
@@ -64,33 +64,49 @@ export const activityLogsRelations = relations(activityLogsTable, ({ one }) => (
   }),
 }));
 
-export const insertUserSchema = createInsertSchema(usersTable)
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-    loginTerakhir: true,
-  })
-  .extend({
-    password: z.string().min(8, "Password minimal 8 karakter"),
-    email: z.string().email("Format email tidak valid"),
-    nik: z.string().min(1, "NIK tidak boleh kosong"),
-    namaLengkap: z.string().min(1, "Nama lengkap tidak boleh kosong"),
-  });
+export const insertUserSchema = z.object({
+  nik: z.string().min(1, "NIK tidak boleh kosong"),
+  namaLengkap: z.string().min(1, "Nama lengkap tidak boleh kosong"),
+  email: z.string().email("Format email tidak valid"),
+  password: z.string().min(8, "Password minimal 8 karakter"),
+  role: z.enum(["admin", "operator", "viewer"]).default("viewer"),
+  noHp: z.string().nullable().optional(),
+  departemen: z.string().nullable().optional(),
+  jabatan: z.string().nullable().optional(),
+  seksi: z.string().nullable().optional(),
+  status: z.enum(["active", "inactive", "suspended"]).default("active"),
+  dibuatOleh: z.number().nullable().optional(),
+  tanggalGabung: z.string().optional(),
+});
 
 export const updateUserSchema = insertUserSchema
   .partial()
   .omit({ password: true });
 
-export const selectUserSchema = createSelectSchema(usersTable).omit({
-  password: true,
+export const selectUserSchema = z.object({
+  id: z.number(),
+  nik: z.string(),
+  namaLengkap: z.string(),
+  email: z.string(),
+  role: z.enum(["admin", "operator", "viewer"]),
+  noHp: z.string().nullable(),
+  departemen: z.string().nullable(),
+  jabatan: z.string().nullable(),
+  seksi: z.string().nullable(),
+  status: z.enum(["active", "inactive", "suspended"]),
+  dibuatOleh: z.number().nullable(),
+  tanggalGabung: z.string(),
+  loginTerakhir: z.string().nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
-export const insertActivityLogSchema = createInsertSchema(
-  activityLogsTable,
-).omit({
-  id: true,
-  createdAt: true,
+export const insertActivityLogSchema = z.object({
+  userId: z.number(),
+  aksi: z.string(),
+  detail: z.string().nullable().optional(),
+  ipAddress: z.string().nullable().optional(),
+  userAgent: z.string().nullable().optional(),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

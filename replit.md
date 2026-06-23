@@ -71,6 +71,7 @@ Data awal (dari Materials_2026.xlsx):
 ## Gotchas
 
 - Jangan pakai `zod/v4` di mana pun — esbuild tidak bisa resolve subpath, dan `z.email()` (v4 API) tidak ada di zod v3; pakai `z.string().email()`
+- **Jangan pakai `createInsertSchema`/`createSelectSchema` dari `drizzle-zod`** — drizzle-zod menggunakan Zod v4 internals, sehingga hasilnya tidak kompatibel dengan Zod v3. Tulis schema secara manual dengan `z.object({...})` biasa.
 - Jalankan `pnpm --filter @workspace/db run push` setiap ada perubahan skema DB
 - Vite dev server jalan di port 5000 (bukan 8080 seperti di replit.md lama)
 - API server jalan di port 8082 (bukan 8081)
