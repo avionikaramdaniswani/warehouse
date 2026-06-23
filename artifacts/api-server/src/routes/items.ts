@@ -34,7 +34,7 @@ router.get("/items", authenticate, async (req, res) => {
   // — Paginated mode (saat page param ada) —
   if (pageParam !== undefined) {
     const page = Math.max(1, parseInt(pageParam) || 1);
-    const limit = Math.min(200, Math.max(1, parseInt(req.query.limit as string) || 50));
+    const limit = Math.min(500, Math.max(1, parseInt(req.query.limit as string) || 50));
     const search = ((req.query.search as string) ?? "").trim();
     const kategori = (req.query.kategori as string) ?? "";
     const statusQ = (req.query.status as string) ?? "";
