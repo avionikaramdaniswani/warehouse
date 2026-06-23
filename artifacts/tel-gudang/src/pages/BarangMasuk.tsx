@@ -38,7 +38,8 @@ function formatWaktu(iso: string): string {
 }
 
 export default function BarangMasuk() {
-  const { items, setItems, token } = useAppContext();
+  const { items, setItems, token, currentUser } = useAppContext();
+  const canEdit = currentUser?.role !== 'viewer';
 
   const [transaksi, setTransaksi] = useState<TransaksiMasuk[]>([]);
   const [loading, setLoading] = useState(false);
@@ -274,15 +275,17 @@ export default function BarangMasuk() {
               </Button>
             )}
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-            <Button
-              className="flex-1 sm:flex-none h-9"
-              onClick={() => { resetForm(); setFormOpen(true); }}
-            >
-              <Plus className="h-4 w-4 mr-1.5" />
-              Input Penerimaan
-            </Button>
-          </div>
+          {canEdit && (
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button
+                className="flex-1 sm:flex-none h-9"
+                onClick={() => { resetForm(); setFormOpen(true); }}
+              >
+                <Plus className="h-4 w-4 mr-1.5" />
+                Input Penerimaan
+              </Button>
+            </div>
+          )}
         </div>
 
         {(search || filterTanggal || filterKategori !== 'Semua') && (

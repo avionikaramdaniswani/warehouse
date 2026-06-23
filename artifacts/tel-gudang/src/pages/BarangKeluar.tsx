@@ -50,7 +50,8 @@ function formatWaktu(iso: string): string {
 }
 
 export default function BarangKeluar() {
-  const { items, setItems, token } = useAppContext();
+  const { items, setItems, token, currentUser } = useAppContext();
+  const canEdit = currentUser?.role !== 'viewer';
 
   const [transaksi, setTransaksi] = useState<TransaksiKeluar[]>([]);
   const [loading, setLoading] = useState(false);
@@ -287,13 +288,15 @@ export default function BarangKeluar() {
               </Button>
             )}
           </div>
-          <Button
-            className="w-full sm:w-auto h-9"
-            onClick={() => { resetForm(); setFormOpen(true); }}
-          >
-            <Plus className="h-4 w-4 mr-1.5" />
-            Input Pengeluaran
-          </Button>
+          {canEdit && (
+            <Button
+              className="w-full sm:w-auto h-9"
+              onClick={() => { resetForm(); setFormOpen(true); }}
+            >
+              <Plus className="h-4 w-4 mr-1.5" />
+              Input Pengeluaran
+            </Button>
+          )}
         </div>
 
         {(search || filterKeperluan !== 'Semua' || filterTanggal) && (

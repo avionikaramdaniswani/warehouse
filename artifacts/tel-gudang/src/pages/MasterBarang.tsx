@@ -121,6 +121,7 @@ export default function MasterBarang() {
   const [importOpen, setImportOpen] = useState(false);
 
   const isAdmin = currentUser?.role === 'admin';
+  const canEdit = currentUser?.role === 'admin' || currentUser?.role === 'operator';
 
   const [printModeOpen, setPrintModeOpen] = useState(false);
 
@@ -489,12 +490,16 @@ window.onload=function(){
                 <CheckSquare className="mr-2 h-4 w-4" /> Pilih Item
               </Button>
             )}
-            <Button variant="outline" onClick={() => setImportOpen(true)} className="w-full sm:w-auto border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400">
-              <FileSpreadsheet className="mr-2 h-4 w-4" /> Import Excel
-            </Button>
-            <Button onClick={() => setAddOpen(true)} className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" /> Tambah Barang
-            </Button>
+            {canEdit && (
+              <Button variant="outline" onClick={() => setImportOpen(true)} className="w-full sm:w-auto border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400">
+                <FileSpreadsheet className="mr-2 h-4 w-4" /> Import Excel
+              </Button>
+            )}
+            {canEdit && (
+              <Button onClick={() => setAddOpen(true)} className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" /> Tambah Barang
+              </Button>
+            )}
           </div>
         </div>
 
@@ -562,10 +567,12 @@ window.onload=function(){
                       onClick={() => { setSelectedItem(item); setSheetType('detail'); }}>
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50"
-                      onClick={() => { setSelectedItem(item); setSheetType('edit'); }}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
+                    {canEdit && (
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50"
+                        onClick={() => { setSelectedItem(item); setSheetType('edit'); }}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600 hover:bg-slate-100"
                       onClick={() => { setSelectedItem(item); setSheetType('qr'); }}>
                       <QrCode className="h-4 w-4" />
@@ -652,10 +659,12 @@ window.onload=function(){
                           onClick={() => { setSelectedItem(item); setDetailOpen(true); }}>
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50"
-                          onClick={() => { setSelectedItem(item); setEditOpen(true); }}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
+                        {canEdit && (
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50"
+                            onClick={() => { setSelectedItem(item); setEditOpen(true); }}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600 hover:bg-slate-100"
                           onClick={() => { setSelectedItem(item); setQrOpen(true); }}>
                           <QrCode className="h-4 w-4" />
