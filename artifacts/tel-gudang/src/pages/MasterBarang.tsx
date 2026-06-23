@@ -180,6 +180,8 @@ export default function MasterBarang() {
 
   const handlePageSizeChange = (newSize: number) => {
     setPageSize(newSize);
+    setCurrentPage(1);
+    setTotalPages(1);
     setSelectedForPrint(new Set());
     fetchPage(1, searchTerm, categoryFilter, statusFilter, newSize);
   };

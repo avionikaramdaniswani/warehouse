@@ -12,7 +12,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { Search, FileDown, Package, CheckCircle2, AlertTriangle, XCircle, FileX, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE_OPTIONS = [50, 100, 150, 200, 300, 400, 500];
 
 function getPageRange(current: number, total: number): (number | 'ellipsis')[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
@@ -37,6 +37,7 @@ export default function LaporanBarang() {
   const [kategoriFilter, setKategoriFilter] = useState('Semua');
   const [statusFilter, setStatusFilter] = useState('Semua');
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
 
   useEffect(() => {
     if (!token) return;
@@ -61,16 +62,17 @@ export default function LaporanBarang() {
     return matchSearch && matchKat && matchStatus;
   }), [items, search, kategoriFilter, statusFilter]);
 
-  // Reset to page 1 whenever filters change
-  useEffect(() => { setCurrentPage(1); }, [search, kategoriFilter, statusFilter]);
+  // Reset to page 1 whenever filters or page size change
+  useEffect(() => { setCurrentPage(1); }, [search, kategoriFilter, statusFilter, pageSize]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
-  const startEntry = filtered.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
-  const endEntry = Math.min(safePage * PAGE_SIZE, filtered.length);
-  const pageItems = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const startEntry = filtered.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const endEntry = Math.min(safePage * pageSize, filtered.length);
+  const pageItems = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   const goToPage = (p: number) => setCurrentPage(Math.max(1, Math.min(p, totalPages)));
+  const handlePageSizeChange = (newSize: number) => { setPageSize(newSize); setCurrentPage(1); };
 
   const total = items.length;
   const normal = items.filter(i => i.status === 'Normal').length;
@@ -282,13 +284,25 @@ export default function LaporanBarang() {
         </Card>
 
         {/* Pagination bar */}
-        {!isLoading && filtered.length > PAGE_SIZE && (
+        {!isLoading && filtered.length > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
-            <p className="text-sm text-muted-foreground order-2 sm:order-1">
-              Menampilkan{' '}
-              <span className="font-medium text-foreground">{startEntry}–{endEntry}</span>{' '}
-              dari <span className="font-medium text-foreground">{filtered.length}</span> data
-            </p>
+            <div className="flex items-center gap-2 order-2 sm:order-1">
+              <p className="text-sm text-muted-foreground">
+                Menampilkan{' '}
+                <span className="font-medium text-foreground">{startEntry}–{endEntry}</span>{' '}
+                dari <span className="font-medium text-foreground">{filtered.length}</span> data
+              </p>
+              <select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                className="text-sm border rounded-md px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                aria-label="Jumlah data per halaman"
+              >
+                {PAGE_SIZE_OPTIONS.map((n) => (
+                  <option key={n} value={n}>{n} / hal</option>
+                ))}
+              </select>
+            </div>
             <div className="flex items-center gap-1 order-1 sm:order-2">
               <Button
                 variant="outline"
