@@ -5,8 +5,8 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 loadEnv({ path: path.resolve(__dirname, "../../.env"), quiet: true });
 
-import app from "./app";
-import { logger } from "./lib/logger";
+const { default: app } = await import("./app.js");
+const { logger } = await import("./lib/logger.js");
 
 const rawPort = process.env["PORT"];
 
