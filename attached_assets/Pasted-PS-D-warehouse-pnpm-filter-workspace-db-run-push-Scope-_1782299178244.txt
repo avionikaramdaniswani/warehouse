@@ -1,0 +1,48 @@
+PS D:\warehouse> pnpm --filter @workspace/db run push
+Scope: all 8 workspace projects
+✓ Lockfile passes supply-chain policies (543 entries in 8.5s)
+Lockfile is up to date, resolution step is skipped
+Packages: +537
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 537, reused 537, downloaded 0, added 537, done
+
+dependencies:
++ concurrently 10.0.3
+
+devDependencies:
++ prettier 3.8.3
++ typescript 5.9.3
+
+. preinstall$ sh -c 'rm -f package-lock.json yarn.lock; case "$npm_config_user_agent" in pnpm/*) ;; *) echo "Use pnpm…
+│ 'sh' is not recognized as an internal or external command,
+│ operable program or batch file.
+└─ Failed in 123ms at D:\warehouse
+[ELIFECYCLE] Command failed with exit code 1.
+[ERROR] Command failed with exit code 1: "C:\Program Files\nodejs\node.exe" "C:\Users\afio1\AppData\Roaming\npm\node_modules\pnpm\bin\pnpm.mjs" install
+
+pnpm: Command failed with exit code 1: "C:\Program Files\nodejs\node.exe" "C:\Users\afio1\AppData\Roaming\npm\node_modules\pnpm\bin\pnpm.mjs" install
+    at getFinalError (file:///C:/Users/afio1/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.mjs:34291:14)
+    at makeError (file:///C:/Users/afio1/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.mjs:36598:21)
+    at getSyncResult (file:///C:/Users/afio1/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.mjs:38442:10)
+    at spawnSubprocessSync (file:///C:/Users/afio1/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.mjs:38402:14)
+    at execaCoreSync (file:///C:/Users/afio1/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.mjs:38332:23)
+    at callBoundExeca (file:///C:/Users/afio1/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.mjs:40860:23)
+    at boundExeca (file:///C:/Users/afio1/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.mjs:40837:49)
+    at sync (file:///C:/Users/afio1/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.mjs:40996:10)
+    at runPnpmCli (file:///C:/Users/afio1/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.mjs:247126:5)
+    at runDepsStatusCheck (file:///C:/Users/afio1/AppData/Roaming/npm/node_modules/pnpm/dist/pnpm.mjs:248869:7)
+PS D:\warehouse> psql -U postgres -c "CREATE DATABASE telgudang;"
+Password for user postgres:
+
+CREATE DATABASE
+PS D:\warehouse> psql postgresql://postgres:Avionika27@localhost:5432/telgudang -f scripts/seed.sql
+psql:scripts/seed.sql:18: ERROR:  relation "users" does not exist
+LINE 1: INSERT INTO users (nik, nama_lengkap, email, password, role,...
+                    ^
+psql:scripts/seed.sql:32: ERROR:  relation "kategori" does not exist
+LINE 1: INSERT INTO kategori (nama, keterangan, is_active, created_a...
+                    ^
+psql:scripts/seed.sql:55: ERROR:  relation "items" does not exist
+LINE 1: INSERT INTO items (ts_code, ms_code, nama, kategori, bin_loc...
+                    ^
+PS D:\warehouse>
