@@ -1,6 +1,10 @@
 import { defineConfig } from "drizzle-kit";
 import { config as loadEnv } from "dotenv";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 loadEnv({ path: path.resolve(__dirname, "../../.env"), quiet: true });
 
@@ -9,7 +13,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 export default defineConfig({
-  schema: path.join(__dirname, "./src/schema/index.ts"),
+  schema: "./src/schema/index.ts",
   dialect: "postgresql",
   dbCredentials: {
     url: process.env.DATABASE_URL,
