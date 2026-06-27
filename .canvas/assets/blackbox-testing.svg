@@ -1,0 +1,610 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2600 3285" width="2600" height="3285" style="font-family:Arial,sans-serif;background:#fff;">
+<!-- Title -->
+<rect x="0" y="0" width="2600" height="55" fill="#1e3a6e"/>
+<text x="1300" y="22" text-anchor="middle" font-size="16" font-weight="bold" fill="#fff" font-family="Arial,sans-serif">PENGUJIAN BLACK BOX</text>
+<text x="1300" y="42" text-anchor="middle" font-size="13" fill="#93c5fd" font-family="Arial,sans-serif">Sistem Manajemen Inventori Gudang — Tel Gudang (PT Tanjungenim Lestari Pulp &amp; Paper)</text>
+
+<!-- Header -->
+<rect x="0" y="55" width="55" height="50" fill="#1e3a6e"/>
+<text x="6" y="83" font-size="12" font-weight="bold" fill="#fff" font-family="Arial,sans-serif">No.</text><line x1="0" y1="55" x2="0" y2="105" stroke="#2d5ba3" stroke-width="1"/>
+<rect x="55" y="55" width="180" height="50" fill="#1e3a6e"/>
+<text x="61" y="83" font-size="12" font-weight="bold" fill="#fff" font-family="Arial,sans-serif">Modul</text><line x1="55" y1="55" x2="55" y2="105" stroke="#2d5ba3" stroke-width="1"/>
+<rect x="235" y="55" width="250" height="50" fill="#1e3a6e"/>
+<text x="241" y="83" font-size="12" font-weight="bold" fill="#fff" font-family="Arial,sans-serif">Nama Pengujian</text><line x1="235" y1="55" x2="235" y2="105" stroke="#2d5ba3" stroke-width="1"/>
+<rect x="485" y="55" width="280" height="50" fill="#1e3a6e"/>
+<text x="491" y="83" font-size="12" font-weight="bold" fill="#fff" font-family="Arial,sans-serif">Prosedur Pengujian</text><line x1="485" y1="55" x2="485" y2="105" stroke="#2d5ba3" stroke-width="1"/>
+<rect x="765" y="55" width="330" height="50" fill="#1e3a6e"/>
+<text x="771" y="83" font-size="12" font-weight="bold" fill="#fff" font-family="Arial,sans-serif">Keluaran yang Diharapkan</text><line x1="765" y1="55" x2="765" y2="105" stroke="#2d5ba3" stroke-width="1"/>
+<rect x="1095" y="55" width="290" height="50" fill="#1e3a6e"/>
+<text x="1101" y="83" font-size="12" font-weight="bold" fill="#fff" font-family="Arial,sans-serif">Data Masukan</text><line x1="1095" y1="55" x2="1095" y2="105" stroke="#2d5ba3" stroke-width="1"/>
+<rect x="1385" y="55" width="110" height="50" fill="#1e3a6e"/>
+<text x="1391" y="83" font-size="12" font-weight="bold" fill="#fff" font-family="Arial,sans-serif">Status</text><line x1="1385" y1="55" x2="1385" y2="105" stroke="#2d5ba3" stroke-width="1"/>
+<rect x="0" y="55" width="2600" height="50" fill="none" stroke="#1e3a6e" stroke-width="1.5"/>
+
+
+<!-- Rows -->
+<rect x="0" y="105" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="105" width="180" height="375" fill="#dbeafe"/>
+<rect x="55" y="105" width="180" height="375" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="295.5" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">Autentikasi</text><rect x="1393" y="129.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="147.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="145.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">1</text><text x="241" y="145.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login - Kredensial Valid</text><text x="491" y="137.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Buka halaman login, masukkan email &amp; password</text>
+<text x="491" y="153" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">terdaftar, klik Masuk</text><text x="771" y="137.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Redirect ke dashboard, JWT tersimpan, nama user tampil</text>
+<text x="771" y="153" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">di navbar</text><text x="1101" y="137.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Email: admin@telgudang.com</text>
+<text x="1101" y="153" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Password: Admin@12345</text><line x1="0" y1="180" x2="2600" y2="180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="105" x2="0" y2="180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="105" x2="55" y2="180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="105" x2="235" y2="180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="105" x2="485" y2="180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="105" x2="765" y2="180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="105" x2="1095" y2="180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="105" x2="1385" y2="180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="105" x2="2600" y2="180" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="180" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="204.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="222.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="220.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">2</text><text x="241" y="220.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login - Password Salah</text><text x="491" y="212.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Masukkan email valid, password salah, klik</text>
+<text x="491" y="228" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Masuk</text><text x="771" y="220.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Pesan error 'Email atau password salah'</text><text x="1101" y="212.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Email: admin@telgudang.com</text>
+<text x="1101" y="228" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Password: salah123</text><line x1="0" y1="255" x2="2600" y2="255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="180" x2="0" y2="255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="180" x2="55" y2="255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="180" x2="235" y2="255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="180" x2="485" y2="255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="180" x2="765" y2="255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="180" x2="1095" y2="255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="180" x2="1385" y2="255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="180" x2="2600" y2="255" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="255" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="279.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="297.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="295.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">3</text><text x="241" y="295.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login - Email Tidak Terdaftar</text><text x="491" y="295.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Masukkan email yang tidak ada di sistem</text><text x="771" y="295.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Pesan error 'Email atau password salah'</text><text x="1101" y="287.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Email: unknown@test.com</text>
+<text x="1101" y="303" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Password: Test@123</text><line x1="0" y1="330" x2="2600" y2="330" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="255" x2="0" y2="330" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="255" x2="55" y2="330" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="255" x2="235" y2="330" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="255" x2="485" y2="330" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="255" x2="765" y2="330" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="255" x2="1095" y2="330" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="255" x2="1385" y2="330" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="255" x2="2600" y2="330" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="330" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="354.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="372.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="370.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">4</text><text x="241" y="370.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login - Field Kosong</text><text x="491" y="370.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik tombol Masuk tanpa mengisi field apapun</text><text x="771" y="370.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Validasi form menolak submit, field wajib ditandai</text><text x="1101" y="362.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Email: (kosong)</text>
+<text x="1101" y="378" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Password: (kosong)</text><line x1="0" y1="405" x2="2600" y2="405" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="330" x2="0" y2="405" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="330" x2="55" y2="405" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="330" x2="235" y2="405" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="330" x2="485" y2="405" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="330" x2="765" y2="405" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="330" x2="1095" y2="405" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="330" x2="1385" y2="405" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="330" x2="2600" y2="405" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="405" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="429.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="447.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="445.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">5</text><text x="241" y="445.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Logout</text><text x="491" y="445.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login terlebih dahulu, klik tombol Logout</text><text x="771" y="445.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">JWT dihapus, redirect ke halaman login</text><text x="1101" y="445.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi aktif sebagai admin</text><line x1="0" y1="480" x2="2600" y2="480" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="405" x2="0" y2="480" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="405" x2="55" y2="480" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="405" x2="235" y2="480" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="405" x2="485" y2="480" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="405" x2="765" y2="480" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="405" x2="1095" y2="480" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="405" x2="1385" y2="480" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="405" x2="2600" y2="480" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="480" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="480" width="180" height="150" fill="#d1fae5"/>
+<rect x="55" y="480" width="180" height="150" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="558" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">Dashboard</text><rect x="1393" y="504.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="522.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="520.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">6</text><text x="241" y="520.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Lihat Statistik Ringkasan</text><text x="491" y="512.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login sebagai admin/operator, buka halaman</text>
+<text x="491" y="528" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Dashboard</text><text x="771" y="512.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Menampilkan total barang, total stok, transaksi</text>
+<text x="771" y="528" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">masuk/keluar</text><text x="1101" y="520.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login aktif</text><line x1="0" y1="555" x2="2600" y2="555" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="480" x2="0" y2="555" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="480" x2="55" y2="555" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="480" x2="235" y2="555" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="480" x2="485" y2="555" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="480" x2="765" y2="555" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="480" x2="1095" y2="555" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="480" x2="1385" y2="555" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="480" x2="2600" y2="555" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="555" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="579.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="597.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="595.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">7</text><text x="241" y="595.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Akses Dashboard sebagai Viewer</text><text x="491" y="595.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login sebagai viewer, buka Dashboard</text><text x="771" y="595.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Dashboard tampil (read-only), tanpa tombol tambah/edit</text><text x="1101" y="595.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login role: viewer</text><line x1="0" y1="630" x2="2600" y2="630" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="555" x2="0" y2="630" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="555" x2="55" y2="630" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="555" x2="235" y2="630" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="555" x2="485" y2="630" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="555" x2="765" y2="630" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="555" x2="1095" y2="630" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="555" x2="1385" y2="630" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="555" x2="2600" y2="630" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="630" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="630" width="180" height="525" fill="#fef9c3"/>
+<rect x="55" y="630" width="180" height="525" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="895.5" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">Manajemen Barang</text><rect x="1393" y="654.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="672.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="670.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">8</text><text x="241" y="670.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Lihat Daftar Barang</text><text x="491" y="670.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Buka menu Barang</text><text x="771" y="662.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Tabel barang tampil lengkap dengan nama, kategori,</text>
+<text x="771" y="678" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">stok, MS Code</text><text x="1101" y="670.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login aktif</text><line x1="0" y1="705" x2="2600" y2="705" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="630" x2="0" y2="705" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="630" x2="55" y2="705" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="630" x2="235" y2="705" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="630" x2="485" y2="705" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="630" x2="765" y2="705" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="630" x2="1095" y2="705" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="630" x2="1385" y2="705" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="630" x2="2600" y2="705" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="705" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="729.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="747.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="745.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">9</text><text x="241" y="745.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Tambah Barang - Data Valid</text><text x="491" y="737.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik Tambah Barang, isi semua field, klik</text>
+<text x="491" y="753" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Simpan</text><text x="771" y="737.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Barang tersimpan, muncul di daftar, log aktivitas</text>
+<text x="771" y="753" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">tercatat</text><text x="1101" y="713.625" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Nama: Pipa PVC 3"</text>
+<text x="1101" y="729.375" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Kategori: Civil</text>
+<text x="1101" y="745.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Satuan: Batang</text>
+<text x="1101" y="760.875" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Stok: 50</text>
+<text x="1101" y="776.625" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">MS Code: 10023</text><line x1="0" y1="780" x2="2600" y2="780" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="705" x2="0" y2="780" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="705" x2="55" y2="780" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="705" x2="235" y2="780" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="705" x2="485" y2="780" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="705" x2="765" y2="780" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="705" x2="1095" y2="780" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="705" x2="1385" y2="780" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="705" x2="2600" y2="780" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="780" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="804.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="822.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="820.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">10</text><text x="241" y="820.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Tambah Barang - Field Wajib Kosong</text><text x="491" y="812.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik Tambah Barang, biarkan nama kosong, klik</text>
+<text x="491" y="828" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Simpan</text><text x="771" y="820.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Validasi menolak, pesan error pada field nama</text><text x="1101" y="812.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Nama: (kosong)</text>
+<text x="1101" y="828" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Kategori: Civil</text><line x1="0" y1="855" x2="2600" y2="855" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="780" x2="0" y2="855" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="780" x2="55" y2="855" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="780" x2="235" y2="855" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="780" x2="485" y2="855" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="780" x2="765" y2="855" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="780" x2="1095" y2="855" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="780" x2="1385" y2="855" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="780" x2="2600" y2="855" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="855" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="879.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="897.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="895.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">11</text><text x="241" y="895.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Edit Data Barang</text><text x="491" y="887.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik ikon edit pada barang, ubah data, klik</text>
+<text x="491" y="903" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Simpan</text><text x="771" y="895.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Data barang ter-update, perubahan tampil di tabel</text><text x="1101" y="887.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Nama diubah: Pipa PVC 4"</text>
+<text x="1101" y="903" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Stok diubah: 75</text><line x1="0" y1="930" x2="2600" y2="930" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="855" x2="0" y2="930" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="855" x2="55" y2="930" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="855" x2="235" y2="930" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="855" x2="485" y2="930" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="855" x2="765" y2="930" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="855" x2="1095" y2="930" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="855" x2="1385" y2="930" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="855" x2="2600" y2="930" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="930" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="954.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="972.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="970.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">12</text><text x="241" y="970.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Hapus Barang</text><text x="491" y="970.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik ikon hapus pada barang, konfirmasi dialog</text><text x="771" y="970.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Barang terhapus dari daftar, log aktivitas tercatat</text><text x="1101" y="970.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Barang: Pipa PVC 3"</text><line x1="0" y1="1005" x2="2600" y2="1005" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="930" x2="0" y2="1005" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="930" x2="55" y2="1005" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="930" x2="235" y2="1005" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="930" x2="485" y2="1005" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="930" x2="765" y2="1005" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="930" x2="1095" y2="1005" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="930" x2="1385" y2="1005" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="930" x2="2600" y2="1005" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1005" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="1029.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1047.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1045.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">13</text><text x="241" y="1045.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Cari / Filter Barang</text><text x="491" y="1045.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Ketik keyword di kolom pencarian</text><text x="771" y="1045.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Tabel hanya tampilkan barang yang mengandung 'Baut'</text><text x="1101" y="1045.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Keyword: 'Baut'</text><line x1="0" y1="1080" x2="2600" y2="1080" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1005" x2="0" y2="1080" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1005" x2="55" y2="1080" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1005" x2="235" y2="1080" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1005" x2="485" y2="1080" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1005" x2="765" y2="1080" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1005" x2="1095" y2="1080" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1005" x2="1385" y2="1080" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1005" x2="2600" y2="1080" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1080" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="1104.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1122.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1120.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">14</text><text x="241" y="1120.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Akses Kelola Barang - Viewer</text><text x="491" y="1120.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login sebagai viewer, buka menu Barang</text><text x="771" y="1112.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Tabel barang tampil, tombol Tambah/Edit/Hapus tidak</text>
+<text x="771" y="1128" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">tersedia</text><text x="1101" y="1120.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login role: viewer</text><line x1="0" y1="1155" x2="2600" y2="1155" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1080" x2="0" y2="1155" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1080" x2="55" y2="1155" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1080" x2="235" y2="1155" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1080" x2="485" y2="1155" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1080" x2="765" y2="1155" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1080" x2="1095" y2="1155" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1080" x2="1385" y2="1155" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1080" x2="2600" y2="1155" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1155" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="1155" width="180" height="300" fill="#dcfce7"/>
+<rect x="55" y="1155" width="180" height="300" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="1308" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">Transaksi Masuk</text><rect x="1393" y="1179.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1197.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1195.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">15</text><text x="241" y="1195.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Catat Barang Masuk - Valid</text><text x="491" y="1187.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Buka Transaksi Masuk, pilih barang, isi jumlah</text>
+<text x="491" y="1203" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">&amp; keterangan, simpan</text><text x="771" y="1195.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Transaksi tersimpan, stok barang bertambah 100</text><text x="1101" y="1179.375" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Barang: Baut M12</text>
+<text x="1101" y="1195.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Jumlah: 100</text>
+<text x="1101" y="1210.875" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Keterangan: Pembelian</text><line x1="0" y1="1230" x2="2600" y2="1230" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1155" x2="0" y2="1230" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1155" x2="55" y2="1230" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1155" x2="235" y2="1230" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1155" x2="485" y2="1230" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1155" x2="765" y2="1230" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1155" x2="1095" y2="1230" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1155" x2="1385" y2="1230" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1155" x2="2600" y2="1230" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1230" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="1254.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1272.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1270.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">16</text><text x="241" y="1270.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Catat Barang Masuk - Jumlah Nol/Negatif</text><text x="491" y="1270.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Isi jumlah dengan 0 atau -10, klik Simpan</text><text x="771" y="1270.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Validasi menolak, pesan error jumlah harus lebih dari 0</text><text x="1101" y="1270.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Jumlah: 0 atau -10</text><line x1="0" y1="1305" x2="2600" y2="1305" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1230" x2="0" y2="1305" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1230" x2="55" y2="1305" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1230" x2="235" y2="1305" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1230" x2="485" y2="1305" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1230" x2="765" y2="1305" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1230" x2="1095" y2="1305" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1230" x2="1385" y2="1305" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1230" x2="2600" y2="1305" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1305" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="1329.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1347.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1345.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">17</text><text x="241" y="1345.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Catat Barang Masuk - Tanpa Pilih Barang</text><text x="491" y="1345.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Tidak memilih barang, langsung klik Simpan</text><text x="771" y="1345.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Validasi menolak, pesan error barang wajib dipilih</text><text x="1101" y="1337.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Barang: (kosong)</text>
+<text x="1101" y="1353" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Jumlah: 50</text><line x1="0" y1="1380" x2="2600" y2="1380" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1305" x2="0" y2="1380" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1305" x2="55" y2="1380" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1305" x2="235" y2="1380" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1305" x2="485" y2="1380" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1305" x2="765" y2="1380" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1305" x2="1095" y2="1380" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1305" x2="1385" y2="1380" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1305" x2="2600" y2="1380" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1380" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="1404.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1422.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1420.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">18</text><text x="241" y="1420.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Lihat Riwayat Transaksi Masuk</text><text x="491" y="1420.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Buka tab riwayat di Transaksi Masuk</text><text x="771" y="1412.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Daftar semua transaksi masuk tampil dengan tanggal,</text>
+<text x="771" y="1428" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">barang, jumlah</text><text x="1101" y="1420.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login aktif</text><line x1="0" y1="1455" x2="2600" y2="1455" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1380" x2="0" y2="1455" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1380" x2="55" y2="1455" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1380" x2="235" y2="1455" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1380" x2="485" y2="1455" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1380" x2="765" y2="1455" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1380" x2="1095" y2="1455" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1380" x2="1385" y2="1455" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1380" x2="2600" y2="1455" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1455" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="1455" width="180" height="300" fill="#fee2e2"/>
+<rect x="55" y="1455" width="180" height="300" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="1608" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">Transaksi Keluar</text><rect x="1393" y="1479.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1497.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1495.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">19</text><text x="241" y="1495.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Catat Barang Keluar - Valid</text><text x="491" y="1487.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Buka Transaksi Keluar, pilih barang, isi</text>
+<text x="491" y="1503" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">jumlah, simpan</text><text x="771" y="1495.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Transaksi tersimpan, stok barang berkurang menjadi 70</text><text x="1101" y="1487.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Barang: Baut M12 (stok:100)</text>
+<text x="1101" y="1503" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Jumlah: 30</text><line x1="0" y1="1530" x2="2600" y2="1530" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1455" x2="0" y2="1530" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1455" x2="55" y2="1530" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1455" x2="235" y2="1530" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1455" x2="485" y2="1530" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1455" x2="765" y2="1530" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1455" x2="1095" y2="1530" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1455" x2="1385" y2="1530" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1455" x2="2600" y2="1530" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1530" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="1554.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1572.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1570.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">20</text><text x="241" y="1570.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Catat Barang Keluar - Melebihi Stok</text><text x="491" y="1570.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Isi jumlah keluar melebihi stok tersedia</text><text x="771" y="1570.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Pesan error 'Stok tidak mencukupi'</text><text x="1101" y="1562.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Barang: Baut M12 (stok:30)</text>
+<text x="1101" y="1578" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Jumlah: 50</text><line x1="0" y1="1605" x2="2600" y2="1605" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1530" x2="0" y2="1605" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1530" x2="55" y2="1605" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1530" x2="235" y2="1605" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1530" x2="485" y2="1605" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1530" x2="765" y2="1605" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1530" x2="1095" y2="1605" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1530" x2="1385" y2="1605" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1530" x2="2600" y2="1605" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1605" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="1629.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1647.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1645.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">21</text><text x="241" y="1645.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Catat Barang Keluar - Jumlah Nol</text><text x="491" y="1645.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Isi jumlah 0, klik Simpan</text><text x="771" y="1645.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Validasi menolak, pesan error jumlah harus lebih dari 0</text><text x="1101" y="1645.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Jumlah: 0</text><line x1="0" y1="1680" x2="2600" y2="1680" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1605" x2="0" y2="1680" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1605" x2="55" y2="1680" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1605" x2="235" y2="1680" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1605" x2="485" y2="1680" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1605" x2="765" y2="1680" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1605" x2="1095" y2="1680" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1605" x2="1385" y2="1680" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1605" x2="2600" y2="1680" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1680" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="1704.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1722.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1720.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">22</text><text x="241" y="1720.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Lihat Riwayat Transaksi Keluar</text><text x="491" y="1720.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Buka tab riwayat di Transaksi Keluar</text><text x="771" y="1712.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Daftar semua transaksi keluar tampil dengan tanggal,</text>
+<text x="771" y="1728" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">barang, jumlah</text><text x="1101" y="1720.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login aktif</text><line x1="0" y1="1755" x2="2600" y2="1755" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1680" x2="0" y2="1755" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1680" x2="55" y2="1755" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1680" x2="235" y2="1755" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1680" x2="485" y2="1755" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1680" x2="765" y2="1755" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1680" x2="1095" y2="1755" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1680" x2="1385" y2="1755" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1680" x2="2600" y2="1755" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1755" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="1755" width="180" height="225" fill="#ede9fe"/>
+<rect x="55" y="1755" width="180" height="225" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="1870.5" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">QR Code</text><rect x="1393" y="1779.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1797.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1795.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">23</text><text x="241" y="1795.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Generate &amp; Lihat QR Code Barang</text><text x="491" y="1787.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Buka detail barang, lihat QR code yang</text>
+<text x="491" y="1803" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">digenerate</text><text x="771" y="1787.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">QR code tampil berisi informasi barang (MS Code, nama,</text>
+<text x="771" y="1803" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">stok)</text><text x="1101" y="1795.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Barang: Baut M12 (MS Code: 10001)</text><line x1="0" y1="1830" x2="2600" y2="1830" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1755" x2="0" y2="1830" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1755" x2="55" y2="1830" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1755" x2="235" y2="1830" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1755" x2="485" y2="1830" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1755" x2="765" y2="1830" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1755" x2="1095" y2="1830" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1755" x2="1385" y2="1830" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1755" x2="2600" y2="1830" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1830" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="1854.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1872.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1870.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">24</text><text x="241" y="1870.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Cetak Label QR Code</text><text x="491" y="1862.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik tombol Cetak Label pada barang,</text>
+<text x="491" y="1878" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">konfirmasi print</text><text x="771" y="1862.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Dialog print browser terbuka dengan layout label QR</text>
+<text x="771" y="1878" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">yang benar</text><text x="1101" y="1870.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Barang dipilih: Baut M12</text><line x1="0" y1="1905" x2="2600" y2="1905" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1830" x2="0" y2="1905" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1830" x2="55" y2="1905" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1830" x2="235" y2="1905" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1830" x2="485" y2="1905" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1830" x2="765" y2="1905" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1830" x2="1095" y2="1905" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1830" x2="1385" y2="1905" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1830" x2="2600" y2="1905" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1905" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="1929.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="1947.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="1945.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">25</text><text x="241" y="1945.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Scan QR Code - Tampilkan Detail</text><text x="491" y="1937.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Scan QR Code barang menggunakan fitur scan di</text>
+<text x="491" y="1953" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">aplikasi</text><text x="771" y="1937.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Halaman detail barang tampil dengan nama, stok,</text>
+<text x="771" y="1953" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">kategori</text><text x="1101" y="1945.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">QR Code barang: Baut M12</text><line x1="0" y1="1980" x2="2600" y2="1980" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1905" x2="0" y2="1980" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1905" x2="55" y2="1980" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1905" x2="235" y2="1980" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1905" x2="485" y2="1980" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1905" x2="765" y2="1980" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1905" x2="1095" y2="1980" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1905" x2="1385" y2="1980" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1905" x2="2600" y2="1980" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="1980" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="1980" width="180" height="150" fill="#ffedd5"/>
+<rect x="55" y="1980" width="180" height="150" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="2058" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">Laporan &amp; Ekspor</text><rect x="1393" y="2004.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2022.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2020.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">26</text><text x="241" y="2020.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Ekspor Laporan Stok ke Excel</text><text x="491" y="2020.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Buka menu Laporan, klik tombol Ekspor Excel</text><text x="771" y="2020.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">File .xlsx terunduh berisi data stok semua barang</text><text x="1101" y="2020.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Filter: semua barang / semua kategori</text><line x1="0" y1="2055" x2="2600" y2="2055" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="1980" x2="0" y2="2055" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="1980" x2="55" y2="2055" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="1980" x2="235" y2="2055" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="1980" x2="485" y2="2055" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="1980" x2="765" y2="2055" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="1980" x2="1095" y2="2055" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="1980" x2="1385" y2="2055" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="1980" x2="2600" y2="2055" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2055" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="2079.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2097.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2095.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">27</text><text x="241" y="2095.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Ekspor dengan Filter Kategori</text><text x="491" y="2095.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Pilih kategori tertentu lalu ekspor Excel</text><text x="771" y="2095.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">File .xlsx hanya berisi barang dengan kategori Civil</text><text x="1101" y="2095.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Filter Kategori: Civil</text><line x1="0" y1="2130" x2="2600" y2="2130" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2055" x2="0" y2="2130" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2055" x2="55" y2="2130" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2055" x2="235" y2="2130" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2055" x2="485" y2="2130" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2055" x2="765" y2="2130" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2055" x2="1095" y2="2130" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2055" x2="1385" y2="2130" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2055" x2="2600" y2="2130" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2130" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="2130" width="180" height="375" fill="#fce7f3"/>
+<rect x="55" y="2130" width="180" height="375" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="2320.5" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">Manajemen Pengguna</text><rect x="1393" y="2154.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2172.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2170.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">28</text><text x="241" y="2170.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Lihat Daftar Pengguna</text><text x="491" y="2170.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login sebagai admin, buka menu Pengguna</text><text x="771" y="2170.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Tabel pengguna tampil: nama, email, NIK, role, status</text><text x="1101" y="2170.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login role: admin</text><line x1="0" y1="2205" x2="2600" y2="2205" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2130" x2="0" y2="2205" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2130" x2="55" y2="2205" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2130" x2="235" y2="2205" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2130" x2="485" y2="2205" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2130" x2="765" y2="2205" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2130" x2="1095" y2="2205" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2130" x2="1385" y2="2205" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2130" x2="2600" y2="2205" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2205" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="2229.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2247.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2245.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">29</text><text x="241" y="2245.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Tambah Pengguna Baru</text><text x="491" y="2245.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik Tambah Pengguna, isi form lengkap, simpan</text><text x="771" y="2245.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Pengguna tersimpan, bisa login dengan akun baru</text><text x="1101" y="2213.625" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Nama: Budi Santoso</text>
+<text x="1101" y="2229.375" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Email: budi@tel.com</text>
+<text x="1101" y="2245.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">NIK: OPR002</text>
+<text x="1101" y="2260.875" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Role: operator</text>
+<text x="1101" y="2276.625" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Password: Test@1234</text><line x1="0" y1="2280" x2="2600" y2="2280" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2205" x2="0" y2="2280" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2205" x2="55" y2="2280" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2205" x2="235" y2="2280" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2205" x2="485" y2="2280" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2205" x2="765" y2="2280" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2205" x2="1095" y2="2280" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2205" x2="1385" y2="2280" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2205" x2="2600" y2="2280" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2280" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="2304.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2322.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2320.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">30</text><text x="241" y="2320.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Tambah Pengguna - Email Duplikat</text><text x="491" y="2312.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Coba tambah pengguna dengan email yang sudah</text>
+<text x="491" y="2328" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">ada</text><text x="771" y="2320.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Pesan error 'Email sudah digunakan'</text><text x="1101" y="2320.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Email: admin@telgudang.com (sudah ada)</text><line x1="0" y1="2355" x2="2600" y2="2355" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2280" x2="0" y2="2355" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2280" x2="55" y2="2355" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2280" x2="235" y2="2355" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2280" x2="485" y2="2355" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2280" x2="765" y2="2355" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2280" x2="1095" y2="2355" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2280" x2="1385" y2="2355" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2280" x2="2600" y2="2355" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2355" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="2379.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2397.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2395.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">31</text><text x="241" y="2395.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Reset Password Pengguna</text><text x="491" y="2387.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik Reset Password pada pengguna, masukkan</text>
+<text x="491" y="2403" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">password baru</text><text x="771" y="2387.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Password ter-update, pengguna bisa login dengan</text>
+<text x="771" y="2403" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">password baru</text><text x="1101" y="2395.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Password baru: NewPass@123</text><line x1="0" y1="2430" x2="2600" y2="2430" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2355" x2="0" y2="2430" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2355" x2="55" y2="2430" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2355" x2="235" y2="2430" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2355" x2="485" y2="2430" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2355" x2="765" y2="2430" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2355" x2="1095" y2="2430" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2355" x2="1385" y2="2430" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2355" x2="2600" y2="2430" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2430" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="2454.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2472.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2470.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">32</text><text x="241" y="2470.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Akses Menu Pengguna - Non-Admin</text><text x="491" y="2462.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login sebagai operator, coba akses menu</text>
+<text x="491" y="2478" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Pengguna</text><text x="771" y="2470.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Akses ditolak, redirect atau menu tidak tampil</text><text x="1101" y="2470.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login role: operator</text><line x1="0" y1="2505" x2="2600" y2="2505" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2430" x2="0" y2="2505" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2430" x2="55" y2="2505" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2430" x2="235" y2="2505" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2430" x2="485" y2="2505" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2430" x2="765" y2="2505" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2430" x2="1095" y2="2505" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2430" x2="1385" y2="2505" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2430" x2="2600" y2="2505" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2505" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="2505" width="180" height="300" fill="#e0f2fe"/>
+<rect x="55" y="2505" width="180" height="300" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="2658" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">Kelola Kategori</text><rect x="1393" y="2529.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2547.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2545.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">33</text><text x="241" y="2545.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Lihat Daftar Kategori</text><text x="491" y="2545.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login sebagai admin, buka menu Kategori</text><text x="771" y="2537.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">5 kategori awal tampil: Civil, Civil Material,</text>
+<text x="771" y="2553" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Consumables, dll.</text><text x="1101" y="2545.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login role: admin</text><line x1="0" y1="2580" x2="2600" y2="2580" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2505" x2="0" y2="2580" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2505" x2="55" y2="2580" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2505" x2="235" y2="2580" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2505" x2="485" y2="2580" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2505" x2="765" y2="2580" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2505" x2="1095" y2="2580" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2505" x2="1385" y2="2580" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2505" x2="2600" y2="2580" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2580" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="2604.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2622.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2620.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">34</text><text x="241" y="2620.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Tambah Kategori Baru</text><text x="491" y="2620.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik Tambah, isi nama kategori, simpan</text><text x="771" y="2612.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Kategori tersimpan dan muncul di daftar + dropdown</text>
+<text x="771" y="2628" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">barang</text><text x="1101" y="2620.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Nama Kategori: Electrical Material</text><line x1="0" y1="2655" x2="2600" y2="2655" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2580" x2="0" y2="2655" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2580" x2="55" y2="2655" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2580" x2="235" y2="2655" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2580" x2="485" y2="2655" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2580" x2="765" y2="2655" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2580" x2="1095" y2="2655" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2580" x2="1385" y2="2655" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2580" x2="2600" y2="2655" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2655" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="2679.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2697.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2695.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">35</text><text x="241" y="2695.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Edit Nama Kategori</text><text x="491" y="2695.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik edit pada kategori, ubah nama, simpan</text><text x="771" y="2695.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Nama kategori ter-update di seluruh sistem</text><text x="1101" y="2695.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Kategori: Civil → Civil Works</text><line x1="0" y1="2730" x2="2600" y2="2730" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2655" x2="0" y2="2730" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2655" x2="55" y2="2730" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2655" x2="235" y2="2730" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2655" x2="485" y2="2730" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2655" x2="765" y2="2730" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2655" x2="1095" y2="2730" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2655" x2="1385" y2="2730" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2655" x2="2600" y2="2730" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2730" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="2754.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2772.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2770.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">36</text><text x="241" y="2770.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Hapus Kategori</text><text x="491" y="2770.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Klik hapus pada kategori yang tidak digunakan</text><text x="771" y="2770.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Kategori terhapus dari daftar</text><text x="1101" y="2770.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Kategori: Electrical Material (tidak ada barang)</text><line x1="0" y1="2805" x2="2600" y2="2805" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2730" x2="0" y2="2805" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2730" x2="55" y2="2805" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2730" x2="235" y2="2805" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2730" x2="485" y2="2805" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2730" x2="765" y2="2805" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2730" x2="1095" y2="2805" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2730" x2="1385" y2="2805" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2730" x2="2600" y2="2805" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2805" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="2805" width="180" height="150" fill="#f1f5f9"/>
+<rect x="55" y="2805" width="180" height="150" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="2883" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">Log Aktivitas</text><rect x="1393" y="2829.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2847.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2845.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">37</text><text x="241" y="2845.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Lihat Log Aktivitas Sistem</text><text x="491" y="2845.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login sebagai admin, buka menu Log Aktivitas</text><text x="771" y="2837.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Riwayat aksi tampil: login, tambah/edit barang,</text>
+<text x="771" y="2853" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">transaksi, dll.</text><text x="1101" y="2845.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login role: admin</text><line x1="0" y1="2880" x2="2600" y2="2880" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2805" x2="0" y2="2880" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2805" x2="55" y2="2880" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2805" x2="235" y2="2880" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2805" x2="485" y2="2880" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2805" x2="765" y2="2880" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2805" x2="1095" y2="2880" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2805" x2="1385" y2="2880" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2805" x2="2600" y2="2880" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2880" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="2904.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2922.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2920.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">38</text><text x="241" y="2920.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Akses Log Aktivitas - Non-Admin</text><text x="491" y="2912.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login sebagai operator, coba akses Log</text>
+<text x="491" y="2928" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Aktivitas</text><text x="771" y="2920.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Akses ditolak, menu Log tidak tersedia</text><text x="1101" y="2920.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Sesi login role: operator</text><line x1="0" y1="2955" x2="2600" y2="2955" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2880" x2="0" y2="2955" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2880" x2="55" y2="2955" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2880" x2="235" y2="2955" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2880" x2="485" y2="2955" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2880" x2="765" y2="2955" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2880" x2="1095" y2="2955" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2880" x2="1385" y2="2955" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2880" x2="2600" y2="2955" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="2955" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="55" y="2955" width="180" height="300" fill="#fef3c7"/>
+<rect x="55" y="2955" width="180" height="300" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+<text x="61" y="3108" font-size="12" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">Keamanan &amp; RBAC</text><rect x="1393" y="2979.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="2997.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="2995.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">39</text><text x="241" y="2995.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Akses API Tanpa Token</text><text x="491" y="2987.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Kirim request ke /api/items tanpa</text>
+<text x="491" y="3003" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Authorization header</text><text x="771" y="2995.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Response 401 Unauthorized</text><text x="1101" y="2987.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">GET /api/items</text>
+<text x="1101" y="3003" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">(tanpa Bearer token)</text><line x1="0" y1="3030" x2="2600" y2="3030" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="2955" x2="0" y2="3030" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="2955" x2="55" y2="3030" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="2955" x2="235" y2="3030" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="2955" x2="485" y2="3030" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="2955" x2="765" y2="3030" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="2955" x2="1095" y2="3030" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="2955" x2="1385" y2="3030" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="2955" x2="2600" y2="3030" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="3030" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="3054.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="3072.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="3070.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">40</text><text x="241" y="3070.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Akses API dengan Token Kadaluarsa</text><text x="491" y="3062.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Gunakan JWT yang sudah expired untuk request</text>
+<text x="491" y="3078" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">API</text><text x="771" y="3070.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Response 401 Unauthorized, pesan token tidak valid</text><text x="1101" y="3070.125" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">Authorization: Bearer &lt;expired_token&gt;</text><line x1="0" y1="3105" x2="2600" y2="3105" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="3030" x2="0" y2="3105" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="3030" x2="55" y2="3105" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="3030" x2="235" y2="3105" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="3030" x2="485" y2="3105" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="3030" x2="765" y2="3105" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="3030" x2="1095" y2="3105" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="3030" x2="1385" y2="3105" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="3030" x2="2600" y2="3105" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="3105" width="2600" height="75" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="3129.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="3147.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="3145.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">41</text><text x="241" y="3145.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Operator Akses Endpoint Admin</text><text x="491" y="3137.25" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login sebagai operator, request endpoint</text>
+<text x="491" y="3153" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">/api/users</text><text x="771" y="3145.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Response 403 Forbidden, akses ditolak</text><text x="1101" y="3137.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">GET /api/users</text>
+<text x="1101" y="3153" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">(role: operator)</text><line x1="0" y1="3180" x2="2600" y2="3180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="3105" x2="0" y2="3180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="3105" x2="55" y2="3180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="3105" x2="235" y2="3180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="3105" x2="485" y2="3180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="3105" x2="765" y2="3180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="3105" x2="1095" y2="3180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="3105" x2="1385" y2="3180" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="3105" x2="2600" y2="3180" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="0" y="3180" width="2600" height="75" fill="#f8faff" stroke="#94a3b8" stroke-width="0.5"/>
+<rect x="1393" y="3204.5" width="94" height="26" rx="13" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+<text x="1440" y="3222.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#16a34a" font-family="Arial,sans-serif">Berhasil</text>
+<text x="6" y="3220.75" font-size="13" font-weight="bold" fill="#1e3a6e" font-family="Arial,sans-serif">42</text><text x="241" y="3220.25" font-size="11" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Viewer Akses Endpoint Write</text><text x="491" y="3220.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Login sebagai viewer, request POST /api/items</text><text x="771" y="3220.125" font-size="10.5" font-weight="normal" fill="#1a1a1a" font-family="Arial,sans-serif">Response 403 Forbidden, tidak ada hak tulis</text><text x="1101" y="3212.25" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">POST /api/items</text>
+<text x="1101" y="3228" font-size="10.5" font-weight="normal" fill="#374151" font-family="Arial,sans-serif">(role: viewer)</text><line x1="0" y1="3255" x2="2600" y2="3255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="0" y1="3180" x2="0" y2="3255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="55" y1="3180" x2="55" y2="3255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="235" y1="3180" x2="235" y2="3255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="485" y1="3180" x2="485" y2="3255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="765" y1="3180" x2="765" y2="3255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1095" y1="3180" x2="1095" y2="3255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="1385" y1="3180" x2="1385" y2="3255" stroke="#94a3b8" stroke-width="0.5"/>
+<line x1="2600" y1="3180" x2="2600" y2="3255" stroke="#94a3b8" stroke-width="0.5"/>
+
+
+<!-- Outer border -->
+<rect x="0" y="55" width="2600" height="3230" fill="none" stroke="#1e3a6e" stroke-width="2"/>
+</svg>
