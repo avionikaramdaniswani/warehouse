@@ -13,7 +13,8 @@ app.set("trust proxy", 1);
 
 app.use(
   helmet({
-    crossOriginResourcePolicy: { policy: "same-origin" },
+    frameguard: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
@@ -72,6 +73,132 @@ app.use(
 app.use(globalLimiter);
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+
+app.get("/diagram/use-case", (_req, res) => {
+  res.removeHeader("X-Frame-Options");
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.send(`<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"/><title>Use Case Diagram</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;}</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 1080" style="width:100%;height:auto;font-family:Arial,sans-serif;background:#fff;">
+<defs>
+  <marker id="arr" markerWidth="13" markerHeight="9" refX="12" refY="4.5" orient="auto">
+    <path d="M0,0 L12,4.5 L0,9" fill="none" stroke="#000" stroke-width="1.3"/>
+  </marker>
+</defs>
+<text x="950" y="18" text-anchor="middle" font-size="15" font-weight="bold">Use Case Diagram — Sistem Manajemen Inventori Gudang</text>
+<rect x="148" y="26" width="1604" height="1040" rx="6" fill="none" stroke="#000" stroke-width="2.5"/>
+<text x="950" y="52" text-anchor="middle" font-size="12" font-style="italic" fill="#333">«system» Sistem Manajemen Inventori Gudang</text>
+<ellipse cx="520" cy="95" rx="82" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="520" y="100" text-anchor="middle" font-size="13">Login</text>
+<ellipse cx="520" cy="205" rx="82" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="520" y="210" text-anchor="middle" font-size="13">Logout</text>
+<ellipse cx="900" cy="95" rx="130" ry="27" fill="#fff" stroke="#000" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="900" y="100" text-anchor="middle" font-size="13">Verifikasi Kredensial</text>
+<ellipse cx="375" cy="345" rx="130" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="375" y="350" text-anchor="middle" font-size="13">Scan QR Code Barang</text>
+<ellipse cx="375" cy="458" rx="120" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="375" y="463" text-anchor="middle" font-size="13">Lihat Stok Barang</text>
+<ellipse cx="375" cy="571" rx="120" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="375" y="576" text-anchor="middle" font-size="13">Lihat Laporan Stok</text>
+<ellipse cx="770" cy="345" rx="120" ry="27" fill="#fff" stroke="#000" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="770" y="350" text-anchor="middle" font-size="13">Lihat Detail Barang</text>
+<ellipse cx="770" cy="475" rx="120" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="770" y="480" text-anchor="middle" font-size="13">Kelola Data Barang</text>
+<ellipse cx="770" cy="590" rx="130" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="770" y="595" text-anchor="middle" font-size="13">Catat Barang Masuk</text>
+<ellipse cx="770" cy="705" rx="130" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="770" y="710" text-anchor="middle" font-size="13">Catat Barang Keluar</text>
+<ellipse cx="1120" cy="647" rx="125" ry="27" fill="#fff" stroke="#000" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="1120" y="652" text-anchor="middle" font-size="13">Update Stok Barang</text>
+<ellipse cx="770" cy="820" rx="130" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="770" y="825" text-anchor="middle" font-size="13">Cetak Label QR Code</text>
+<ellipse cx="1120" cy="820" rx="118" ry="27" fill="#fff" stroke="#000" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="1120" y="825" text-anchor="middle" font-size="13">Generate QR Code</text>
+<ellipse cx="770" cy="940" rx="130" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="770" y="945" text-anchor="middle" font-size="13">Ekspor Laporan Excel</text>
+<ellipse cx="1390" cy="200" rx="120" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1390" y="205" text-anchor="middle" font-size="13">Kelola Pengguna</text>
+<ellipse cx="1620" cy="200" rx="125" ry="27" fill="#fff" stroke="#000" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="1620" y="205" text-anchor="middle" font-size="13">Validasi Hak Akses</text>
+<ellipse cx="1390" cy="335" rx="132" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1390" y="340" text-anchor="middle" font-size="13">Kelola Kategori Barang</text>
+<ellipse cx="1390" cy="470" rx="120" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1390" y="475" text-anchor="middle" font-size="13">Lihat Log Aktivitas</text>
+<ellipse cx="1390" cy="605" rx="135" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1390" y="610" text-anchor="middle" font-size="13">Lihat Riwayat Transaksi</text>
+<ellipse cx="1390" cy="740" rx="125" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1390" y="745" text-anchor="middle" font-size="13">Dashboard &amp; Statistik</text>
+<ellipse cx="1390" cy="875" rx="120" ry="27" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1390" y="880" text-anchor="middle" font-size="13">Reset Password User</text>
+<circle cx="62" cy="380" r="20" fill="#fff" stroke="#000" stroke-width="1.8"/>
+<line x1="62" y1="400" x2="62" y2="450" stroke="#000" stroke-width="1.8"/>
+<line x1="35" y1="423" x2="89" y2="423" stroke="#000" stroke-width="1.8"/>
+<line x1="62" y1="450" x2="38" y2="486" stroke="#000" stroke-width="1.8"/>
+<line x1="62" y1="450" x2="86" y2="486" stroke="#000" stroke-width="1.8"/>
+<text x="62" y="510" text-anchor="middle" font-size="13" font-weight="bold">Petugas</text>
+<text x="62" y="528" text-anchor="middle" font-size="13" font-weight="bold">Lapangan</text>
+<circle cx="62" cy="710" r="20" fill="#fff" stroke="#000" stroke-width="1.8"/>
+<line x1="62" y1="730" x2="62" y2="780" stroke="#000" stroke-width="1.8"/>
+<line x1="35" y1="753" x2="89" y2="753" stroke="#000" stroke-width="1.8"/>
+<line x1="62" y1="780" x2="38" y2="816" stroke="#000" stroke-width="1.8"/>
+<line x1="62" y1="780" x2="86" y2="816" stroke="#000" stroke-width="1.8"/>
+<text x="62" y="840" text-anchor="middle" font-size="13" font-weight="bold">Operator</text>
+<circle cx="1838" cy="520" r="20" fill="#fff" stroke="#000" stroke-width="1.8"/>
+<line x1="1838" y1="540" x2="1838" y2="590" stroke="#000" stroke-width="1.8"/>
+<line x1="1811" y1="563" x2="1865" y2="563" stroke="#000" stroke-width="1.8"/>
+<line x1="1838" y1="590" x2="1814" y2="626" stroke="#000" stroke-width="1.8"/>
+<line x1="1838" y1="590" x2="1862" y2="626" stroke="#000" stroke-width="1.8"/>
+<text x="1838" y="650" text-anchor="middle" font-size="13" font-weight="bold">Admin</text>
+<line x1="602" y1="95" x2="768" y2="95" stroke="#000" stroke-width="1.2" stroke-dasharray="7,4" marker-end="url(#arr)"/>
+<text x="685" y="88" text-anchor="middle" font-size="11" font-style="italic">«include»</text>
+<line x1="505" y1="345" x2="648" y2="345" stroke="#000" stroke-width="1.2" stroke-dasharray="7,4" marker-end="url(#arr)"/>
+<text x="576" y="338" text-anchor="middle" font-size="11" font-style="italic">«include»</text>
+<line x1="900" y1="600" x2="993" y2="638" stroke="#000" stroke-width="1.2" stroke-dasharray="7,4" marker-end="url(#arr)"/>
+<text x="950" y="610" text-anchor="middle" font-size="11" font-style="italic">«include»</text>
+<line x1="900" y1="695" x2="993" y2="658" stroke="#000" stroke-width="1.2" stroke-dasharray="7,4" marker-end="url(#arr)"/>
+<text x="950" y="686" text-anchor="middle" font-size="11" font-style="italic">«include»</text>
+<line x1="900" y1="820" x2="1000" y2="820" stroke="#000" stroke-width="1.2" stroke-dasharray="7,4" marker-end="url(#arr)"/>
+<text x="950" y="813" text-anchor="middle" font-size="11" font-style="italic">«include»</text>
+<line x1="680" y1="920" x2="467" y2="594" stroke="#000" stroke-width="1.2" stroke-dasharray="7,4" marker-end="url(#arr)"/>
+<text x="550" y="762" text-anchor="middle" font-size="11" font-style="italic">«extend»</text>
+<line x1="1510" y1="200" x2="1494" y2="200" stroke="#000" stroke-width="1.2" stroke-dasharray="7,4" marker-end="url(#arr)"/>
+<text x="1552" y="193" text-anchor="middle" font-size="11" font-style="italic">«include»</text>
+<line x1="82" y1="372" x2="438" y2="104" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="382" x2="438" y2="212" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="400" x2="245" y2="350" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="415" x2="255" y2="462" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="430" x2="255" y2="568" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="695" x2="438" y2="110" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="702" x2="438" y2="218" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="715" x2="245" y2="358" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="724" x2="255" y2="575" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="730" x2="650" y2="480" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="736" x2="640" y2="592" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="742" x2="640" y2="706" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="749" x2="640" y2="820" stroke="#000" stroke-width="1"/>
+<line x1="82" y1="756" x2="640" y2="940" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="504" x2="603" y2="103" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="510" x2="603" y2="213" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="520" x2="1510" y2="206" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="528" x2="1522" y2="340" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="536" x2="1510" y2="472" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="544" x2="1525" y2="606" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="552" x2="1515" y2="742" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="560" x2="1510" y2="876" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="516" x2="890" y2="480" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="524" x2="900" y2="590" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="530" x2="900" y2="705" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="538" x2="900" y2="820" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="546" x2="900" y2="940" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="496" x2="495" y2="460" stroke="#000" stroke-width="1"/>
+<line x1="1818" y1="490" x2="495" y2="572" stroke="#000" stroke-width="1"/>
+</svg>
+</body></html>`);
+});
 
 app.use("/api", router);
 
