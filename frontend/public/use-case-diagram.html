@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Use Case Diagram</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  svg { max-width: 100%; height: auto; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 960" width="1420" height="960" style="font-family:Arial,sans-serif;background:white;">
+
+  <!-- ── JUDUL DIAGRAM ── -->
+  <text x="710" y="22" text-anchor="middle" font-size="16" font-weight="bold" fill="black">Use Case Diagram – Sistem Manajemen Inventori Gudang</text>
+
+  <!-- ── SYSTEM BOUNDARY ── -->
+  <rect x="205" y="35" width="990" height="905" fill="white" stroke="black" stroke-width="2.5"/>
+  <text x="700" y="60" text-anchor="middle" font-size="13" fill="black" font-style="italic">«system» Sistem Manajemen Inventori Gudang</text>
+
+  <!-- ═══════════════════════════════ USE CASES ═══════════════════════════════ -->
+
+  <!-- UC0: Login (top, shared) -->
+  <ellipse cx="700" cy="110" rx="95" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="700" y="115" text-anchor="middle" font-size="13" fill="black">Login</text>
+
+  <!-- ── Kolom Kiri (cx=415) ── -->
+  <ellipse cx="415" cy="210" rx="125" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="415" y="215" text-anchor="middle" font-size="13" fill="black">Kelola Pengguna</text>
+
+  <ellipse cx="415" cy="315" rx="125" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="415" y="320" text-anchor="middle" font-size="13" fill="black">Kelola Kategori Barang</text>
+
+  <ellipse cx="415" cy="420" rx="112" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="415" y="425" text-anchor="middle" font-size="13" fill="black">Kelola Data Barang</text>
+
+  <ellipse cx="415" cy="525" rx="130" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="415" y="530" text-anchor="middle" font-size="13" fill="black">Catat Barang Masuk</text>
+
+  <ellipse cx="415" cy="630" rx="130" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="415" y="635" text-anchor="middle" font-size="13" fill="black">Catat Barang Keluar</text>
+
+  <ellipse cx="415" cy="735" rx="120" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="415" y="740" text-anchor="middle" font-size="13" fill="black">Cetak Label QR Code</text>
+
+  <!-- ── Kolom Kanan (cx=905) ── -->
+  <ellipse cx="905" cy="315" rx="118" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="905" y="320" text-anchor="middle" font-size="13" fill="black">Ekspor Laporan Excel</text>
+
+  <ellipse cx="905" cy="420" rx="112" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="905" y="425" text-anchor="middle" font-size="13" fill="black">Lihat Laporan Stok</text>
+
+  <ellipse cx="905" cy="525" rx="122" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="905" y="530" text-anchor="middle" font-size="13" fill="black">Lihat Stok Barang</text>
+
+  <ellipse cx="905" cy="630" rx="115" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="905" y="635" text-anchor="middle" font-size="13" fill="black">Scan QR Code Barang</text>
+
+  <ellipse cx="905" cy="735" rx="125" ry="27" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="905" y="740" text-anchor="middle" font-size="13" fill="black">Lihat Log Aktivitas</text>
+
+  <!-- ═══════════════════════════════ ACTORS ═══════════════════════════════ -->
+
+  <!-- ADMIN (kiri atas) -->
+  <circle cx="85" cy="280" r="19" fill="white" stroke="black" stroke-width="1.8"/>
+  <line x1="85" y1="299" x2="85" y2="348" stroke="black" stroke-width="1.8"/>
+  <line x1="57"  y1="320" x2="113" y2="320" stroke="black" stroke-width="1.8"/>
+  <line x1="85"  y1="348" x2="62"  y2="382" stroke="black" stroke-width="1.8"/>
+  <line x1="85"  y1="348" x2="108" y2="382" stroke="black" stroke-width="1.8"/>
+  <text x="85" y="406" text-anchor="middle" font-size="14" font-weight="bold" fill="black">Admin</text>
+
+  <!-- OPERATOR (kiri bawah) -->
+  <circle cx="85" cy="600" r="19" fill="white" stroke="black" stroke-width="1.8"/>
+  <line x1="85" y1="619" x2="85" y2="668" stroke="black" stroke-width="1.8"/>
+  <line x1="57"  y1="640" x2="113" y2="640" stroke="black" stroke-width="1.8"/>
+  <line x1="85"  y1="668" x2="62"  y2="702" stroke="black" stroke-width="1.8"/>
+  <line x1="85"  y1="668" x2="108" y2="702" stroke="black" stroke-width="1.8"/>
+  <text x="85" y="726" text-anchor="middle" font-size="14" font-weight="bold" fill="black">Operator</text>
+
+  <!-- PETUGAS LAPANGAN (kanan) -->
+  <circle cx="1338" cy="460" r="19" fill="white" stroke="black" stroke-width="1.8"/>
+  <line x1="1338" y1="479" x2="1338" y2="528" stroke="black" stroke-width="1.8"/>
+  <line x1="1310" y1="500" x2="1366" y2="500" stroke="black" stroke-width="1.8"/>
+  <line x1="1338" y1="528" x2="1315" y2="562" stroke="black" stroke-width="1.8"/>
+  <line x1="1338" y1="528" x2="1361" y2="562" stroke="black" stroke-width="1.8"/>
+  <text x="1338" y="586" text-anchor="middle" font-size="14" font-weight="bold" fill="black">Petugas</text>
+  <text x="1338" y="604" text-anchor="middle" font-size="14" font-weight="bold" fill="black">Lapangan</text>
+
+  <!-- ═══════════════════════════════ CONNECTIONS ═══════════════════════════════ -->
+
+  <!-- ── ADMIN → use cases ── -->
+  <line x1="103" y1="267" x2="607" y2="112" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="275" x2="290"  y2="210" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="285" x2="290"  y2="315" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="293" x2="303"  y2="420" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="301" x2="285"  y2="525" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="311" x2="285"  y2="630" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="321" x2="295"  y2="735" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="263" x2="787"  y2="315" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="258" x2="793"  y2="420" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="253" x2="783"  y2="525" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="248" x2="780"  y2="735" stroke="black" stroke-width="1"/>
+
+  <!-- ── OPERATOR → use cases ── -->
+  <line x1="103" y1="587" x2="607"  y2="128" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="596" x2="303"  y2="420" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="602" x2="285"  y2="525" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="608" x2="285"  y2="630" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="614" x2="295"  y2="735" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="593" x2="787"  y2="315" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="589" x2="793"  y2="420" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="585" x2="783"  y2="525" stroke="black" stroke-width="1"/>
+  <line x1="104" y1="619" x2="790"  y2="630" stroke="black" stroke-width="1"/>
+
+  <!-- ── PETUGAS LAPANGAN → use cases ── -->
+  <line x1="1319" y1="446" x2="793"  y2="120" stroke="black" stroke-width="1"/>
+  <line x1="1319" y1="455" x2="1017" y2="420" stroke="black" stroke-width="1"/>
+  <line x1="1319" y1="463" x2="1027" y2="525" stroke="black" stroke-width="1"/>
+  <line x1="1319" y1="470" x2="1020" y2="630" stroke="black" stroke-width="1"/>
+
+</svg>
+</body>
+</html>

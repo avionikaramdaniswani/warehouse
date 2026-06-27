@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 940" width="1420" height="940" style="background:white;font-family:Arial,sans-serif;">
+
+  <!-- System boundary -->
+  <rect x="210" y="40" width="980" height="860" fill="white" stroke="black" stroke-width="2"/>
+
+  <!-- System title -->
+  <text x="700" y="30" text-anchor="middle" font-size="15" font-weight="bold" fill="black">Sistem Manajemen Inventori Gudang</text>
+  <text x="700" y="72" text-anchor="middle" font-size="12" fill="black">&#171;system&#187;</text>
+
+  <!-- ═══════════════════════════════ USE CASES ═══════════════════════════════ -->
+
+  <!-- UC0: Login (top center) -->
+  <ellipse cx="700" cy="115" rx="90" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="700" y="119" text-anchor="middle" font-size="13" fill="black">Login</text>
+
+  <!-- LEFT COLUMN (cx=420) -->
+  <!-- UC1: Kelola Pengguna -->
+  <ellipse cx="420" cy="210" rx="118" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="420" y="214" text-anchor="middle" font-size="13" fill="black">Kelola Pengguna</text>
+
+  <!-- UC2: Kelola Kategori -->
+  <ellipse cx="420" cy="310" rx="118" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="420" y="314" text-anchor="middle" font-size="13" fill="black">Kelola Kategori</text>
+
+  <!-- UC3: Kelola Barang -->
+  <ellipse cx="420" cy="410" rx="108" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="420" y="414" text-anchor="middle" font-size="13" fill="black">Kelola Barang</text>
+
+  <!-- UC4: Catat Barang Masuk -->
+  <ellipse cx="420" cy="510" rx="128" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="420" y="514" text-anchor="middle" font-size="13" fill="black">Catat Barang Masuk</text>
+
+  <!-- UC5: Catat Barang Keluar -->
+  <ellipse cx="420" cy="610" rx="128" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="420" y="614" text-anchor="middle" font-size="13" fill="black">Catat Barang Keluar</text>
+
+  <!-- UC6: Cetak QR Code -->
+  <ellipse cx="420" cy="710" rx="110" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="420" y="714" text-anchor="middle" font-size="13" fill="black">Cetak QR Code</text>
+
+  <!-- RIGHT COLUMN (cx=900) -->
+  <!-- UC7: Ekspor Laporan -->
+  <ellipse cx="900" cy="310" rx="115" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="900" y="314" text-anchor="middle" font-size="13" fill="black">Ekspor Laporan</text>
+
+  <!-- UC8: Lihat Laporan -->
+  <ellipse cx="900" cy="410" rx="108" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="900" y="414" text-anchor="middle" font-size="13" fill="black">Lihat Laporan</text>
+
+  <!-- UC9: Lihat Stok Barang -->
+  <ellipse cx="900" cy="510" rx="122" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="900" y="514" text-anchor="middle" font-size="13" fill="black">Lihat Stok Barang</text>
+
+  <!-- UC10: Scan QR Code -->
+  <ellipse cx="900" cy="610" rx="110" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="900" y="614" text-anchor="middle" font-size="13" fill="black">Scan QR Code</text>
+
+  <!-- UC11: Lihat Log Aktivitas -->
+  <ellipse cx="900" cy="710" rx="122" ry="26" fill="white" stroke="black" stroke-width="1.5"/>
+  <text x="900" y="714" text-anchor="middle" font-size="13" fill="black">Lihat Log Aktivitas</text>
+
+  <!-- ═══════════════════════════════ ACTORS ═══════════════════════════════ -->
+
+  <!-- ACTOR: Admin (left, top) -->
+  <circle cx="90" cy="270" r="18" fill="white" stroke="black" stroke-width="1.5"/>
+  <line x1="90" y1="288" x2="90" y2="335" stroke="black" stroke-width="1.5"/>
+  <line x1="63" y1="310" x2="117" y2="310" stroke="black" stroke-width="1.5"/>
+  <line x1="90" y1="335" x2="68" y2="368" stroke="black" stroke-width="1.5"/>
+  <line x1="90" y1="335" x2="112" y2="368" stroke="black" stroke-width="1.5"/>
+  <text x="90" y="392" text-anchor="middle" font-size="14" font-weight="bold" fill="black">Admin</text>
+
+  <!-- ACTOR: Operator (left, bottom) -->
+  <circle cx="90" cy="590" r="18" fill="white" stroke="black" stroke-width="1.5"/>
+  <line x1="90" y1="608" x2="90" y2="655" stroke="black" stroke-width="1.5"/>
+  <line x1="63" y1="630" x2="117" y2="630" stroke="black" stroke-width="1.5"/>
+  <line x1="90" y1="655" x2="68" y2="688" stroke="black" stroke-width="1.5"/>
+  <line x1="90" y1="655" x2="112" y2="688" stroke="black" stroke-width="1.5"/>
+  <text x="90" y="712" text-anchor="middle" font-size="14" font-weight="bold" fill="black">Operator</text>
+
+  <!-- ACTOR: Petugas Lapangan (right) -->
+  <circle cx="1330" cy="450" r="18" fill="white" stroke="black" stroke-width="1.5"/>
+  <line x1="1330" y1="468" x2="1330" y2="515" stroke="black" stroke-width="1.5"/>
+  <line x1="1303" y1="490" x2="1357" y2="490" stroke="black" stroke-width="1.5"/>
+  <line x1="1330" y1="515" x2="1308" y2="548" stroke="black" stroke-width="1.5"/>
+  <line x1="1330" y1="515" x2="1352" y2="548" stroke="black" stroke-width="1.5"/>
+  <text x="1330" y="572" text-anchor="middle" font-size="14" font-weight="bold" fill="black">Petugas</text>
+  <text x="1330" y="590" text-anchor="middle" font-size="14" font-weight="bold" fill="black">Lapangan</text>
+
+  <!-- ═══════════════════════════════ CONNECTIONS ═══════════════════════════════ -->
+
+  <!-- ADMIN connections -->
+  <!-- Admin → Login -->
+  <line x1="107" y1="258" x2="612" y2="115" stroke="black" stroke-width="1"/>
+  <!-- Admin → Kelola Pengguna -->
+  <line x1="107" y1="277" x2="302" y2="210" stroke="black" stroke-width="1"/>
+  <!-- Admin → Kelola Kategori -->
+  <line x1="107" y1="285" x2="302" y2="310" stroke="black" stroke-width="1"/>
+  <!-- Admin → Kelola Barang -->
+  <line x1="107" y1="295" x2="312" y2="410" stroke="black" stroke-width="1"/>
+  <!-- Admin → Catat Barang Masuk -->
+  <line x1="107" y1="305" x2="292" y2="510" stroke="black" stroke-width="1"/>
+  <!-- Admin → Catat Barang Keluar -->
+  <line x1="107" y1="315" x2="292" y2="610" stroke="black" stroke-width="1"/>
+  <!-- Admin → Cetak QR Code -->
+  <line x1="107" y1="325" x2="310" y2="710" stroke="black" stroke-width="1"/>
+  <!-- Admin → Ekspor Laporan -->
+  <line x1="107" y1="262" x2="785" y2="310" stroke="black" stroke-width="1"/>
+  <!-- Admin → Lihat Laporan -->
+  <line x1="107" y1="255" x2="792" y2="410" stroke="black" stroke-width="1"/>
+  <!-- Admin → Lihat Stok Barang -->
+  <line x1="107" y1="250" x2="778" y2="510" stroke="black" stroke-width="1"/>
+  <!-- Admin → Lihat Log Aktivitas -->
+  <line x1="107" y1="245" x2="778" y2="710" stroke="black" stroke-width="1"/>
+
+  <!-- OPERATOR connections -->
+  <!-- Operator → Login -->
+  <line x1="107" y1="578" x2="612" y2="128" stroke="black" stroke-width="1"/>
+  <!-- Operator → Kelola Barang -->
+  <line x1="107" y1="598" x2="312" y2="410" stroke="black" stroke-width="1"/>
+  <!-- Operator → Catat Barang Masuk -->
+  <line x1="107" y1="603" x2="292" y2="510" stroke="black" stroke-width="1"/>
+  <!-- Operator → Catat Barang Keluar -->
+  <line x1="107" y1="608" x2="292" y2="610" stroke="black" stroke-width="1"/>
+  <!-- Operator → Cetak QR Code -->
+  <line x1="107" y1="615" x2="310" y2="710" stroke="black" stroke-width="1"/>
+  <!-- Operator → Ekspor Laporan -->
+  <line x1="107" y1="588" x2="785" y2="310" stroke="black" stroke-width="1"/>
+  <!-- Operator → Lihat Laporan -->
+  <line x1="107" y1="583" x2="792" y2="410" stroke="black" stroke-width="1"/>
+  <!-- Operator → Lihat Stok Barang -->
+  <line x1="107" y1="578" x2="778" y2="510" stroke="black" stroke-width="1"/>
+  <!-- Operator → Scan QR Code -->
+  <line x1="107" y1="620" x2="790" y2="610" stroke="black" stroke-width="1"/>
+
+  <!-- PETUGAS LAPANGAN connections -->
+  <!-- Petugas → Login -->
+  <line x1="1313" y1="436" x2="790" y2="120" stroke="black" stroke-width="1"/>
+  <!-- Petugas → Lihat Laporan -->
+  <line x1="1313" y1="448" x2="1008" y2="410" stroke="black" stroke-width="1"/>
+  <!-- Petugas → Lihat Stok Barang -->
+  <line x1="1313" y1="457" x2="1022" y2="510" stroke="black" stroke-width="1"/>
+  <!-- Petugas → Scan QR Code -->
+  <line x1="1313" y1="464" x2="1010" y2="610" stroke="black" stroke-width="1"/>
+
+</svg>
