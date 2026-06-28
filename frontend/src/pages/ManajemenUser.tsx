@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   UserPlus, Pencil, ShieldAlert, CheckCircle, Search,
   Loader2, Eye, KeyRound, ClipboardList, Building2,
-  Phone, Mail, CreditCard, CalendarDays, Clock, Shield, User as UserIcon,
+  Phone, Mail, CreditCard, CalendarDays, Clock, Shield, User as UserIcon, Trash2,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -126,6 +126,9 @@ export default function ManajemenUser() {
   const [resetPassOpen, setResetPassOpen] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteUser, setDeleteUser] = useState<ApiUser | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState<ApiUser | null>(null);
   const [formData, setFormData] = useState<FormData>(emptyForm);
@@ -285,6 +288,29 @@ export default function ManajemenUser() {
     setAlertOpen(false);
   };
 
+  /* ── HAPUS AKUN ── */
+  const handleOpenDelete = (user: ApiUser) => {
+    setDeleteUser(user);
+    setDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteUser) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/users/${deleteUser.id}`, { method: 'DELETE', headers: authHeaders });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.message ?? 'Gagal menghapus akun'); return; }
+      toast.success(`Akun ${deleteUser.namaLengkap} berhasil dihapus`);
+      setDeleteOpen(false);
+      fetchUsers();
+    } catch {
+      toast.error('Terjadi kesalahan jaringan');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   /* ── TAMBAH ── */
   const handleOpenAdd = () => {
     setSelectedUser(null);
@@ -312,14 +338,16 @@ export default function ManajemenUser() {
         <TooltipContent>Edit Data</TooltipContent>
       </Tooltip>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-orange-600 hover:bg-orange-50" onClick={() => handleOpenResetPass(user)}>
-            <KeyRound className="h-4 w-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Reset Password</TooltipContent>
-      </Tooltip>
+      {user.role !== 'admin' && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-orange-600 hover:bg-orange-50" onClick={() => handleOpenResetPass(user)}>
+              <KeyRound className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Reset Password</TooltipContent>
+        </Tooltip>
+      )}
 
       <Tooltip>
         <TooltipTrigger asChild>
@@ -343,6 +371,20 @@ export default function ManajemenUser() {
         </TooltipTrigger>
         <TooltipContent>{user.status === 'active' ? 'Nonaktifkan' : 'Aktifkan'}</TooltipContent>
       </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost" size="icon"
+            className="h-8 w-8 text-slate-500 hover:text-red-700 hover:bg-red-50"
+            onClick={() => handleOpenDelete(user)}
+            disabled={user.id === currentUser?.id}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Hapus Akun</TooltipContent>
+      </Tooltip>
     </div>
   );
 
@@ -364,79 +406,137 @@ export default function ManajemenUser() {
             <div className="flex items-center justify-center py-20 text-muted-foreground">
               <Loader2 className="h-6 w-6 animate-spin mr-2" /> Memuat data...
             </div>
-          ) : (
-            <>
-              {/* MOBILE */}
-              <div className="flex flex-col gap-3 md:hidden">
-                {filtered.length === 0 ? (
-                  <div className="py-12 text-center text-muted-foreground text-sm">Tidak ada pengguna ditemukan.</div>
-                ) : filtered.map((user) => (
-                  <Card key={user.id} className={user.status !== 'active' ? 'opacity-70' : ''}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div>
-                          <p className="font-semibold text-slate-800">{user.namaLengkap}</p>
-                          <p className="text-xs font-mono text-muted-foreground">{user.nik} · {user.email}</p>
-                        </div>
-                        <StatusBadge status={statusLabel(user.status) as any} />
-                      </div>
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-xs bg-primary/10 text-primary rounded px-2 py-0.5 font-medium">{roleBadge(user.role)}</span>
-                        {user.loginTerakhir && (
-                          <span className="flex items-center gap-1 text-xs text-muted-foreground ml-auto">
-                            <Clock className="h-3 w-3" />{new Date(user.loginTerakhir).toLocaleDateString('id-ID')}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex gap-1 justify-end border-t pt-3">
-                        <ActionButtons user={user} />
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+          ) : (() => {
+            const filteredStaff = filtered.filter(u => u.role === 'admin' || u.role === 'kepala_gudang');
+            const filteredPetugas = filtered.filter(u => u.role === 'petugas');
 
-              {/* DESKTOP */}
-              <Card className="shadow-sm border-border overflow-hidden hidden md:block">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader className="bg-slate-100">
-                      <TableRow>
-                        <TableHead>NIK</TableHead>
-                        <TableHead>Nama Lengkap</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Departemen</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Login Terakhir</TableHead>
-                        <TableHead className="text-right">Aksi</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filtered.length > 0 ? filtered.map((user) => (
-                        <TableRow key={user.id} className={user.status !== 'active' ? 'opacity-60' : ''}>
-                          <TableCell className="font-mono text-sm">{user.nik}</TableCell>
-                          <TableCell className="font-semibold text-slate-800">{user.namaLengkap}</TableCell>
-                          <TableCell className="text-sm text-slate-600">{user.email}</TableCell>
-                          <TableCell>
-                            <span className="text-xs bg-primary/10 text-primary rounded px-2 py-0.5 font-medium">{roleBadge(user.role)}</span>
-                          </TableCell>
-                          <TableCell className="text-sm text-slate-600">{user.departemen ?? '-'}</TableCell>
-                          <TableCell><StatusBadge status={statusLabel(user.status) as any} /></TableCell>
-                          <TableCell className="text-sm text-slate-500">{fmtDate(user.loginTerakhir)}</TableCell>
-                          <TableCell><ActionButtons user={user} /></TableCell>
-                        </TableRow>
-                      )) : (
-                        <TableRow>
-                          <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">Tidak ada pengguna ditemukan.</TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
+            const UserCard = ({ user }: { user: ApiUser }) => (
+              <Card key={user.id} className={user.status !== 'active' ? 'opacity-70' : ''}>
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                      <p className="font-semibold text-slate-800">{user.namaLengkap}</p>
+                      <p className="text-xs font-mono text-muted-foreground">{user.nik} · {user.email}</p>
+                    </div>
+                    <StatusBadge status={statusLabel(user.status) as any} />
+                  </div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs bg-primary/10 text-primary rounded px-2 py-0.5 font-medium">{roleBadge(user.role)}</span>
+                    {user.loginTerakhir && (
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground ml-auto">
+                        <Clock className="h-3 w-3" />{new Date(user.loginTerakhir).toLocaleDateString('id-ID')}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-1 justify-end border-t pt-3">
+                    <ActionButtons user={user} />
+                  </div>
+                </CardContent>
               </Card>
-            </>
-          )}
+            );
+
+            const UserTableRows = ({ list, colSpan = 8 }: { list: ApiUser[]; colSpan?: number }) =>
+              list.length > 0 ? (
+                <>
+                  {list.map((user) => (
+                    <TableRow key={user.id} className={user.status !== 'active' ? 'opacity-60' : ''}>
+                      <TableCell className="font-mono text-sm">{user.nik}</TableCell>
+                      <TableCell className="font-semibold text-slate-800">{user.namaLengkap}</TableCell>
+                      <TableCell className="text-sm text-slate-600">{user.email}</TableCell>
+                      <TableCell>
+                        <span className="text-xs bg-primary/10 text-primary rounded px-2 py-0.5 font-medium">{roleBadge(user.role)}</span>
+                      </TableCell>
+                      <TableCell className="text-sm text-slate-600">{user.departemen ?? '-'}</TableCell>
+                      <TableCell><StatusBadge status={statusLabel(user.status) as any} /></TableCell>
+                      <TableCell className="text-sm text-slate-500">{fmtDate(user.loginTerakhir)}</TableCell>
+                      <TableCell><ActionButtons user={user} /></TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={colSpan} className="h-20 text-center text-muted-foreground text-sm">Tidak ada pengguna.</TableCell>
+                </TableRow>
+              );
+
+            const tableHeader = (
+              <TableHeader className="bg-slate-100">
+                <TableRow>
+                  <TableHead>NIK</TableHead>
+                  <TableHead>Nama Lengkap</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Departemen</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Login Terakhir</TableHead>
+                  <TableHead className="text-right">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+            );
+
+            return (
+              <>
+                {/* ── MOBILE ── */}
+                <div className="flex flex-col gap-4 md:hidden">
+                  {/* Grup Admin & Kepala Gudang */}
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2 px-1">Admin & Kepala Gudang</p>
+                    <div className="flex flex-col gap-3">
+                      {filteredStaff.length === 0
+                        ? <div className="py-6 text-center text-muted-foreground text-sm bg-white rounded-lg border">Tidak ada pengguna.</div>
+                        : filteredStaff.map((u) => <UserCard key={u.id} user={u} />)}
+                    </div>
+                  </div>
+                  {/* Grup Petugas */}
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2 px-1">Petugas</p>
+                    <div className="flex flex-col gap-3">
+                      {filteredPetugas.length === 0
+                        ? <div className="py-6 text-center text-muted-foreground text-sm bg-white rounded-lg border">Tidak ada petugas.</div>
+                        : filteredPetugas.map((u) => <UserCard key={u.id} user={u} />)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── DESKTOP ── */}
+                <div className="hidden md:flex flex-col gap-5">
+                  {/* Tabel Admin & Kepala Gudang */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Shield className="h-4 w-4 text-primary" />
+                      <h3 className="text-sm font-semibold text-slate-700">Admin & Kepala Gudang</h3>
+                      <span className="text-xs text-muted-foreground bg-slate-100 px-2 py-0.5 rounded-full">{filteredStaff.length} pengguna</span>
+                    </div>
+                    <Card className="shadow-sm border-border overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <Table>
+                          {tableHeader}
+                          <TableBody><UserTableRows list={filteredStaff} /></TableBody>
+                        </Table>
+                      </div>
+                    </Card>
+                  </div>
+
+                  {/* Tabel Petugas */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <UserIcon className="h-4 w-4 text-slate-500" />
+                      <h3 className="text-sm font-semibold text-slate-700">Petugas</h3>
+                      <span className="text-xs text-muted-foreground bg-slate-100 px-2 py-0.5 rounded-full">{filteredPetugas.length} pengguna</span>
+                    </div>
+                    <Card className="shadow-sm border-border overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <Table>
+                          {tableHeader}
+                          <TableBody><UserTableRows list={filteredPetugas} /></TableBody>
+                        </Table>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
         </div>
 
         {/* ═══════════════════════════════════
@@ -510,9 +610,11 @@ export default function ManajemenUser() {
                   <Button variant="outline" size="sm" className="flex-1 h-9" onClick={() => { setProfileOpen(false); handleOpenEdit(selectedUser); }}>
                     <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit Data
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1 h-9" onClick={() => { setProfileOpen(false); handleOpenResetPass(selectedUser); }}>
-                    <KeyRound className="w-3.5 h-3.5 mr-1.5" /> Reset Password
-                  </Button>
+                  {selectedUser.role !== 'admin' && (
+                    <Button variant="outline" size="sm" className="flex-1 h-9" onClick={() => { setProfileOpen(false); handleOpenResetPass(selectedUser); }}>
+                      <KeyRound className="w-3.5 h-3.5 mr-1.5" /> Reset Password
+                    </Button>
+                  )}
                 </div>
               </>
             )}
@@ -809,6 +911,40 @@ export default function ManajemenUser() {
                 className={selectedUser?.status === 'active' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}
               >
                 Ya, Lanjutkan
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* ═══════════════════════════════════
+            ALERT: HAPUS AKUN
+        ═══════════════════════════════════ */}
+        <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2 text-red-700">
+                <Trash2 className="w-5 h-5" /> Hapus Akun Pengguna
+              </AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div className="space-y-2 text-sm text-slate-600">
+                  <p>Anda akan menghapus akun berikut secara permanen dari database:</p>
+                  <div className="bg-red-50 border border-red-100 rounded-lg px-4 py-3 space-y-0.5">
+                    <p className="font-semibold text-slate-800">{deleteUser?.namaLengkap}</p>
+                    <p className="font-mono text-xs text-slate-500">{deleteUser?.nik} · {deleteUser?.email}</p>
+                    <p className="text-xs text-slate-500">{roleBadge(deleteUser?.role ?? '')}</p>
+                  </div>
+                  <p className="text-red-600 font-medium">Tindakan ini tidak dapat dibatalkan.</p>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>Batal</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDelete}
+                disabled={deleting}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {deleting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Menghapus...</> : <><Trash2 className="w-4 h-4 mr-2" />Ya, Hapus Permanen</>}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
