@@ -130,7 +130,7 @@ export default function Login() {
               <form onSubmit={handleLogin} className="space-y-5">
                 <div className="space-y-1.5">
                   <Label htmlFor="email" className="text-gray-700 font-medium">
-                    Email
+                    Email <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="email"
@@ -149,7 +149,7 @@ export default function Login() {
                     htmlFor="password"
                     className="text-gray-700 font-medium"
                   >
-                    Password
+                    Password <span className="text-red-500">*</span>
                   </Label>
                   <div className="relative">
                     <Input

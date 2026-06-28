@@ -157,7 +157,7 @@ export default function LupaPassword() {
 
                   <form onSubmit={handleVerifikasi} className="space-y-5">
                     <div className="space-y-1.5">
-                      <Label htmlFor="nik" className="text-gray-700 font-medium">NIK</Label>
+                      <Label htmlFor="nik" className="text-gray-700 font-medium">NIK <span className="text-red-500">*</span></Label>
                       <Input
                         id="nik"
                         type="text"
@@ -171,7 +171,7 @@ export default function LupaPassword() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
+                      <Label htmlFor="email" className="text-gray-700 font-medium">Email <span className="text-red-500">*</span></Label>
                       <Input
                         id="email"
                         type="email"
@@ -223,7 +223,7 @@ export default function LupaPassword() {
 
                   <form onSubmit={handleResetPassword} className="space-y-5">
                     <div className="space-y-1.5">
-                      <Label htmlFor="passwordBaru" className="text-gray-700 font-medium">Password Baru</Label>
+                      <Label htmlFor="passwordBaru" className="text-gray-700 font-medium">Password Baru <span className="text-red-500">*</span></Label>
                       <div className="relative">
                         <Input
                           id="passwordBaru"
@@ -241,7 +241,7 @@ export default function LupaPassword() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="konfirmasi" className="text-gray-700 font-medium">Konfirmasi Password</Label>
+                      <Label htmlFor="konfirmasi" className="text-gray-700 font-medium">Konfirmasi Password <span className="text-red-500">*</span></Label>
                       <div className="relative">
                         <Input
                           id="konfirmasi"
