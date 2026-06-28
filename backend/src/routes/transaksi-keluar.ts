@@ -81,7 +81,7 @@ router.get("/transaksi-keluar", authenticate, async (req, res) => {
   res.json(result);
 });
 
-router.post("/transaksi-keluar", authenticate, authorize("admin", "operator"), async (req, res) => {
+router.post("/transaksi-keluar", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
   const parsed = createSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ message: parsed.error.errors[0]?.message ?? "Data tidak valid" });

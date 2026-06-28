@@ -10,7 +10,7 @@ import {
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
-export const roleEnum = pgEnum("role", ["admin", "operator", "viewer"]);
+export const roleEnum = pgEnum("role", ["admin", "kepala_gudang", "petugas"]);
 export const statusEnum = pgEnum("user_status", ["active", "inactive", "suspended"]);
 
 export const usersTable = pgTable("users", {
@@ -20,7 +20,7 @@ export const usersTable = pgTable("users", {
   namaLengkap: text("nama_lengkap").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  role: roleEnum("role").notNull().default("viewer"),
+  role: roleEnum("role").notNull().default("petugas"),
   noHp: text("no_hp"),
   departemen: text("departemen"),
   jabatan: text("jabatan"),
@@ -69,7 +69,7 @@ export const insertUserSchema = z.object({
   namaLengkap: z.string().min(1, "Nama lengkap tidak boleh kosong"),
   email: z.string().email("Format email tidak valid"),
   password: z.string().min(8, "Password minimal 8 karakter"),
-  role: z.enum(["admin", "operator", "viewer"]).default("viewer"),
+  role: z.enum(["admin", "kepala_gudang", "petugas"]).default("petugas"),
   noHp: z.string().nullable().optional(),
   departemen: z.string().nullable().optional(),
   jabatan: z.string().nullable().optional(),
@@ -88,7 +88,7 @@ export const selectUserSchema = z.object({
   nik: z.string(),
   namaLengkap: z.string(),
   email: z.string(),
-  role: z.enum(["admin", "operator", "viewer"]),
+  role: z.enum(["admin", "kepala_gudang", "petugas"]),
   noHp: z.string().nullable(),
   departemen: z.string().nullable(),
   jabatan: z.string().nullable(),

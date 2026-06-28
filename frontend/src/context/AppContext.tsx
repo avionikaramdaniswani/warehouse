@@ -18,7 +18,7 @@ export interface CurrentUser {
   nik: string;
   namaLengkap: string;
   email: string;
-  role: 'admin' | 'operator' | 'viewer';
+  role: 'admin' | 'kepala_gudang' | 'petugas';
   noHp: string | null;
   departemen: string | null;
   jabatan: string | null;

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-type Role = "admin" | "operator" | "viewer";
+type Role = "admin" | "kepala_gudang" | "petugas";
 
 export function authorize(...roles: Role[]) {
   return (req: Request, res: Response, next: NextFunction) => {

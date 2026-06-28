@@ -38,8 +38,8 @@ Sistem manajemen gudang (WMS) PT Tanjungenim Lestari Pulp & Paper dengan autenti
 | Role | Akses |
 |------|-------|
 | `admin` | Full access: kelola pengguna, barang, semua fitur |
-| `operator` | Kelola barang/inventori (tidak bisa kelola pengguna) |
-| `viewer` | Hanya lihat laporan (read-only) |
+| `kepala_gudang` | Kelola barang/inventori & transaksi (tidak bisa kelola pengguna) |
+| `petugas` | Hanya lihat laporan & stok (read-only) |
 
 ## Kategori Barang
 
@@ -82,3 +82,8 @@ Data awal (dari Materials_2026.xlsx):
 - Password: `Admin@12345`
 - NIK: `ADM001`
 - Hash bcrypt: `$2b$12$/6maOn3DACYzodRZ5tmsxOsrNHbfAq72pUZJhBX45WpLqXk.6WIgW`
+
+## Role Rename History
+
+- `operator` → `kepala_gudang` (Kepala Gudang)
+- `viewer` → `petugas` (Petugas)

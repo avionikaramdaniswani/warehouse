@@ -17,7 +17,7 @@ interface UserData {
   nik: string;
   namaLengkap: string;
   email: string;
-  role: 'admin' | 'operator' | 'viewer';
+  role: 'admin' | 'kepala_gudang' | 'petugas';
   noHp: string | null;
   departemen: string | null;
   jabatan: string | null;
@@ -30,10 +30,10 @@ interface UserData {
 const roleBadge = (role: UserData['role']) => {
   const map = {
     admin: 'bg-purple-100 text-purple-700 border-purple-200',
-    operator: 'bg-blue-100 text-blue-700 border-blue-200',
-    viewer: 'bg-slate-100 text-slate-600 border-slate-200',
+    kepala_gudang: 'bg-blue-100 text-blue-700 border-blue-200',
+    petugas: 'bg-slate-100 text-slate-600 border-slate-200',
   };
-  const label = { admin: 'Admin', operator: 'Operator', viewer: 'Viewer' };
+  const label = { admin: 'Admin', kepala_gudang: 'Kepala Gudang', petugas: 'Petugas' };
   return <span className={`px-2 py-0.5 rounded text-xs font-semibold border ${map[role]}`}>{label[role]}</span>;
 };
 
@@ -90,8 +90,8 @@ export default function LaporanPengguna() {
 
   const totalUsers = users.length;
   const totalAdmin = users.filter(u => u.role === 'admin').length;
-  const totalOperator = users.filter(u => u.role === 'operator').length;
-  const totalViewer = users.filter(u => u.role === 'viewer').length;
+  const totalOperator = users.filter(u => u.role === 'kepala_gudang').length;
+  const totalViewer = users.filter(u => u.role === 'petugas').length;
 
   const handleExportExcel = () => {
     if (filtered.length === 0) { toast.error('Tidak ada data untuk diekspor'); return; }
@@ -158,7 +158,7 @@ export default function LaporanPengguna() {
                   <Wrench className="h-5 w-5 text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground font-medium uppercase">Operator</p>
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Kepala Gudang</p>
                   {isLoading ? <Skeleton className="h-7 w-10 mt-1" /> : <p className="text-2xl font-bold font-mono text-blue-700">{totalOperator}</p>}
                 </div>
               </div>
@@ -171,7 +171,7 @@ export default function LaporanPengguna() {
                   <Eye className="h-5 w-5 text-slate-400" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground font-medium uppercase">Viewer</p>
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Petugas</p>
                   {isLoading ? <Skeleton className="h-7 w-10 mt-1" /> : <p className="text-2xl font-bold font-mono text-slate-600">{totalViewer}</p>}
                 </div>
               </div>
@@ -191,8 +191,8 @@ export default function LaporanPengguna() {
               <SelectContent>
                 <SelectItem value="Semua">Semua Role</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="operator">Operator</SelectItem>
-                <SelectItem value="viewer">Viewer</SelectItem>
+                <SelectItem value="kepala_gudang">Kepala Gudang</SelectItem>
+                <SelectItem value="petugas">Petugas</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>

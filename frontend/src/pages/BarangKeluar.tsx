@@ -51,7 +51,7 @@ function formatWaktu(iso: string): string {
 
 export default function BarangKeluar() {
   const { items, setItems, token, currentUser } = useAppContext();
-  const canEdit = currentUser?.role !== 'viewer';
+  const canEdit = currentUser?.role !== 'petugas';
 
   const [transaksi, setTransaksi] = useState<TransaksiKeluar[]>([]);
   const [loading, setLoading] = useState(false);

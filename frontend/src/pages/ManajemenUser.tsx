@@ -27,7 +27,7 @@ interface ApiUser {
   nik: string;
   namaLengkap: string;
   email: string;
-  role: 'admin' | 'operator' | 'viewer';
+  role: 'admin' | 'kepala_gudang' | 'petugas';
   noHp: string | null;
   departemen: string | null;
   jabatan: string | null;
@@ -53,7 +53,7 @@ interface FormData {
   namaLengkap: string;
   email: string;
   password: string;
-  role: 'admin' | 'operator' | 'viewer';
+  role: 'admin' | 'kepala_gudang' | 'petugas';
   noHp: string;
   departemen: string;
   jabatan: string;
@@ -63,10 +63,10 @@ interface FormData {
 
 const emptyForm: FormData = {
   nik: '', namaLengkap: '', email: '', password: '',
-  role: 'viewer', noHp: '', departemen: '', jabatan: '', seksi: '', status: 'active',
+  role: 'petugas', noHp: '', departemen: '', jabatan: '', seksi: '', status: 'active',
 };
 
-const roleBadge = (role: string) => ({ admin: 'Admin', operator: 'Operator', viewer: 'Viewer' }[role] ?? role);
+const roleBadge = (role: string) => ({ admin: 'Admin', kepala_gudang: 'Kepala Gudang', petugas: 'Petugas' }[role] ?? role);
 const statusLabel = (s: string) => ({ active: 'Aktif', inactive: 'Nonaktif', suspended: 'Ditangguhkan' }[s] ?? s);
 const fmtDate = (d: string | null) => d ? new Date(d).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
 const fmtDateOnly = (d: string) => new Date(d).toLocaleDateString('id-ID', { dateStyle: 'long' });
@@ -580,8 +580,8 @@ export default function ManajemenUser() {
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="operator">Operator</SelectItem>
-                      <SelectItem value="viewer">Viewer</SelectItem>
+                      <SelectItem value="kepala_gudang">Kepala Gudang</SelectItem>
+                      <SelectItem value="petugas">Petugas</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

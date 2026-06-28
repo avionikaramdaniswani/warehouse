@@ -47,8 +47,8 @@ function formatDate(iso: string | null | undefined) {
 
 function roleLabel(role: string) {
   if (role === 'admin') return 'Admin';
-  if (role === 'operator') return 'Operator';
-  return 'Viewer';
+  if (role === 'kepala_gudang') return 'Kepala Gudang';
+  return 'Petugas';
 }
 
 export default function Pengaturan() {

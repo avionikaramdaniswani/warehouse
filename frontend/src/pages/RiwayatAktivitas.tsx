@@ -21,7 +21,7 @@ interface ActivityLog {
   userId: number;
   namaLengkap: string | null;
   nik: string | null;
-  role: 'admin' | 'operator' | 'viewer' | null;
+  role: 'admin' | 'kepala_gudang' | 'petugas' | null;
 }
 
 const today = new Date().toISOString().slice(0, 10);

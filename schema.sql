@@ -16,12 +16,12 @@
 -- ---------------------------------------------------------------------------
 -- ENUM TYPES
 -- ---------------------------------------------------------------------------
-CREATE TYPE role        AS ENUM ('admin', 'operator', 'viewer');
+CREATE TYPE role        AS ENUM ('admin', 'kepala_gudang', 'petugas');
 CREATE TYPE user_status AS ENUM ('active', 'inactive', 'suspended');
 
 -- ---------------------------------------------------------------------------
 -- TABEL: users
---    Akun pengguna sistem dengan RBAC (admin / operator / viewer)
+--    Akun pengguna sistem dengan RBAC (admin / kepala_gudang / petugas)
 -- ---------------------------------------------------------------------------
 CREATE TABLE users (
   id             SERIAL      PRIMARY KEY,
@@ -29,7 +29,7 @@ CREATE TABLE users (
   nama_lengkap   TEXT        NOT NULL,
   email          TEXT        NOT NULL UNIQUE,
   password       TEXT        NOT NULL,               -- bcrypt hash (cost 12)
-  role           role        NOT NULL DEFAULT 'viewer',
+  role           role        NOT NULL DEFAULT 'petugas',
   no_hp          TEXT,
   departemen     TEXT,
   jabatan        TEXT,

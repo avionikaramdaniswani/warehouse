@@ -91,7 +91,7 @@ router.get("/items", authenticate, async (req, res) => {
   res.json(normalized);
 });
 
-router.post("/items", authenticate, authorize("admin", "operator"), async (req, res) => {
+router.post("/items", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
   const parsed = itemSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ message: parsed.error.errors[0]?.message ?? "Data tidak valid" });
@@ -128,7 +128,7 @@ router.post("/items", authenticate, authorize("admin", "operator"), async (req, 
   res.status(201).json(row);
 });
 
-router.put("/items/:tsCode", authenticate, authorize("admin", "operator"), async (req, res) => {
+router.put("/items/:tsCode", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
   const { tsCode } = req.params;
 
   const parsed = updateItemSchema.safeParse(req.body);
@@ -160,7 +160,7 @@ router.put("/items/:tsCode", authenticate, authorize("admin", "operator"), async
   res.json(updated);
 });
 
-router.patch("/items/:tsCode/stok", authenticate, authorize("admin", "operator"), async (req, res) => {
+router.patch("/items/:tsCode/stok", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
   const { tsCode } = req.params;
   const parsed = z.object({ delta: z.number().int() }).safeParse(req.body);
   if (!parsed.success) {
@@ -193,7 +193,7 @@ router.patch("/items/:tsCode/stok", authenticate, authorize("admin", "operator")
   res.json(updated);
 });
 
-router.post("/items/import", authenticate, authorize("admin", "operator"), async (req, res) => {
+router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
   const rowSchema = z.object({
     tsCode: z.string().min(1).max(50),
     msCode: z.string().optional(),

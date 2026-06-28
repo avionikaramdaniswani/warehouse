@@ -31,7 +31,7 @@ export async function verifyPassword(
 
 export interface JwtPayload {
   userId: number;
-  role: "admin" | "operator" | "viewer";
+  role: "admin" | "kepala_gudang" | "petugas";
   nik: string;
 }
 

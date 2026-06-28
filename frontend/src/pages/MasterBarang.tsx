@@ -121,7 +121,7 @@ export default function MasterBarang() {
   const [importOpen, setImportOpen] = useState(false);
 
   const isAdmin = currentUser?.role === 'admin';
-  const canEdit = currentUser?.role === 'admin' || currentUser?.role === 'operator';
+  const canEdit = currentUser?.role === 'admin' || currentUser?.role === 'kepala_gudang';
 
   const [printModeOpen, setPrintModeOpen] = useState(false);
 
