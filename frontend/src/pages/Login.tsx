@@ -78,7 +78,7 @@ export default function Login() {
               Materials Townsite Warehouse System
             </p>
             <p className="text-white/85 text-sm font-semibold">
-              PT Tanjungenim Lestari Pulp &amp; Paper
+              PT Tanjungenim Lestari Pulp and Paper
             </p>
           </div>
           <div className="w-16 h-px bg-white/20 mt-2" />
@@ -86,7 +86,7 @@ export default function Login() {
 
         {/* bottom copyright */}
         <p className="relative z-10 text-white/30 text-xs">
-          &copy; {YEAR} PT Tanjungenim Lestari Pulp &amp; Paper
+          &copy; {YEAR} PT Tanjungenim Lestari Pulp and Paper
         </p>
       </div>
 
@@ -111,7 +111,7 @@ export default function Login() {
                   Townsite Warehouse
                 </p>
                 <p className="text-white/65 text-xs mt-0.5">
-                  PT Tanjungenim Lestari Pulp &amp; Paper
+                  PT Tanjungenim Lestari Pulp and Paper
                 </p>
               </div>
             </div>
@@ -263,7 +263,7 @@ export default function Login() {
               </form>
 
               <p className="lg:hidden text-center text-xs text-gray-400 mt-6">
-                &copy; {YEAR} PT Tanjungenim Lestari Pulp &amp; Paper
+                &copy; {YEAR} PT Tanjungenim Lestari Pulp and Paper
               </p>
             </div>
           </div>
