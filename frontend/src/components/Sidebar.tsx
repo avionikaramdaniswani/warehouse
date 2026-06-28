@@ -22,11 +22,18 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
   const laporanActive = location.startsWith('/laporan');
   const [laporanOpen, setLaporanOpen] = useState(laporanActive);
 
+  const perms = currentUser?.permissions ?? {};
+  const isPetugas = currentUser?.role === 'petugas';
+
   const topNavItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/barang', label: 'Daftar Barang', icon: Package },
-    { href: '/barang-masuk', label: 'Barang Masuk', icon: PackageCheck },
-    { href: '/barang-keluar', label: 'Barang Keluar', icon: PackageX },
+    ...(!isPetugas || perms.transaksi_masuk
+      ? [{ href: '/barang-masuk', label: 'Barang Masuk', icon: PackageCheck }]
+      : []),
+    ...(!isPetugas || perms.transaksi_keluar
+      ? [{ href: '/barang-keluar', label: 'Barang Keluar', icon: PackageX }]
+      : []),
   ];
 
   const laporanSubItems = [

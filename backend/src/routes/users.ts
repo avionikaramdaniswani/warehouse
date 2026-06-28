@@ -24,6 +24,7 @@ const publicUserFields = {
   jabatan: usersTable.jabatan,
   seksi: usersTable.seksi,
   status: usersTable.status,
+  permissions: usersTable.permissions,
   dibuatOleh: usersTable.dibuatOleh,
   dibuatOlehNama: creator.namaLengkap,
   tanggalGabung: usersTable.tanggalGabung,
@@ -173,6 +174,29 @@ router.patch("/users/:id/password", authenticate, authorize("admin"), async (req
   );
 
   res.json({ message: "Password berhasil diubah" });
+});
+
+const updatePermissionsSchema = z.object({
+  transaksi_masuk: z.boolean(),
+  transaksi_keluar: z.boolean(),
+});
+
+router.patch("/users/:id/permissions", authenticate, authorize("admin"), async (req, res) => {
+  const id = Number(req.params.id);
+  if (isNaN(id)) { res.status(400).json({ message: "ID tidak valid" }); return; }
+
+  const parsed = updatePermissionsSchema.safeParse(req.body);
+  if (!parsed.success) { res.status(400).json({ message: "Data tidak valid" }); return; }
+
+  const [user] = await db.select({ id: usersTable.id, role: usersTable.role, nik: usersTable.nik }).from(usersTable).where(eq(usersTable.id, id)).limit(1);
+  if (!user) { res.status(404).json({ message: "Pengguna tidak ditemukan" }); return; }
+  if (user.role !== "petugas") { res.status(400).json({ message: "Custom akses hanya berlaku untuk petugas" }); return; }
+
+  await db.update(usersTable).set({ permissions: parsed.data, updatedAt: new Date() }).where(eq(usersTable.id, id));
+
+  await logActivity(req.user!.userId, "UPDATE_PERMISSIONS", `Ubah akses petugas NIK: ${user.nik} → masuk:${parsed.data.transaksi_masuk} keluar:${parsed.data.transaksi_keluar}`, req);
+
+  res.json({ message: "Akses berhasil diperbarui", permissions: parsed.data });
 });
 
 router.delete("/users/:id", authenticate, authorize("admin"), async (req, res) => {

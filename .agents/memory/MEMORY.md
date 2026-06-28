@@ -3,3 +3,4 @@
 - [QR label print](qr-label-print.md) — SVG serialized via outerHTML from DOM element with known ID; print via window.open with injected HTML + auto-print script.
 - [Transaksi tables](transaksi-db.md) — transaksi_masuk & transaksi_keluar in DB; POST endpoints update stok atomically; AppContext no longer holds transaksi state (each page fetches own data).
 - [drizzle-zod incompatibility](drizzle-zod-v4.md) — createInsertSchema/createSelectSchema from drizzle-zod uses Zod v4 internals; breaks when mixed with Zod v3 via .extend(). Always write schemas manually with z.object({}).
+- [Petugas permissions](petugas-permissions.md) — JSONB permissions column on users table; toggles transaksi_masuk/keluar only for petugas; default {}; enforced by checkPermission middleware.

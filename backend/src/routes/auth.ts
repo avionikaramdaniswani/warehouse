@@ -264,6 +264,7 @@ router.get("/auth/me", authenticate, async (req, res) => {
       jabatan: usersTable.jabatan,
       seksi: usersTable.seksi,
       status: usersTable.status,
+      permissions: usersTable.permissions,
       dibuatOleh: usersTable.dibuatOleh,
       tanggalGabung: usersTable.tanggalGabung,
       loginTerakhir: usersTable.loginTerakhir,
@@ -279,7 +280,7 @@ router.get("/auth/me", authenticate, async (req, res) => {
     return;
   }
 
-  res.json(user);
+  res.json({ ...user, permissions: user.permissions ?? {} });
 });
 
 export default router;

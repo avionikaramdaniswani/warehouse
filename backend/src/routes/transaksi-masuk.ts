@@ -5,6 +5,7 @@ import { eq, and, desc, count } from "drizzle-orm";
 import { z } from "zod";
 import { authenticate } from "../middlewares/authenticate.js";
 import { authorize } from "../middlewares/authorize.js";
+import { requirePermission } from "../middlewares/checkPermission.js";
 import { logActivity } from "../lib/activity.js";
 
 const router = Router();
@@ -76,7 +77,7 @@ router.get("/transaksi-masuk", authenticate, async (req, res) => {
   res.json(result);
 });
 
-router.post("/transaksi-masuk", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
+router.post("/transaksi-masuk", authenticate, authorize("admin", "kepala_gudang", "petugas"), requirePermission("transaksi_masuk"), async (req, res) => {
   const parsed = createSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ message: parsed.error.errors[0]?.message ?? "Data tidak valid" });

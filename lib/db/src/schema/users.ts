@@ -5,6 +5,7 @@ import {
   pgEnum,
   timestamp,
   integer,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 import { z } from "zod";
@@ -28,6 +29,11 @@ export const usersTable = pgTable("users", {
   status: statusEnum("status").notNull().default("active"),
 
   dibuatOleh: integer("dibuat_oleh"),
+
+  permissions: jsonb("permissions")
+    .$type<{ transaksi_masuk?: boolean; transaksi_keluar?: boolean }>()
+    .notNull()
+    .default({}),
 
   tanggalGabung: timestamp("tanggal_gabung", { withTimezone: true }).notNull().defaultNow(),
   loginTerakhir: timestamp("login_terakhir", { withTimezone: true }),

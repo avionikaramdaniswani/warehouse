@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   UserPlus, ShieldAlert, CheckCircle, Search,
   Loader2, Eye, ClipboardList, Building2,
-  Phone, Mail, CreditCard, CalendarDays, Clock, Shield, User as UserIcon, Trash2, Save,
+  Phone, Mail, CreditCard, CalendarDays, Clock, Shield, User as UserIcon, Trash2, Save, ToggleLeft, ToggleRight,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -33,6 +33,7 @@ interface ApiUser {
   jabatan: string | null;
   seksi: string | null;
   status: 'active' | 'inactive' | 'suspended';
+  permissions: { transaksi_masuk?: boolean; transaksi_keluar?: boolean } | null;
   dibuatOleh: number | null;
   dibuatOlehNama: string | null;
   loginTerakhir: string | null;
@@ -140,18 +141,58 @@ export default function ManajemenUser() {
   const [activityTypeFilter, setActivityTypeFilter] = useState('semua');
   const [activityTimeFilter, setActivityTimeFilter] = useState('semua');
 
+  const [permissionsMap, setPermissionsMap] = useState<Record<number, { transaksi_masuk: boolean; transaksi_keluar: boolean }>>({});
+  const [savingPermIds, setSavingPermIds] = useState<Set<number>>(new Set());
+
   if (currentUser?.role !== 'admin') return <Redirect to="/dashboard" />;
 
   const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
 
+  const getEffectivePerms = (user: ApiUser) =>
+    permissionsMap[user.id] ?? {
+      transaksi_masuk: user.permissions?.transaksi_masuk ?? false,
+      transaksi_keluar: user.permissions?.transaksi_keluar ?? false,
+    };
+
   const fetchUsers = async () => {
     try {
       const res = await fetch('/api/users', { headers: authHeaders });
-      if (res.ok) setUsers(await res.json());
+      if (res.ok) {
+        const data: ApiUser[] = await res.json();
+        setUsers(data);
+        const map: Record<number, { transaksi_masuk: boolean; transaksi_keluar: boolean }> = {};
+        for (const u of data) {
+          if (u.role === 'petugas') {
+            map[u.id] = {
+              transaksi_masuk: u.permissions?.transaksi_masuk ?? false,
+              transaksi_keluar: u.permissions?.transaksi_keluar ?? false,
+            };
+          }
+        }
+        setPermissionsMap(map);
+      }
     } catch {
       toast.error('Gagal memuat data pengguna');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSavePermissions = async (user: ApiUser) => {
+    const perms = getEffectivePerms(user);
+    setSavingPermIds((s) => new Set(s).add(user.id));
+    try {
+      const res = await fetch(`/api/users/${user.id}/permissions`, {
+        method: 'PATCH', headers: authHeaders, body: JSON.stringify(perms),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.message ?? 'Gagal menyimpan akses'); return; }
+      toast.success(`Akses ${user.namaLengkap} berhasil diperbarui`);
+      setUsers((prev) => prev.map((u) => u.id === user.id ? { ...u, permissions: perms } : u));
+    } catch {
+      toast.error('Terjadi kesalahan jaringan');
+    } finally {
+      setSavingPermIds((s) => { const n = new Set(s); n.delete(user.id); return n; });
     }
   };
 
@@ -363,7 +404,7 @@ export default function ManajemenUser() {
             const filteredStaff = filtered.filter(u => u.role === 'admin' || u.role === 'kepala_gudang');
             const filteredPetugas = filtered.filter(u => u.role === 'petugas');
 
-            const UserCard = ({ user }: { user: ApiUser }) => (
+            const UserCard = ({ user, children }: { user: ApiUser; children?: React.ReactNode }) => (
               <Card key={user.id} className={user.status !== 'active' ? 'opacity-70' : ''}>
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-2">
@@ -384,6 +425,7 @@ export default function ManajemenUser() {
                   <div className="flex gap-1 justify-end border-t pt-3">
                     <ActionButtons user={user} />
                   </div>
+                  {children}
                 </CardContent>
               </Card>
             );
@@ -446,7 +488,48 @@ export default function ManajemenUser() {
                     <div className="flex flex-col gap-3">
                       {filteredPetugas.length === 0
                         ? <div className="py-6 text-center text-muted-foreground text-sm bg-white rounded-lg border">Tidak ada petugas.</div>
-                        : filteredPetugas.map((u) => <UserCard key={u.id} user={u} />)}
+                        : filteredPetugas.map((u) => {
+                          const perms = getEffectivePerms(u);
+                          const isSaving = savingPermIds.has(u.id);
+                          const origPerms = {
+                            transaksi_masuk: u.permissions?.transaksi_masuk ?? false,
+                            transaksi_keluar: u.permissions?.transaksi_keluar ?? false,
+                          };
+                          const isDirty = perms.transaksi_masuk !== origPerms.transaksi_masuk || perms.transaksi_keluar !== origPerms.transaksi_keluar;
+                          return (
+                            <UserCard key={u.id} user={u}>
+                              <div className="border-t pt-3 mt-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-2">Hak Akses Tambahan</p>
+                                <div className="flex items-center gap-3">
+                                  {(['transaksi_masuk', 'transaksi_keluar'] as const).map((field) => {
+                                    const on = perms[field];
+                                    const label = field === 'transaksi_masuk' ? 'Barang Masuk' : 'Barang Keluar';
+                                    return (
+                                      <button
+                                        key={field}
+                                        onClick={() => setPermissionsMap((m) => ({ ...m, [u.id]: { ...perms, [field]: !on } }))}
+                                        className={`flex items-center gap-1.5 text-xs font-medium rounded px-2 py-1 transition-colors ${on ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}
+                                      >
+                                        {on ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
+                                        {label}
+                                      </button>
+                                    );
+                                  })}
+                                  {isDirty && (
+                                    <button
+                                      onClick={() => handleSavePermissions(u)}
+                                      disabled={isSaving}
+                                      className="ml-auto flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded px-2 py-1"
+                                    >
+                                      {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                                      Simpan
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </UserCard>
+                          );
+                        })}
                     </div>
                   </div>
                 </div>
@@ -476,12 +559,88 @@ export default function ManajemenUser() {
                       <UserIcon className="h-4 w-4 text-slate-500" />
                       <h3 className="text-sm font-semibold text-slate-700">Petugas</h3>
                       <span className="text-xs text-muted-foreground bg-slate-100 px-2 py-0.5 rounded-full">{filteredPetugas.length} pengguna</span>
+                      <span className="text-xs text-slate-400 ml-1">— atur hak akses tambahan per petugas</span>
                     </div>
                     <Card className="shadow-sm border-border overflow-hidden">
                       <div className="overflow-x-auto">
                         <Table>
-                          {tableHeader}
-                          <TableBody><UserTableRows list={filteredPetugas} /></TableBody>
+                          <TableHeader className="bg-slate-100">
+                            <TableRow>
+                              <TableHead>NIK</TableHead>
+                              <TableHead>Nama Lengkap</TableHead>
+                              <TableHead>Email</TableHead>
+                              <TableHead>Departemen</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead>Login Terakhir</TableHead>
+                              <TableHead className="text-center">Barang Masuk</TableHead>
+                              <TableHead className="text-center">Barang Keluar</TableHead>
+                              <TableHead className="text-right">Aksi</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {filteredPetugas.length === 0 ? (
+                              <TableRow>
+                                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground text-sm">Tidak ada petugas.</TableCell>
+                              </TableRow>
+                            ) : filteredPetugas.map((user) => {
+                              const perms = getEffectivePerms(user);
+                              const isSaving = savingPermIds.has(user.id);
+                              const origPerms = {
+                                transaksi_masuk: user.permissions?.transaksi_masuk ?? false,
+                                transaksi_keluar: user.permissions?.transaksi_keluar ?? false,
+                              };
+                              const isDirty = perms.transaksi_masuk !== origPerms.transaksi_masuk || perms.transaksi_keluar !== origPerms.transaksi_keluar;
+
+                              const PermToggle = ({ field, label }: { field: 'transaksi_masuk' | 'transaksi_keluar'; label: string }) => {
+                                const on = perms[field];
+                                return (
+                                  <button
+                                    onClick={() => setPermissionsMap((m) => ({ ...m, [user.id]: { ...perms, [field]: !on } }))}
+                                    className={`flex flex-col items-center gap-1 rounded px-2 py-1 transition-colors ${on ? 'text-green-600 hover:bg-green-50' : 'text-slate-400 hover:bg-slate-50'}`}
+                                    title={`${label}: ${on ? 'Aktif' : 'Nonaktif'}`}
+                                  >
+                                    {on
+                                      ? <ToggleRight className="h-5 w-5" />
+                                      : <ToggleLeft className="h-5 w-5" />}
+                                    <span className={`text-[10px] font-medium ${on ? 'text-green-600' : 'text-slate-400'}`}>{on ? 'Aktif' : 'Off'}</span>
+                                  </button>
+                                );
+                              };
+
+                              return (
+                                <TableRow key={user.id} className={user.status !== 'active' ? 'opacity-60' : ''}>
+                                  <TableCell className="font-mono text-sm">{user.nik}</TableCell>
+                                  <TableCell className="font-semibold text-slate-800">{user.namaLengkap}</TableCell>
+                                  <TableCell className="text-sm text-slate-600">{user.email}</TableCell>
+                                  <TableCell className="text-sm text-slate-600">{user.departemen ?? '-'}</TableCell>
+                                  <TableCell><StatusBadge status={statusLabel(user.status) as any} /></TableCell>
+                                  <TableCell className="text-sm text-slate-500">{fmtDate(user.loginTerakhir)}</TableCell>
+                                  <TableCell className="text-center"><PermToggle field="transaksi_masuk" label="Barang Masuk" /></TableCell>
+                                  <TableCell className="text-center"><PermToggle field="transaksi_keluar" label="Barang Keluar" /></TableCell>
+                                  <TableCell>
+                                    <div className="flex items-center justify-end gap-1">
+                                      {isDirty && (
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <Button
+                                              variant="ghost" size="icon"
+                                              className="h-8 w-8 text-primary hover:bg-primary/10"
+                                              onClick={() => handleSavePermissions(user)}
+                                              disabled={isSaving}
+                                            >
+                                              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                            </Button>
+                                          </TooltipTrigger>
+                                          <TooltipContent>Simpan Akses</TooltipContent>
+                                        </Tooltip>
+                                      )}
+                                      <ActionButtons user={user} />
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
                         </Table>
                       </div>
                     </Card>

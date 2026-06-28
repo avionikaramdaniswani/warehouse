@@ -13,6 +13,11 @@ export interface Item {
   status: string;
 }
 
+export interface UserPermissions {
+  transaksi_masuk?: boolean;
+  transaksi_keluar?: boolean;
+}
+
 export interface CurrentUser {
   id: number;
   nik: string;
@@ -26,6 +31,7 @@ export interface CurrentUser {
   status: string;
   tanggalGabung: string | null;
   loginTerakhir: string | null;
+  permissions: UserPermissions;
 }
 
 interface AppContextType {
@@ -63,7 +69,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(() => {
     const stored = localStorage.getItem(USER_KEY);
-    return stored ? JSON.parse(stored) : null;
+    if (!stored) return null;
+    const u = JSON.parse(stored);
+    return { ...u, permissions: u.permissions ?? {} };
   });
   const [items, setItems] = useState<Item[]>([]);
   const [itemsLoading, setItemsLoading] = useState(false);
