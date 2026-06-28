@@ -1,0 +1,73 @@
+PS D:\warehouse> Remove-Item scripts\preinstall.mjs
+>> git pull origin main
+From https://github.com/avionikaramdaniswani/warehouse
+ * branch            main       -> FETCH_HEAD
+Updating 306e23a..8e79115
+Fast-forward
+ .canvas/assets/blackbox-testing.png                | Bin 0 -> 1151265 bytes
+ .canvas/assets/blackbox-testing.svg                | 610 ++++++++++++++++
+ .canvas/assets/blackbox-v2.png                     | Bin 0 -> 241773 bytes
+ .canvas/assets/blackbox-v2.svg                     |  93 +++
+ .canvas/assets/use-case-diagram.png                | Bin 0 -> 132046 bytes
+ .canvas/assets/use-case-diagram.svg                | 145 ++++
+ .canvas/assets/use-case-v2.png                     | Bin 0 -> 228936 bytes
+ .canvas/assets/use-case-v2.svg                     | 242 +++++++
+ ...-head-meta-charset-UTF-8-titl_1782560103754.txt | 255 +++++++
+ ...-workspace-db-run-push-Scope-_1782299178244.txt |  48 ++
+ attached_assets/image_1782299557864.png            | Bin 0 -> 309996 bytes
+ attached_assets/image_1782301862002.png            | Bin 0 -> 210023 bytes
+ attached_assets/image_1782558801985.png            | Bin 0 -> 87137 bytes
+ attached_assets/image_1782559989695.png            | Bin 0 -> 14814 bytes
+ attached_assets/image_1782561239386.png            | Bin 0 -> 172399 bytes
+ attached_assets/targeted_element_1782559834220.png | Bin 0 -> 1506981 bytes
+ backend/package.json                               |   2 +-
+ backend/src/app.ts                                 | 129 +++-
+ backend/src/index.ts                               |   4 +-
+ backend/src/lib/auth.ts                            |   2 +-
+ backend/src/middlewares/authorize.ts               |   2 +-
+ backend/src/routes/items.ts                        |   8 +-
+ backend/src/routes/transaksi-keluar.ts             |   2 +-
+ backend/src/routes/transaksi-masuk.ts              |   2 +-
+ frontend/public/blackbox-testing.html              | 610 ++++++++++++++++
+ frontend/public/blackbox-v2.html                   |  95 +++
+ frontend/public/use-case-diagram.html              | 255 +++++++
+ frontend/src/context/AppContext.tsx                |   2 +-
+ frontend/src/pages/BarangKeluar.tsx                |   2 +-
+ frontend/src/pages/BarangMasuk.tsx                 |   2 +-
+ frontend/src/pages/LaporanPengguna.tsx             |  20 +-
+ frontend/src/pages/ManajemenUser.tsx               |  12 +-
+ frontend/src/pages/MasterBarang.tsx                |   2 +-
+ frontend/src/pages/Pengaturan.tsx                  |   4 +-
+ frontend/src/pages/RiwayatAktivitas.tsx            |   2 +-
+ frontend/vite.config.ts                            |  17 +-
+ lib/db/drizzle.config.ts                           |   9 +-
+ lib/db/package.json                                |   1 +
+ lib/db/src/schema/users.ts                         |   8 +-
+ package.json                                       |   9 +-
+ pnpm-lock.yaml                                     | 778 ++++++++++++++++++---
+ pnpm-workspace.yaml                                |  79 ---
+ replit.md                                          |   9 +-
+ schema.sql                                         |   6 +-
+ scripts/preinstall.mjs                             |  11 +
+ 45 files changed, 3255 insertions(+), 222 deletions(-)
+ create mode 100644 .canvas/assets/blackbox-testing.png
+ create mode 100644 .canvas/assets/blackbox-testing.svg
+ create mode 100644 .canvas/assets/blackbox-v2.png
+ create mode 100644 .canvas/assets/blackbox-v2.svg
+ create mode 100644 .canvas/assets/use-case-diagram.png
+ create mode 100644 .canvas/assets/use-case-diagram.svg
+ create mode 100644 .canvas/assets/use-case-v2.png
+ create mode 100644 .canvas/assets/use-case-v2.svg
+ create mode 100644 attached_assets/Pasted--DOCTYPE-html-html-lang-id-head-meta-charset-UTF-8-titl_1782560103754.txt
+ create mode 100644 attached_assets/Pasted-PS-D-warehouse-pnpm-filter-workspace-db-run-push-Scope-_1782299178244.txt
+ create mode 100644 attached_assets/image_1782299557864.png
+ create mode 100644 attached_assets/image_1782301862002.png
+ create mode 100644 attached_assets/image_1782558801985.png
+ create mode 100644 attached_assets/image_1782559989695.png
+ create mode 100644 attached_assets/image_1782561239386.png
+ create mode 100644 attached_assets/targeted_element_1782559834220.png
+ create mode 100644 frontend/public/blackbox-testing.html
+ create mode 100644 frontend/public/blackbox-v2.html
+ create mode 100644 frontend/public/use-case-diagram.html
+ create mode 100644 scripts/preinstall.mjs
+PS D:\warehouse> 
