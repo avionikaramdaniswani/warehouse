@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { z } from "zod";
-import { verifyPassword, hashPassword, signToken } from "../lib/auth.js";
+import { verifyPassword, hashPassword, signToken, signResetToken, verifyResetToken } from "../lib/auth.js";
 import { authenticate } from "../middlewares/authenticate.js";
-import { loginLimiter } from "../middlewares/rateLimiter.js";
+import { loginLimiter, forgotPasswordLimiter } from "../middlewares/rateLimiter.js";
 import { logActivity } from "../lib/activity.js";
 
 const router = Router();
@@ -162,6 +162,93 @@ router.post("/auth/change-password", authenticate, async (req, res) => {
 
   await logActivity(user.id, "CHANGE_PASSWORD", "Ubah password", req);
   res.json({ message: "Password berhasil diubah" });
+});
+
+const forgotPasswordSchema = z.object({
+  nik: z.string().min(1, "NIK wajib diisi"),
+  email: z.string().email("Format email tidak valid"),
+});
+
+router.post("/auth/forgot-password", forgotPasswordLimiter, async (req, res) => {
+  const parsed = forgotPasswordSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ message: parsed.error.errors[0]?.message ?? "Data tidak valid" });
+    return;
+  }
+
+  const { nik, email } = parsed.data;
+
+  const [user] = await db
+    .select({ id: usersTable.id, status: usersTable.status })
+    .from(usersTable)
+    .where(and(eq(usersTable.nik, nik), eq(usersTable.email, email)))
+    .limit(1);
+
+  if (!user) {
+    res.status(400).json({ message: "NIK dan email tidak cocok. Periksa kembali data Anda." });
+    return;
+  }
+
+  if (user.status !== "active") {
+    res.status(403).json({ message: "Akun tidak aktif. Hubungi admin." });
+    return;
+  }
+
+  const { signResetToken } = await import("../lib/auth.js");
+  const resetToken = signResetToken(user.id);
+
+  res.json({ resetToken });
+});
+
+const resetPasswordSchema = z.object({
+  resetToken: z.string().min(1, "Token tidak valid"),
+  passwordBaru: z.string().min(8, "Password baru minimal 8 karakter"),
+  konfirmasi: z.string().min(1, "Konfirmasi password wajib diisi"),
+});
+
+router.post("/auth/reset-password", async (req, res) => {
+  const parsed = resetPasswordSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ message: parsed.error.errors[0]?.message ?? "Data tidak valid" });
+    return;
+  }
+
+  const { resetToken, passwordBaru, konfirmasi } = parsed.data;
+
+  if (passwordBaru !== konfirmasi) {
+    res.status(400).json({ message: "Konfirmasi password tidak cocok" });
+    return;
+  }
+
+  let userId: number;
+  try {
+    const { verifyResetToken } = await import("../lib/auth.js");
+    const payload = verifyResetToken(resetToken);
+    userId = payload.userId;
+  } catch {
+    res.status(400).json({ message: "Token tidak valid atau sudah kedaluwarsa. Ulangi proses dari awal." });
+    return;
+  }
+
+  const [user] = await db
+    .select({ id: usersTable.id, status: usersTable.status })
+    .from(usersTable)
+    .where(eq(usersTable.id, userId))
+    .limit(1);
+
+  if (!user || user.status !== "active") {
+    res.status(403).json({ message: "Akun tidak ditemukan atau tidak aktif." });
+    return;
+  }
+
+  const hashed = await hashPassword(passwordBaru);
+  await db
+    .update(usersTable)
+    .set({ password: hashed, updatedAt: new Date() })
+    .where(eq(usersTable.id, userId));
+
+  await logActivity(userId, "RESET_PASSWORD", "Reset password via lupa password", req);
+  res.json({ message: "Password berhasil direset. Silakan login dengan password baru." });
 });
 
 router.get("/auth/me", authenticate, async (req, res) => {

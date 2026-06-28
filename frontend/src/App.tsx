@@ -7,6 +7,7 @@ import { AppProvider, useAppContext } from "@/context/AppContext";
 
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/Login";
+import LupaPassword from "@/pages/LupaPassword";
 import BinPage from "@/pages/BinPage";
 import Dashboard from "@/pages/Dashboard";
 import MasterBarang from "@/pages/MasterBarang";
@@ -39,6 +40,7 @@ function Router() {
     <Switch>
       <Route path="/" component={() => <Redirect to="/login" />} />
       <Route path="/login" component={Login} />
+      <Route path="/lupa-password" component={LupaPassword} />
       <Route path="/bin/:binLoc" component={BinPage} />
 
       <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />

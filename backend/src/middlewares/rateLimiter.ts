@@ -17,3 +17,12 @@ export const loginLimiter = rateLimit({
   message: { message: "Terlalu banyak percobaan login. Coba lagi dalam 15 menit." },
   skipSuccessfulRequests: true,
 });
+
+export const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Terlalu banyak permintaan reset password. Coba lagi dalam 1 jam." },
+  skipSuccessfulRequests: false,
+});

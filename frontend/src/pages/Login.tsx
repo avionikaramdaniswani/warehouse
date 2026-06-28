@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useAppContext } from "@/context/AppContext";
 import { TeLLogo } from "@/components/TeLLogo";
 import { Input } from "@/components/ui/input";
@@ -260,6 +260,15 @@ export default function Login() {
                     "Masuk"
                   )}
                 </Button>
+
+                <div className="text-center mt-1">
+                  <Link
+                    to="/lupa-password"
+                    className="text-sm text-[#1B3A2D]/70 hover:text-[#1B3A2D] transition-colors"
+                  >
+                    Lupa password?
+                  </Link>
+                </div>
               </form>
 
               <p className="lg:hidden text-center text-xs text-gray-400 mt-6">

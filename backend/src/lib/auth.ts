@@ -42,3 +42,18 @@ export function signToken(payload: JwtPayload): string {
 export function verifyToken(token: string): JwtPayload {
   return jwt.verify(token, secret) as JwtPayload;
 }
+
+export interface ResetTokenPayload {
+  userId: number;
+  type: "reset";
+}
+
+export function signResetToken(userId: number): string {
+  return jwt.sign({ userId, type: "reset" } satisfies ResetTokenPayload, secret, { expiresIn: "15m" });
+}
+
+export function verifyResetToken(token: string): ResetTokenPayload {
+  const payload = jwt.verify(token, secret) as ResetTokenPayload;
+  if (payload.type !== "reset") throw new Error("Bukan reset token");
+  return payload;
+}
