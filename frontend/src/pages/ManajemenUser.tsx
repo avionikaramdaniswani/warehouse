@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import {
   UserPlus, Pencil, ShieldAlert, CheckCircle, Search,
-  Loader2, Eye, KeyRound, ClipboardList, Building2,
+  Loader2, Eye, ClipboardList, Building2,
   Phone, Mail, CreditCard, CalendarDays, Clock, Shield, User as UserIcon, Trash2,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
@@ -123,7 +123,6 @@ export default function ManajemenUser() {
 
   const [editOpen, setEditOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [resetPassOpen, setResetPassOpen] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -133,10 +132,6 @@ export default function ManajemenUser() {
   const [selectedUser, setSelectedUser] = useState<ApiUser | null>(null);
   const [formData, setFormData] = useState<FormData>(emptyForm);
   const [saving, setSaving] = useState(false);
-
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [resettingPass, setResettingPass] = useState(false);
 
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [loadingActivity, setLoadingActivity] = useState(false);
@@ -213,38 +208,6 @@ export default function ManajemenUser() {
       toast.error('Terjadi kesalahan jaringan');
     } finally {
       setSaving(false);
-    }
-  };
-
-  /* ── RESET PASSWORD ── */
-  const handleOpenResetPass = (user: ApiUser) => {
-    setSelectedUser(user);
-    setNewPassword('');
-    setConfirmPassword('');
-    setResetPassOpen(true);
-  };
-
-  const handleResetPassword = async () => {
-    if (!newPassword || newPassword.length < 8) {
-      toast.error('Password minimal 8 karakter'); return;
-    }
-    if (newPassword !== confirmPassword) {
-      toast.error('Konfirmasi password tidak cocok'); return;
-    }
-    setResettingPass(true);
-    try {
-      const res = await fetch(`/api/users/${selectedUser!.id}/password`, {
-        method: 'PATCH', headers: authHeaders,
-        body: JSON.stringify({ passwordBaru: newPassword }),
-      });
-      const data = await res.json();
-      if (!res.ok) { toast.error(data.message ?? 'Gagal mereset password'); return; }
-      toast.success(`Password ${selectedUser!.namaLengkap} berhasil direset`);
-      setResetPassOpen(false);
-    } catch {
-      toast.error('Terjadi kesalahan jaringan');
-    } finally {
-      setResettingPass(false);
     }
   };
 
@@ -337,17 +300,6 @@ export default function ManajemenUser() {
         </TooltipTrigger>
         <TooltipContent>Edit Data</TooltipContent>
       </Tooltip>
-
-      {user.role !== 'admin' && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-orange-600 hover:bg-orange-50" onClick={() => handleOpenResetPass(user)}>
-              <KeyRound className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Reset Password</TooltipContent>
-        </Tooltip>
-      )}
 
       <Tooltip>
         <TooltipTrigger asChild>
@@ -610,11 +562,6 @@ export default function ManajemenUser() {
                   <Button variant="outline" size="sm" className="flex-1 h-9" onClick={() => { setProfileOpen(false); handleOpenEdit(selectedUser); }}>
                     <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit Data
                   </Button>
-                  {selectedUser.role !== 'admin' && (
-                    <Button variant="outline" size="sm" className="flex-1 h-9" onClick={() => { setProfileOpen(false); handleOpenResetPass(selectedUser); }}>
-                      <KeyRound className="w-3.5 h-3.5 mr-1.5" /> Reset Password
-                    </Button>
-                  )}
                 </div>
               </>
             )}
@@ -704,49 +651,6 @@ export default function ManajemenUser() {
               <Button variant="outline" onClick={() => setEditOpen(false)}>Batal</Button>
               <Button className="bg-primary hover:bg-primary/90" onClick={handleSave} disabled={saving}>
                 {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Menyimpan...</> : 'Simpan'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* ═══════════════════════════════════
-            DIALOG: RESET PASSWORD
-        ═══════════════════════════════════ */}
-        <Dialog open={resetPassOpen} onOpenChange={setResetPassOpen}>
-          <DialogContent className="sm:max-w-[400px]">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <KeyRound className="w-5 h-5 text-slate-500" />
-                Reset Password
-              </DialogTitle>
-            </DialogHeader>
-            <div className="py-2 space-y-1 text-sm text-muted-foreground bg-slate-50 rounded-lg px-3 py-2 mb-2">
-              <p>Pengguna: <span className="font-semibold text-slate-700">{selectedUser?.namaLengkap}</span></p>
-              <p>NIK: <span className="font-mono text-slate-700">{selectedUser?.nik}</span></p>
-            </div>
-            <div className="grid gap-3">
-              <div className="space-y-1.5">
-                <Label>Password Baru <span className="text-red-500">*</span></Label>
-                <Input type="password" placeholder="Minimal 8 karakter" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Konfirmasi Password <span className="text-red-500">*</span></Label>
-                <Input
-                  type="password"
-                  placeholder="Ulangi password baru"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={confirmPassword && newPassword !== confirmPassword ? 'border-red-400 focus-visible:ring-red-400' : ''}
-                />
-                {confirmPassword && newPassword !== confirmPassword && (
-                  <p className="text-xs text-red-500">Password tidak cocok</p>
-                )}
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setResetPassOpen(false)}>Batal</Button>
-              <Button className="bg-primary hover:bg-primary/90" onClick={handleResetPassword} disabled={resettingPass}>
-                {resettingPass ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Mereset...</> : <><KeyRound className="w-4 h-4 mr-2" />Reset Password</>}
               </Button>
             </DialogFooter>
           </DialogContent>
