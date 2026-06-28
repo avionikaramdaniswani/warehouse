@@ -13,9 +13,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import {
-  UserPlus, Pencil, ShieldAlert, CheckCircle, Search,
+  UserPlus, ShieldAlert, CheckCircle, Search,
   Loader2, Eye, ClipboardList, Building2,
-  Phone, Mail, CreditCard, CalendarDays, Clock, Shield, User as UserIcon, Trash2,
+  Phone, Mail, CreditCard, CalendarDays, Clock, Shield, User as UserIcon, Trash2, Save,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -132,6 +132,8 @@ export default function ManajemenUser() {
   const [selectedUser, setSelectedUser] = useState<ApiUser | null>(null);
   const [formData, setFormData] = useState<FormData>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [profileRole, setProfileRole] = useState<'admin' | 'kepala_gudang' | 'petugas' | null>(null);
+  const [savingRole, setSavingRole] = useState(false);
 
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [loadingActivity, setLoadingActivity] = useState(false);
@@ -164,50 +166,58 @@ export default function ManajemenUser() {
   /* ── LIHAT PROFIL ── */
   const handleOpenProfile = (user: ApiUser) => {
     setSelectedUser(user);
+    setProfileRole(user.role);
     setProfileOpen(true);
-  };
-
-  /* ── EDIT ── */
-  const handleOpenEdit = (user: ApiUser) => {
-    setSelectedUser(user);
-    setFormData({
-      nik: user.nik, namaLengkap: user.namaLengkap, email: user.email, password: '',
-      role: user.role, noHp: user.noHp ?? '', departemen: user.departemen ?? '',
-      jabatan: user.jabatan ?? '', seksi: user.seksi ?? '', status: user.status,
-    });
-    setEditOpen(true);
   };
 
   const handleSave = async () => {
     if (!formData.nik || !formData.namaLengkap || !formData.email) {
       toast.error('NIK, nama, dan email wajib diisi'); return;
     }
-    if (!selectedUser && !formData.password) {
-      toast.error('Password wajib diisi untuk pengguna baru'); return;
+    if (!formData.password) {
+      toast.error('Password wajib diisi'); return;
     }
     setSaving(true);
     try {
-      const body: Record<string, string> = {
-        nik: formData.nik, namaLengkap: formData.namaLengkap, email: formData.email,
-        role: formData.role, status: formData.status,
-        noHp: formData.noHp, departemen: formData.departemen,
-        jabatan: formData.jabatan, seksi: formData.seksi,
-      };
-      if (!selectedUser) body.password = formData.password;
-
-      const url = selectedUser ? `/api/users/${selectedUser.id}` : '/api/users';
-      const method = selectedUser ? 'PUT' : 'POST';
-      const res = await fetch(url, { method, headers: authHeaders, body: JSON.stringify(body) });
+      const res = await fetch('/api/users', {
+        method: 'POST', headers: authHeaders,
+        body: JSON.stringify({
+          nik: formData.nik, namaLengkap: formData.namaLengkap, email: formData.email,
+          password: formData.password, role: formData.role, status: formData.status,
+          noHp: formData.noHp, departemen: formData.departemen,
+          jabatan: formData.jabatan, seksi: formData.seksi,
+        }),
+      });
       const data = await res.json();
-
       if (!res.ok) { toast.error(data.message ?? 'Gagal menyimpan'); return; }
-      toast.success(selectedUser ? 'Pengguna berhasil diperbarui' : 'Pengguna baru berhasil ditambahkan');
+      toast.success('Pengguna baru berhasil ditambahkan');
       setEditOpen(false);
       fetchUsers();
     } catch {
       toast.error('Terjadi kesalahan jaringan');
     } finally {
       setSaving(false);
+    }
+  };
+
+  /* ── GANTI ROLE (dari panel profil) ── */
+  const handleSaveRole = async () => {
+    if (!selectedUser || profileRole === selectedUser.role) return;
+    setSavingRole(true);
+    try {
+      const res = await fetch(`/api/users/${selectedUser.id}`, {
+        method: 'PUT', headers: authHeaders,
+        body: JSON.stringify({ role: profileRole }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.message ?? 'Gagal mengubah role'); return; }
+      toast.success(`Role ${selectedUser.namaLengkap} diubah ke ${roleBadge(profileRole!)}`);
+      setSelectedUser({ ...selectedUser, role: profileRole! });
+      fetchUsers();
+    } catch {
+      toast.error('Terjadi kesalahan jaringan');
+    } finally {
+      setSavingRole(false);
     }
   };
 
@@ -290,15 +300,6 @@ export default function ManajemenUser() {
           </Button>
         </TooltipTrigger>
         <TooltipContent>Lihat Profil</TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-amber-600 hover:bg-amber-50" onClick={() => handleOpenEdit(user)}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Edit Data</TooltipContent>
       </Tooltip>
 
       <Tooltip>
@@ -555,13 +556,37 @@ export default function ManajemenUser() {
                       <ProfileField label="Dibuat Oleh" value={selectedUser.dibuatOlehNama ?? 'Sistem'} />
                     </div>
                   </div>
-                </div>
 
-                {/* ── Actions ── */}
-                <div className="px-6 py-4 border-t bg-slate-50 flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1 h-9" onClick={() => { setProfileOpen(false); handleOpenEdit(selectedUser); }}>
-                    <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit Data
-                  </Button>
+                  {/* Role */}
+                  <div className="px-6 py-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-3">Role Akses</p>
+                    <div className="flex gap-2 items-center">
+                      <Select
+                        value={profileRole ?? selectedUser.role}
+                        onValueChange={(v: any) => setProfileRole(v)}
+                        disabled={selectedUser.id === currentUser?.id}
+                      >
+                        <SelectTrigger className="flex-1 h-9 text-sm bg-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="kepala_gudang">Kepala Gudang</SelectItem>
+                          <SelectItem value="petugas">Petugas</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        size="sm" className="h-9 px-3 bg-primary hover:bg-primary/90"
+                        onClick={handleSaveRole}
+                        disabled={savingRole || profileRole === selectedUser.role || selectedUser.id === currentUser?.id}
+                      >
+                        {savingRole ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    {selectedUser.id === currentUser?.id && (
+                      <p className="text-[11px] text-muted-foreground mt-1.5">Tidak dapat mengubah role akun sendiri.</p>
+                    )}
+                  </div>
                 </div>
               </>
             )}
@@ -573,12 +598,12 @@ export default function ManajemenUser() {
         ═══════════════════════════════════ */}
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
           <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader><DialogTitle>{selectedUser ? 'Edit Data Pengguna' : 'Tambah Pengguna Baru'}</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>Tambah Pengguna Baru</DialogTitle></DialogHeader>
             <div className="grid gap-3 py-2">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label>NIK <span className="text-red-500">*</span></Label>
-                  <Input value={formData.nik} onChange={(e) => setFormData({ ...formData, nik: e.target.value })} disabled={!!selectedUser} className={selectedUser ? 'bg-slate-50' : ''} />
+                  <Input value={formData.nik} onChange={(e) => setFormData({ ...formData, nik: e.target.value })} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Nama Lengkap <span className="text-red-500">*</span></Label>
@@ -587,27 +612,18 @@ export default function ManajemenUser() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Email {!selectedUser && <span className="text-red-500">*</span>}</Label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    disabled={!!selectedUser}
-                    className={selectedUser ? 'bg-slate-50 text-slate-400' : ''}
-                  />
-                  {selectedUser && <p className="text-[11px] text-muted-foreground">Email tidak dapat diubah.</p>}
+                  <Label>Email <span className="text-red-500">*</span></Label>
+                  <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>No HP</Label>
                   <Input value={formData.noHp} onChange={(e) => setFormData({ ...formData, noHp: e.target.value })} />
                 </div>
               </div>
-              {!selectedUser && (
-                <div className="space-y-1.5">
-                  <Label>Password <span className="text-red-500">*</span></Label>
-                  <Input type="password" placeholder="Minimal 8 karakter" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
-                </div>
-              )}
+              <div className="space-y-1.5">
+                <Label>Password <span className="text-red-500">*</span></Label>
+                <Input type="password" placeholder="Minimal 8 karakter" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1.5">
                   <Label>Departemen</Label>
