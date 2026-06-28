@@ -77,12 +77,29 @@ export default function LupaPassword() {
 
   return (
     <div className="min-h-screen w-full flex">
-      {/* ── LEFT PANEL ── */}
-      <div className="hidden lg:flex flex-col justify-between w-[420px] shrink-0 bg-[#1B3A2D] px-12 py-14">
-        <div className="flex flex-col items-start gap-6">
-          <TeLLogo size="lg" />
-          <div className="space-y-1">
-            <h1 className="text-white font-bold text-2xl leading-tight tracking-tight">
+      {/* ── LEFT PANEL: brand — identik dengan Login ── */}
+      <div className="hidden lg:flex lg:w-[42%] flex-col items-center justify-between bg-[#1B3A2D] relative overflow-hidden px-12 py-14">
+        {/* dot-grid texture */}
+        <div
+          className="absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
+        {/* top fade */}
+        <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/20 to-transparent" />
+        {/* bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/30 to-transparent" />
+
+        {/* top spacer */}
+        <div />
+
+        {/* center content */}
+        <div className="relative z-10 flex flex-col items-center text-center gap-6">
+          <TeLLogo size="xl" />
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-white tracking-tight">
               Townsite Warehouse
             </h1>
             <p className="text-white/65 text-sm leading-relaxed">
@@ -94,30 +111,40 @@ export default function LupaPassword() {
           </div>
           <div className="w-16 h-px bg-white/20 mt-2" />
         </div>
+
+        {/* bottom copyright */}
         <p className="relative z-10 text-white/30 text-xs">
           &copy; {YEAR} PT Tanjungenim Lestari Pulp and Paper
         </p>
       </div>
 
-      {/* ── RIGHT PANEL ── */}
+      {/* ── RIGHT PANEL: image + form — identik dengan Login ── */}
       <div className="flex-1 relative flex items-center justify-center p-6">
+        {/* background warehouse image */}
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('${WAREHOUSE_IMG}')` }}
         />
+        {/* gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60" />
 
+        {/* form card */}
         <div className="relative z-10 w-full max-w-sm">
           <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden">
-            {/* mobile brand header */}
+            {/* mobile-only brand header */}
             <div className="lg:hidden bg-[#1B3A2D] px-8 py-6 flex flex-col items-center text-center gap-3">
               <TeLLogo size="md" />
               <div>
-                <p className="text-white font-bold text-lg leading-tight">Townsite Warehouse</p>
-                <p className="text-white/65 text-xs mt-0.5">PT Tanjungenim Lestari Pulp and Paper</p>
+                <p className="text-white font-bold text-lg leading-tight">
+                  Townsite Warehouse
+                </p>
+                <p className="text-white/65 text-xs mt-0.5">
+                  PT Tanjungenim Lestari Pulp and Paper
+                </p>
               </div>
             </div>
 
+            {/* form body */}
             <div className="px-8 py-8">
               {step === "verifikasi" && (
                 <>
@@ -166,6 +193,16 @@ export default function LupaPassword() {
                     >
                       {loading ? <Spinner text="Memverifikasi..." /> : "Verifikasi Identitas"}
                     </Button>
+
+                    <div className="text-center mt-1">
+                      <button
+                        type="button"
+                        onClick={() => setLocation("/login")}
+                        className="text-sm text-[#1B3A2D]/70 hover:text-[#1B3A2D] transition-colors"
+                      >
+                        ← Kembali ke Login
+                      </button>
+                    </div>
                   </form>
                 </>
               )}
@@ -180,7 +217,7 @@ export default function LupaPassword() {
                     </div>
                     <h2 className="text-xl font-bold text-gray-800">Identitas Terverifikasi</h2>
                     <p className="text-sm text-gray-500 mt-1">
-                      Buat password baru untuk akun Anda. Token berlaku <strong>15 menit</strong>.
+                      Buat password baru. Token berlaku <strong>15 menit</strong>.
                     </p>
                   </div>
 
@@ -250,18 +287,6 @@ export default function LupaPassword() {
                   >
                     Kembali ke Halaman Login
                   </Button>
-                </div>
-              )}
-
-              {step !== "sukses" && (
-                <div className="mt-5 text-center">
-                  <button
-                    type="button"
-                    onClick={() => setLocation("/login")}
-                    className="text-sm text-gray-500 hover:text-[#1B3A2D] transition-colors"
-                  >
-                    ← Kembali ke Login
-                  </button>
                 </div>
               )}
 
