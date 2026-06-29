@@ -216,27 +216,34 @@ export default function LaporanBarangKeluar() {
 
         {/* Filter + Export */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full flex-wrap">
-            <div className="relative max-w-xs w-full">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 flex-1 w-full">
+            <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Cari nomor, TS Code, nama, tujuan..." className="pl-9 bg-white" value={search} onChange={e => setSearch(e.target.value)} />
             </div>
-            <Select value={keperluanFilter} onValueChange={setKeperluanFilter}>
-              <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Semua">Semua Keperluan</SelectItem>
-                {keperluanOptions.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <PeriodePicker
-              dateFrom={dateFrom}
-              dateTo={dateTo}
-              onChange={(from, to) => { setDateFrom(from); setDateTo(to); }}
-            />
+            <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3">
+              <Select value={keperluanFilter} onValueChange={setKeperluanFilter}>
+                <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Semua">Semua Keperluan</SelectItem>
+                  {keperluanOptions.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <PeriodePicker
+                dateFrom={dateFrom}
+                dateTo={dateTo}
+                onChange={(from, to) => { setDateFrom(from); setDateTo(to); }}
+              />
+            </div>
           </div>
-          <Button variant="outline" className="text-green-700 border-green-200 hover:bg-green-50 w-full sm:w-auto shrink-0" onClick={handleExportExcel}>
-            <FileDown className="h-4 w-4 mr-2" /> Export Excel
-          </Button>
+          <div className="flex gap-2 w-full sm:w-auto shrink-0">
+            <Button variant="outline" size="icon" onClick={handleExportExcel} className="sm:hidden h-9 w-9 text-green-700 border-green-200 hover:bg-green-50" title="Export Excel">
+              <FileDown className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" onClick={handleExportExcel} className="hidden sm:flex text-green-700 border-green-200 hover:bg-green-50 shrink-0">
+              <FileDown className="h-4 w-4 mr-2" /> Export Excel
+            </Button>
+          </div>
         </div>
 
         {/* Table */}

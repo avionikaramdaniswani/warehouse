@@ -227,8 +227,8 @@ export default function RiwayatAktivitas() {
 
         {/* Filter + Export */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full flex-wrap">
-            <div className="relative max-w-xs w-full">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 flex-1 w-full">
+            <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Cari aksi, detail, nama, NIK..."
@@ -237,32 +237,31 @@ export default function RiwayatAktivitas() {
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
-
             <PeriodePicker
               dateFrom={dateFrom}
               dateTo={dateTo}
               onChange={(from, to) => { setDateFrom(from); setDateTo(to); }}
             />
-
-            <Select value={userFilter} onValueChange={setUserFilter}>
-              <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Semua">Semua Pengguna</SelectItem>
-                {userOptions.map(([id, nama]) => (
-                  <SelectItem key={id} value={String(id)}>{nama}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={aksiFilter} onValueChange={setAksiFilter}>
-              <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Semua">Semua Aksi</SelectItem>
-                {aksiOptions.map(a => (
-                  <SelectItem key={a} value={a}>{aksiLabel[a] ?? a}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3">
+              <Select value={userFilter} onValueChange={setUserFilter}>
+                <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Semua">Semua Pengguna</SelectItem>
+                  {userOptions.map(([id, nama]) => (
+                    <SelectItem key={id} value={String(id)}>{nama}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={aksiFilter} onValueChange={setAksiFilter}>
+                <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Semua">Semua Aksi</SelectItem>
+                  {aksiOptions.map(a => (
+                    <SelectItem key={a} value={a}>{aksiLabel[a] ?? a}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="flex gap-2 w-full sm:w-auto shrink-0">

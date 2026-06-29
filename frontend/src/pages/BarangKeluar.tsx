@@ -265,22 +265,24 @@ export default function BarangKeluar() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <Select value={filterKeperluan} onValueChange={setFilterKeperluan}>
-              <SelectTrigger className="w-full sm:w-[170px] bg-white h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {KEPERLUAN_OPTIONS.map((k) => (
-                  <SelectItem key={k} value={k}>{k === 'Semua' ? 'Semua Keperluan' : k}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              type="date"
-              className="bg-white h-9 text-sm w-full sm:w-[160px]"
-              value={filterTanggal}
-              onChange={(e) => setFilterTanggal(e.target.value)}
-            />
+            <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-2.5">
+              <Select value={filterKeperluan} onValueChange={setFilterKeperluan}>
+                <SelectTrigger className="w-full sm:w-[170px] bg-white h-9 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {KEPERLUAN_OPTIONS.map((k) => (
+                    <SelectItem key={k} value={k}>{k === 'Semua' ? 'Semua Keperluan' : k}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                type="date"
+                className="bg-white h-9 text-sm w-full sm:w-[160px]"
+                value={filterTanggal}
+                onChange={(e) => setFilterTanggal(e.target.value)}
+              />
+            </div>
             {(search || filterKeperluan !== 'Semua' || filterTanggal) && (
               <Button variant="ghost" size="sm" className="h-9 text-muted-foreground hover:text-slate-800 shrink-0"
                 onClick={() => { setSearch(''); setFilterKeperluan('Semua'); setFilterTanggal(''); }}>
