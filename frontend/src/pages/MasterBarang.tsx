@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Layout } from '@/components/Layout';
 import { useAppContext, Item } from '@/context/AppContext';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight, MoreHorizontal, History } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, Printer, CheckSquare, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight, MoreHorizontal, History } from 'lucide-react';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import {
@@ -73,12 +73,6 @@ function stockColor(item: Item) {
   if (item.stok === 0) return 'text-red-600';
   if (item.stok <= item.safetyStok) return 'text-amber-600';
   return 'text-foreground';
-}
-
-function cardBg(item: Item) {
-  if (item.stok === 0) return 'border-red-200 bg-red-50/40';
-  if (item.stok <= item.safetyStok) return 'border-amber-200 bg-amber-50/40';
-  return '';
 }
 
 function rowBg(item: Item) {
@@ -524,76 +518,8 @@ window.onload=function(){
           </div>
         )}
 
-        {/* MOBILE: Card View */}
-        <div className="flex flex-col gap-2.5 md:hidden">
-          {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i}><CardContent className="p-4 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /><Skeleton className="h-3 w-1/3" /></CardContent></Card>
-            ))
-          ) : pageItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-              <FileX className="h-12 w-12 mb-2 text-slate-300" />
-              <p className="font-medium text-slate-500">Tidak ada data ditemukan</p>
-              <p className="text-sm">Coba sesuaikan filter pencarian.</p>
-            </div>
-          ) : pageItems.map((item) => (
-            <Card key={item.tsCode} className={`border shadow-sm ${cardBg(item)}`}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div className="flex items-start gap-2.5 min-w-0">
-                    {isSelectMode && (
-                      <Checkbox
-                        className="mt-0.5 shrink-0"
-                        checked={selectedForPrint.has(item.tsCode)}
-                        onCheckedChange={() => toggleSelect(item.tsCode)}
-                      />
-                    )}
-                    <div className="min-w-0">
-                      <p className="font-semibold text-sm text-slate-800 leading-tight break-words">{item.nama}</p>
-                      <p className="text-xs font-mono text-muted-foreground mt-0.5">{item.tsCode}</p>
-                    </div>
-                  </div>
-                  <StatusBadge status={item.status} />
-                </div>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mb-3">
-                  <span className="flex items-center gap-1"><Tag className="h-3 w-3" />{item.kategori}</span>
-                  <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{item.binLoc || '-'}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-3 text-sm">
-                    <span>Stok: <strong className={stockColor(item)}>{item.stok}</strong> <span className="text-muted-foreground text-xs">{item.uom}</span></span>
-                    <span className="text-muted-foreground">Min: {item.safetyStok}</span>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50"
-                      onClick={() => { setSelectedItem(item); setSheetType('detail'); }}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    {canEdit && (
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50"
-                        onClick={() => { setSelectedItem(item); setSheetType('edit'); }}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    )}
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600 hover:bg-slate-100"
-                      onClick={() => { setSelectedItem(item); setSheetType('qr'); }}>
-                      <QrCode className="h-4 w-4" />
-                    </Button>
-                    {isAdmin && (
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50"
-                        onClick={() => setDeleteTarget(item)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* DESKTOP: Table View */}
-        <Card className="overflow-hidden border-border shadow-sm hidden md:block">
+        {/* Table View — semua ukuran layar, scroll horizontal di mobile */}
+        <Card className="overflow-hidden border-border shadow-sm">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-slate-100">
