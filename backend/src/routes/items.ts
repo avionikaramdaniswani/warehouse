@@ -193,6 +193,72 @@ router.patch("/items/:tsCode/stok", authenticate, authorize("admin", "kepala_gud
   res.json(updated);
 });
 
+router.post("/items/diff", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
+  const rowSchema = z.object({
+    tsCode: z.string().min(1).max(50),
+    msCode: z.string().optional(),
+    nama: z.string().min(1).max(255),
+    kategori: z.string().min(1),
+    binLoc: z.string().optional(),
+    uom: z.string().min(1).max(20).default("EA"),
+    stok: z.number().int().min(0).default(0),
+    safetyStok: z.number().int().min(0).default(5),
+  });
+
+  const bodySchema = z.object({ items: z.array(rowSchema).min(1).max(1000) });
+  const parsed = bodySchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ message: parsed.error.errors[0]?.message ?? "Data tidak valid" });
+    return;
+  }
+
+  const { items } = parsed.data;
+  const allTsCodes = items.map((i) => i.tsCode);
+
+  const existingRows = await db
+    .select({
+      tsCode: itemsTable.tsCode,
+      msCode: itemsTable.msCode,
+      nama: itemsTable.nama,
+      kategori: itemsTable.kategori,
+      binLoc: itemsTable.binLoc,
+      uom: itemsTable.uom,
+      stok: itemsTable.stok,
+      safetyStok: itemsTable.safetyStok,
+    })
+    .from(itemsTable)
+    .where(inArray(itemsTable.tsCode, allTsCodes));
+
+  const existingMap = new Map(existingRows.map((r) => [r.tsCode, r]));
+
+  const FIELD_LABELS: Record<string, string> = {
+    nama: "Nama", kategori: "Kategori", uom: "UOM",
+    stok: "Stok", safetyStok: "Safety Stok", msCode: "MS Code", binLoc: "BIN LOC",
+  };
+
+  const result = items.map((item) => {
+    const existing = existingMap.get(item.tsCode);
+    if (!existing) return { tsCode: item.tsCode, status: "new" as const, changedFields: [] };
+
+    const changedFields: string[] = [];
+    if (item.nama !== existing.nama) changedFields.push(FIELD_LABELS.nama);
+    if (item.kategori !== existing.kategori) changedFields.push(FIELD_LABELS.kategori);
+    if (item.uom !== existing.uom) changedFields.push(FIELD_LABELS.uom);
+    if (item.stok !== existing.stok) changedFields.push(FIELD_LABELS.stok);
+    if (item.safetyStok !== existing.safetyStok) changedFields.push(FIELD_LABELS.safetyStok);
+    if (item.msCode != null && item.msCode !== (existing.msCode ?? "")) changedFields.push(FIELD_LABELS.msCode);
+    if (item.binLoc != null && item.binLoc !== (existing.binLoc ?? "")) changedFields.push(FIELD_LABELS.binLoc);
+
+    return {
+      tsCode: item.tsCode,
+      status: changedFields.length > 0 ? ("updated" as const) : ("unchanged" as const),
+      changedFields,
+    };
+  });
+
+  res.json({ diff: result });
+});
+
 router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
   const rowSchema = z.object({
     tsCode: z.string().min(1).max(50),

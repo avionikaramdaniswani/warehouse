@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,14 @@ interface ParsedRow {
   stok: number;
   safetyStok: number;
   errors: string[];
+}
+
+type DiffStatus = 'new' | 'updated' | 'unchanged';
+
+interface DiffEntry {
+  tsCode: string;
+  status: DiffStatus;
+  changedFields: string[];
 }
 
 interface Props {
@@ -167,18 +175,49 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<{ inserted: number; updated: number; unchanged: number; errors: { tsCode: string; reason: string }[] } | null>(null);
+  const [diffMap, setDiffMap] = useState<Map<string, DiffEntry>>(new Map());
+  const [diffLoading, setDiffLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const validRows = rows.filter((r) => r.errors.length === 0);
+  const invalidCount = rows.length - validRows.length;
+
+  // Auto-fetch diff setiap kali valid rows berubah
+  useEffect(() => {
+    if (validRows.length === 0 || result) { setDiffMap(new Map()); return; }
+    let cancelled = false;
+    setDiffLoading(true);
+    fetch('/api/items/diff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        items: validRows.map((r) => ({
+          tsCode: r.tsCode, msCode: r.msCode, nama: r.nama,
+          kategori: r.kategori, binLoc: r.binLoc, uom: r.uom,
+          stok: r.stok, safetyStok: r.safetyStok,
+        })),
+      }),
+    })
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (cancelled || !data) return;
+        const map = new Map<string, DiffEntry>();
+        for (const entry of data.diff as DiffEntry[]) map.set(entry.tsCode, entry);
+        setDiffMap(map);
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setDiffLoading(false); });
+    return () => { cancelled = true; };
+  }, [validRows.length, fileName, result]);
 
   const reset = () => {
     setRows([]);
     setFileName('');
     setResult(null);
+    setDiffMap(new Map());
   };
 
-  const handleClose = () => {
-    reset();
-    onClose();
-  };
+  const handleClose = () => { reset(); onClose(); };
 
   const processFile = (file: File) => {
     if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
@@ -187,6 +226,7 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
     }
     setFileName(file.name);
     setResult(null);
+    setDiffMap(new Map());
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -221,9 +261,6 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
     if (file) processFile(file);
   }, []);
 
-  const validRows = rows.filter((r) => r.errors.length === 0);
-  const invalidCount = rows.length - validRows.length;
-
   const handleImport = async () => {
     if (validRows.length === 0) return;
     setImporting(true);
@@ -233,14 +270,9 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           items: validRows.map((r) => ({
-            tsCode: r.tsCode,
-            msCode: r.msCode,
-            nama: r.nama,
-            kategori: r.kategori,
-            binLoc: r.binLoc,
-            uom: r.uom,
-            stok: r.stok,
-            safetyStok: r.safetyStok,
+            tsCode: r.tsCode, msCode: r.msCode, nama: r.nama,
+            kategori: r.kategori, binLoc: r.binLoc, uom: r.uom,
+            stok: r.stok, safetyStok: r.safetyStok,
           })),
         }),
       });
@@ -253,6 +285,44 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
     } finally {
       setImporting(false);
     }
+  };
+
+  // Diff summary counts (only valid rows)
+  const diffCounts = { new: 0, updated: 0, unchanged: 0 };
+  if (diffMap.size > 0) {
+    for (const r of validRows) {
+      const d = diffMap.get(r.tsCode);
+      if (d) diffCounts[d.status]++;
+    }
+  }
+
+  const DiffBadge = ({ tsCode, hasError }: { tsCode: string; hasError: boolean }) => {
+    if (hasError) return (
+      <span className="text-red-600 font-medium flex items-center gap-1">
+        <AlertCircle className="w-3 h-3 shrink-0" />Error
+      </span>
+    );
+    if (diffLoading) return <span className="text-slate-400 text-xs">...</span>;
+    const d = diffMap.get(tsCode);
+    if (!d) return <span className="text-slate-400 text-xs">—</span>;
+    if (d.status === 'new') return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 text-green-700 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
+        ✦ Baru
+      </span>
+    );
+    if (d.status === 'updated') return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-blue-100 text-blue-700 px-2 py-0.5 text-xs font-medium whitespace-nowrap cursor-help"
+        title={`Berubah: ${d.changedFields.join(', ')}`}
+      >
+        🔄 Diperbarui
+      </span>
+    );
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-500 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
+        — Sama
+      </span>
+    );
   };
 
   return (
@@ -332,12 +402,24 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
           {/* Preview table */}
           {rows.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-sm font-semibold text-slate-700">Preview Data</p>
                 {invalidCount > 0 && (
                   <Badge variant="destructive" className="text-xs gap-1">
                     <AlertCircle className="w-3 h-3" /> {invalidCount} baris bermasalah
                   </Badge>
+                )}
+                {diffLoading && (
+                  <span className="flex items-center gap-1 text-xs text-slate-400">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Mengecek perubahan...
+                  </span>
+                )}
+                {!diffLoading && diffMap.size > 0 && !result && (
+                  <span className="text-xs text-slate-500 flex items-center gap-2">
+                    {diffCounts.new > 0 && <span className="text-green-700 font-medium">✦ {diffCounts.new} baru</span>}
+                    {diffCounts.updated > 0 && <span className="text-blue-700 font-medium">🔄 {diffCounts.updated} berubah</span>}
+                    {diffCounts.unchanged > 0 && <span className="text-slate-400">— {diffCounts.unchanged} sama</span>}
+                  </span>
                 )}
               </div>
               <div className="rounded-md border overflow-auto max-h-64">
@@ -356,36 +438,43 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {rows.map((r) => (
-                      <tr key={r.rowNum} className={r.errors.length > 0 ? 'bg-red-50' : ''}>
-                        <td className="px-2 py-1.5 text-muted-foreground">{r.rowNum}</td>
-                        <td className="px-2 py-1.5 font-mono font-medium">{r.tsCode || <span className="text-red-500 italic">kosong</span>}</td>
-                        <td className="px-2 py-1.5 max-w-[220px] truncate">{r.nama || <span className="text-red-500 italic">kosong</span>}</td>
-                        <td className="px-2 py-1.5 whitespace-nowrap">{r.kategori || <span className="text-red-500 italic">kosong</span>}</td>
-                        <td className="px-2 py-1.5 whitespace-nowrap font-mono">{r.binLoc ?? '—'}</td>
-                        <td className="px-2 py-1.5">{r.uom}</td>
-                        <td className="px-2 py-1.5 text-right">{r.stok}</td>
-                        <td className="px-2 py-1.5 text-right">{r.safetyStok}</td>
-                        <td className="px-2 py-1.5">
-                          {r.errors.length > 0 ? (
-                            <span className="text-red-600 font-medium flex items-center gap-1">
-                              <AlertCircle className="w-3 h-3 shrink-0" />
-                              {r.errors[0]}
-                            </span>
-                          ) : (
-                            <span className="text-green-600 flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3" /> OK
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {rows.map((r) => {
+                      const diff = diffMap.get(r.tsCode);
+                      const rowBg = r.errors.length > 0
+                        ? 'bg-red-50'
+                        : diff?.status === 'new' ? 'bg-green-50/40'
+                        : diff?.status === 'updated' ? 'bg-blue-50/40'
+                        : '';
+                      return (
+                        <tr key={r.rowNum} className={rowBg}>
+                          <td className="px-2 py-1.5 text-muted-foreground">{r.rowNum}</td>
+                          <td className="px-2 py-1.5 font-mono font-medium">{r.tsCode || <span className="text-red-500 italic">kosong</span>}</td>
+                          <td className="px-2 py-1.5 max-w-[220px] truncate">{r.nama || <span className="text-red-500 italic">kosong</span>}</td>
+                          <td className="px-2 py-1.5 whitespace-nowrap">{r.kategori || <span className="text-red-500 italic">kosong</span>}</td>
+                          <td className="px-2 py-1.5 whitespace-nowrap font-mono">{r.binLoc ?? '—'}</td>
+                          <td className="px-2 py-1.5">{r.uom}</td>
+                          <td className={`px-2 py-1.5 text-right ${diff?.changedFields.includes('Stok') ? 'text-blue-700 font-semibold' : ''}`}>{r.stok}</td>
+                          <td className={`px-2 py-1.5 text-right ${diff?.changedFields.includes('Safety Stok') ? 'text-blue-700 font-semibold' : ''}`}>{r.safetyStok}</td>
+                          <td className="px-2 py-1.5">
+                            <DiffBadge tsCode={r.tsCode} hasError={r.errors.length > 0} />
+                            {r.errors.length > 0 && (
+                              <span className="block text-red-500 text-xs mt-0.5">{r.errors[0]}</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
               {invalidCount > 0 && (
                 <p className="text-xs text-muted-foreground">
                   Baris yang bermasalah akan dilewati. Hanya <strong>{validRows.length} baris valid</strong> yang akan diimport.
+                </p>
+              )}
+              {!diffLoading && diffMap.size > 0 && diffCounts.updated > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  💡 Hover badge <strong>🔄 Diperbarui</strong> untuk melihat field mana yang berubah.
                 </p>
               )}
             </div>
