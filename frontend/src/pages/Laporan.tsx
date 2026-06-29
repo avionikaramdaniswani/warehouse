@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FileDown, Search, ArrowDownRight, ArrowUpRight, Filter, Activity, Package, ChevronLeft, ChevronRight, Printer } from 'lucide-react';
+import { FileDown, Search, ArrowDownRight, ArrowUpRight, Filter, Activity, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { useAppContext } from '@/context/AppContext';
@@ -352,9 +352,6 @@ export default function Laporan() {
               </Button>
               <Button variant="outline" className="flex-1 md:flex-none text-green-700 border-green-200 hover:bg-green-50" onClick={handleExcel} disabled={isLoading}>
                 <FileDown className="w-4 h-4 mr-2" /> Excel
-              </Button>
-              <Button variant="outline" className="flex-1 md:flex-none text-slate-600 border-slate-200 hover:bg-slate-50" onClick={() => window.print()} disabled={isLoading}>
-                <Printer className="w-4 h-4 mr-2" /> Print
               </Button>
             </div>
           </CardContent>
