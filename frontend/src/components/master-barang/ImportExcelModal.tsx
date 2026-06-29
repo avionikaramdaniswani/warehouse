@@ -438,7 +438,11 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {rows.map((r) => {
+                    {rows.filter((r) => {
+                      if (diffMap.size === 0 || diffLoading) return true;
+                      const d = diffMap.get(r.tsCode);
+                      return r.errors.length > 0 || !d || d.status !== 'unchanged';
+                    }).map((r) => {
                       const diff = diffMap.get(r.tsCode);
                       const rowBg = r.errors.length > 0
                         ? 'bg-red-50'
@@ -467,6 +471,11 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
                   </tbody>
                 </table>
               </div>
+              {!diffLoading && diffMap.size > 0 && diffCounts.new === 0 && diffCounts.updated === 0 && invalidCount === 0 && (
+                <p className="text-xs text-slate-400 text-center py-1">
+                  Semua data sudah sinkron — tidak ada yang perlu diperbarui.
+                </p>
+              )}
               {invalidCount > 0 && (
                 <p className="text-xs text-muted-foreground">
                   Baris yang bermasalah akan dilewati. Hanya <strong>{validRows.length} baris valid</strong> yang akan diimport.
