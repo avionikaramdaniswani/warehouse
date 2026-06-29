@@ -318,11 +318,11 @@ export default function Laporan() {
             <div className="flex flex-wrap gap-4 w-full">
               <div className="space-y-1.5 flex-1 min-w-[130px]">
                 <label className="text-xs font-medium text-slate-500 uppercase">Periode Dari</label>
-                <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
+                <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="pr-2 [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:cursor-pointer" />
               </div>
               <div className="space-y-1.5 flex-1 min-w-[130px]">
                 <label className="text-xs font-medium text-slate-500 uppercase">Sampai</label>
-                <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} />
+                <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="pr-2 [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:cursor-pointer" />
               </div>
               <div className="space-y-1.5 flex-1 min-w-[130px]">
                 <label className="text-xs font-medium text-slate-500 uppercase">Jenis Transaksi</label>
@@ -347,14 +347,14 @@ export default function Laporan() {
               </div>
             </div>
             <div className="flex gap-2 w-full md:w-auto shrink-0">
-              <Button className="flex-1 md:flex-none bg-slate-800 hover:bg-slate-900" onClick={handleTampilkan} disabled={isLoading}>
+              <Button className="flex-1 md:flex-none bg-green-700 hover:bg-green-800 text-white" onClick={handleTampilkan} disabled={isLoading}>
                 <Filter className="w-4 h-4 mr-2" /> Tampilkan
               </Button>
               <Button variant="outline" className="flex-1 md:flex-none text-green-700 border-green-200 hover:bg-green-50" onClick={handleExcel} disabled={isLoading}>
                 <FileDown className="w-4 h-4 mr-2" /> Excel
               </Button>
-              <Button variant="outline" className="flex-1 md:flex-none text-red-700 border-red-200 hover:bg-red-50" onClick={() => window.print()} disabled={isLoading}>
-                <Printer className="w-4 h-4 mr-2" /> PDF
+              <Button variant="outline" className="flex-1 md:flex-none text-slate-600 border-slate-200 hover:bg-slate-50" onClick={() => window.print()} disabled={isLoading}>
+                <Printer className="w-4 h-4 mr-2" /> Print
               </Button>
             </div>
           </CardContent>
