@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, Printer, CheckSquare, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight, MoreHorizontal, History } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, Printer, CheckSquare, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight, MoreHorizontal, History, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import {
@@ -18,6 +18,10 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { ItemDetailModal } from '@/components/master-barang/ItemDetailModal';
 import { ItemFormModal } from '@/components/master-barang/ItemFormModal';
 import { ItemQRModal } from '@/components/master-barang/ItemQRModal';
@@ -582,32 +586,41 @@ window.onload=function(){
                     <TableCell className="text-right text-muted-foreground">{item.safetyStok}</TableCell>
                     <TableCell className="text-center"><StatusBadge status={item.status} /></TableCell>
                     <TableCell className={`sticky right-0 z-10 shadow-[-2px_0_4px_-2px_rgba(0,0,0,0.10)] ${stickyBg(item)}`}>
-                      <div className="flex justify-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50"
-                          onClick={() => { setSelectedItem(item); setDetailOpen(true); }}>
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        {canEdit && (
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:bg-amber-50"
-                            onClick={() => { setSelectedItem(item); setEditOpen(true); }}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                        )}
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600 hover:bg-slate-100"
-                          onClick={() => { setSelectedItem(item); setQrOpen(true); }}>
-                          <QrCode className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-violet-600 hover:bg-violet-50"
-                          title="Riwayat Transaksi"
-                          onClick={() => { setSelectedItem(item); setRiwayatOpen(true); }}>
-                          <History className="h-4 w-4" />
-                        </Button>
-                        {isAdmin && (
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50"
-                            onClick={() => setDeleteTarget(item)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
+                      <div className="flex justify-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:bg-slate-100">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem onClick={() => { setSelectedItem(item); setDetailOpen(true); }}>
+                              <Eye className="h-4 w-4 text-blue-600" /> Detail
+                            </DropdownMenuItem>
+                            {canEdit && (
+                              <DropdownMenuItem onClick={() => { setSelectedItem(item); setEditOpen(true); }}>
+                                <Pencil className="h-4 w-4 text-amber-600" /> Edit
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem onClick={() => { setSelectedItem(item); setQrOpen(true); }}>
+                              <QrCode className="h-4 w-4 text-slate-600" /> Label QR
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setSelectedItem(item); setRiwayatOpen(true); }}>
+                              <History className="h-4 w-4 text-violet-600" /> Riwayat
+                            </DropdownMenuItem>
+                            {isAdmin && (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                  onClick={() => setDeleteTarget(item)}
+                                >
+                                  <Trash2 className="h-4 w-4" /> Hapus
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </TableCell>
                   </TableRow>
