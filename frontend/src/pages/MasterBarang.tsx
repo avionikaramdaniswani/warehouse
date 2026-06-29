@@ -457,8 +457,9 @@ window.onload=function(){
 
         {/* Filters & Actions */}
         <div className="flex flex-col md:flex-row gap-3 justify-between items-start md:items-center">
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-1">
-            <div className="relative max-w-sm w-full">
+          {/* Filter inputs */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto flex-1">
+            <div className="relative w-full sm:max-w-sm">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Cari nama, TS Code, BIN LOC, kategori..."
@@ -467,36 +468,53 @@ window.onload=function(){
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue placeholder="Kategori" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Semua">Semua Kategori</SelectItem>
-                {kategoris.map((k) => <SelectItem key={k.id} value={k.nama}>{k.nama}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-[160px] bg-white"><SelectValue placeholder="Status" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Semua">Semua Status</SelectItem>
-                <SelectItem value="Normal">Normal</SelectItem>
-                <SelectItem value="Warning">Warning</SelectItem>
-                <SelectItem value="Critical">Critical</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3">
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue placeholder="Kategori" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Semua">Semua Kategori</SelectItem>
+                  {kategoris.map((k) => <SelectItem key={k.id} value={k.nama}>{k.nama}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-[160px] bg-white"><SelectValue placeholder="Status" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Semua">Semua Status</SelectItem>
+                  <SelectItem value="Normal">Normal</SelectItem>
+                  <SelectItem value="Warning">Warning</SelectItem>
+                  <SelectItem value="Critical">Critical</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto shrink-0 flex-wrap">
+          {/* Action buttons */}
+          <div className="flex gap-2 w-full sm:w-auto shrink-0">
             {!isSelectMode && canEdit && (
-              <Button variant="outline" onClick={() => setIsSelectMode(true)} className="w-full sm:w-auto">
-                <CheckSquare className="mr-2 h-4 w-4" /> Pilih Item
-              </Button>
+              <>
+                {/* Mobile: icon only */}
+                <Button variant="outline" onClick={() => setIsSelectMode(true)} className="sm:hidden h-9 w-9 p-0 shrink-0" title="Pilih Item">
+                  <CheckSquare className="h-4 w-4" />
+                </Button>
+                {/* Desktop: icon + label */}
+                <Button variant="outline" onClick={() => setIsSelectMode(true)} className="hidden sm:flex">
+                  <CheckSquare className="mr-2 h-4 w-4" /> Pilih Item
+                </Button>
+              </>
             )}
             {canEdit && (
-              <Button variant="outline" onClick={() => setImportOpen(true)} className="w-full sm:w-auto border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400">
-                <FileSpreadsheet className="mr-2 h-4 w-4" /> Import Excel
-              </Button>
+              <>
+                {/* Mobile: icon only */}
+                <Button variant="outline" onClick={() => setImportOpen(true)} className="sm:hidden h-9 w-9 p-0 shrink-0 border-green-300 text-green-700 hover:bg-green-50" title="Import Excel">
+                  <FileSpreadsheet className="h-4 w-4" />
+                </Button>
+                {/* Desktop: icon + label */}
+                <Button variant="outline" onClick={() => setImportOpen(true)} className="hidden sm:flex border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400">
+                  <FileSpreadsheet className="mr-2 h-4 w-4" /> Import Excel
+                </Button>
+              </>
             )}
             {canEdit && (
-              <Button onClick={() => setAddOpen(true)} className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
+              <Button onClick={() => setAddOpen(true)} className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none">
                 <Plus className="mr-2 h-4 w-4" /> Tambah Barang
               </Button>
             )}
