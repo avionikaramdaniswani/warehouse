@@ -226,9 +226,9 @@ export default function RiwayatAktivitas() {
         </div>
 
         {/* Filter + Export */}
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 flex-1 w-full">
-            <div className="relative w-full sm:max-w-xs">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <div className="flex gap-2 items-center flex-1 min-w-0">
+            <div className="relative flex-1 min-w-0">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Cari aksi, detail, nama, NIK..."
@@ -237,45 +237,41 @@ export default function RiwayatAktivitas() {
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
+            <Button variant="outline" size="icon" onClick={fetchData} className="shrink-0 h-9 w-9" title="Refresh">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleExportExcel} className="sm:hidden shrink-0 h-9 w-9 text-green-700 border-green-200 hover:bg-green-50" title="Export Excel">
+              <FileDown className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:gap-3">
             <PeriodePicker
               dateFrom={dateFrom}
               dateTo={dateTo}
               onChange={(from, to) => { setDateFrom(from); setDateTo(to); }}
             />
-            <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3">
-              <Select value={userFilter} onValueChange={setUserFilter}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Semua">Semua Pengguna</SelectItem>
-                  {userOptions.map(([id, nama]) => (
-                    <SelectItem key={id} value={String(id)}>{nama}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={aksiFilter} onValueChange={setAksiFilter}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Semua">Semua Aksi</SelectItem>
-                  {aksiOptions.map(a => (
-                    <SelectItem key={a} value={a}>{aksiLabel[a] ?? a}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={userFilter} onValueChange={setUserFilter}>
+              <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Semua">Semua Pengguna</SelectItem>
+                {userOptions.map(([id, nama]) => (
+                  <SelectItem key={id} value={String(id)}>{nama}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={aksiFilter} onValueChange={setAksiFilter}>
+              <SelectTrigger className="w-full sm:w-[180px] bg-white"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Semua">Semua Aksi</SelectItem>
+                {aksiOptions.map(a => (
+                  <SelectItem key={a} value={a}>{aksiLabel[a] ?? a}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-
-          <div className="flex gap-2 w-full sm:w-auto shrink-0">
-            <Button variant="outline" size="icon" onClick={fetchData} title="Refresh">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="text-green-700 border-green-200 hover:bg-green-50 flex-1 sm:flex-none"
-              onClick={handleExportExcel}
-            >
-              <FileDown className="h-4 w-4 mr-2" /> Export Excel
-            </Button>
-          </div>
+          <Button variant="outline" onClick={handleExportExcel} className="hidden sm:flex text-green-700 border-green-200 hover:bg-green-50 shrink-0">
+            <FileDown className="h-4 w-4 mr-2" /> Export Excel
+          </Button>
         </div>
 
         {/* Table */}
