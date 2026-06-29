@@ -586,7 +586,30 @@ window.onload=function(){
                     <TableCell className="text-right text-muted-foreground">{item.safetyStok}</TableCell>
                     <TableCell className="text-center"><StatusBadge status={item.status} /></TableCell>
                     <TableCell className={`sticky right-0 z-10 shadow-[-2px_0_4px_-2px_rgba(0,0,0,0.10)] ${stickyBg(item)}`}>
-                      <div className="flex justify-center">
+                      {/* Desktop: tombol ikon inline */}
+                      <div className="hidden sm:flex items-center gap-0.5 justify-center">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-blue-600 hover:bg-blue-50" title="Detail" onClick={() => { setSelectedItem(item); setDetailOpen(true); }}>
+                          <Eye className="h-3.5 w-3.5" />
+                        </Button>
+                        {canEdit && (
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-amber-600 hover:bg-amber-50" title="Edit" onClick={() => { setSelectedItem(item); setEditOpen(true); }}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-600 hover:bg-slate-100" title="Label QR" onClick={() => { setSelectedItem(item); setQrOpen(true); }}>
+                          <QrCode className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-violet-600 hover:bg-violet-50" title="Riwayat" onClick={() => { setSelectedItem(item); setRiwayatOpen(true); }}>
+                          <History className="h-3.5 w-3.5" />
+                        </Button>
+                        {isAdmin && (
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-red-500 hover:bg-red-50" title="Hapus" onClick={() => setDeleteTarget(item)}>
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                      </div>
+                      {/* Mobile: dropdown titik 3 */}
+                      <div className="sm:hidden flex justify-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:bg-slate-100">
