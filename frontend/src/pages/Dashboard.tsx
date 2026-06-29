@@ -360,39 +360,8 @@ export default function Dashboard() {
             </div>
           ) : (
             <>
-              {/* MOBILE: Card View */}
-              <div className="md:hidden flex flex-col divide-y divide-slate-100">
-                {lowStockItems.slice(0, 5).map((item) => {
-                  const isHabis = item.stok === 0;
-                  const numColor = isHabis ? 'text-red-600' : 'text-amber-600';
-                  const accentBg = isHabis ? 'bg-red-500' : 'bg-amber-400';
-                  const deficit = item.safetyStok - item.stok;
-                  return (
-                    <div key={item.tsCode} className="flex items-center gap-3 px-4 py-3.5">
-                      <div className={`w-2 h-2 rounded-full shrink-0 ${accentBg}`} />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm text-slate-800 leading-snug line-clamp-1">{item.nama}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{item.tsCode} · {item.kategori}</p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          Min. stok: <span className="font-medium text-slate-600">{item.safetyStok} {item.uom}</span>
-                          {!isHabis && (
-                            <span className="ml-2 text-red-500 font-medium">−{deficit} kurang</span>
-                          )}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1.5 shrink-0">
-                        <p className={`text-xl font-bold leading-none ${numColor}`}>
-                          {item.stok}
-                          <span className="text-xs font-normal text-slate-400 ml-1">{item.uom}</span>
-                        </p>
-                        <StatusBadge status={item.status} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              {/* DESKTOP: Table View */}
-              <div className="hidden md:block">
+              {/* Table */}
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>

@@ -218,39 +218,8 @@ export default function LaporanPengguna() {
             </CardTitle>
           </CardHeader>
 
-          {/* MOBILE */}
-          <div className="md:hidden divide-y">
-            {isLoading ? Array.from({length:3}).map((_,i) => (
-              <div key={i} className="p-4 space-y-2"><Skeleton className="h-4 w-1/2" /><Skeleton className="h-3 w-3/4" /></div>
-            )) : filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 gap-2 text-muted-foreground">
-                <FileX className="h-10 w-10 text-slate-300" />
-                <p className="font-medium text-slate-500">Tidak ada data</p>
-              </div>
-            ) : filtered.map(u => (
-              <div key={u.id} className="p-4">
-                <div className="flex items-start justify-between gap-2 mb-1.5">
-                  <div>
-                    <p className="font-semibold text-sm text-slate-800">{u.namaLengkap}</p>
-                    <p className="text-xs font-mono text-muted-foreground">{u.nik}</p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    {roleBadge(u.role)}
-                    {statusBadge(u.status)}
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground">{u.email}</p>
-                <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground mt-1.5">
-                  {u.departemen && <span>{u.departemen}</span>}
-                  <span>Gabung: {fmtDate(u.tanggalGabung)}</span>
-                  <span>Login: {fmtDateTime(u.loginTerakhir)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* DESKTOP */}
-          <div className="hidden md:block overflow-x-auto">
+          {/* Table */}
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>

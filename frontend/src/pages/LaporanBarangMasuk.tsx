@@ -220,37 +220,8 @@ export default function LaporanBarangMasuk() {
             </CardTitle>
           </CardHeader>
 
-          {/* MOBILE */}
-          <div className="md:hidden divide-y">
-            {isLoading ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="p-4 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /></div>
-            )) : filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 gap-2 text-muted-foreground">
-                <FileX className="h-10 w-10 text-slate-300" />
-                <p className="font-medium text-slate-500">Tidak ada data</p>
-              </div>
-            ) : pageItems.map(row => (
-              <div key={row.id} className="p-4">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <div>
-                    <p className="font-semibold text-sm text-slate-800 break-words">{row.namaBarang}</p>
-                    <p className="text-xs font-mono text-muted-foreground">{row.tsCode}</p>
-                  </div>
-                  <span className="shrink-0 font-bold text-green-700 text-base">+{row.jumlah}</span>
-                </div>
-                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground mt-1.5">
-                  <span className="font-mono">{row.nomor}</span>
-                  <span>{fmtTgl(row.tanggal)}</span>
-                  <span>{row.petugas}</span>
-                  {row.noPo && <span className="text-blue-600">PO: {row.noPo}</span>}
-                </div>
-                {row.keterangan && <p className="text-xs text-muted-foreground mt-1 italic">{row.keterangan}</p>}
-              </div>
-            ))}
-          </div>
-
-          {/* DESKTOP */}
-          <div className="hidden md:block overflow-x-auto">
+          {/* Table */}
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>

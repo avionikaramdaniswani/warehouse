@@ -291,47 +291,8 @@ export default function RiwayatAktivitas() {
             </CardTitle>
           </CardHeader>
 
-          {/* MOBILE */}
-          <div className="md:hidden divide-y">
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="p-4 space-y-2">
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-3 w-3/4" />
-                </div>
-              ))
-            ) : filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 gap-2 text-muted-foreground">
-                <FileX className="h-10 w-10 text-slate-300" />
-                <p className="font-medium text-slate-500">Tidak ada log aktivitas</p>
-              </div>
-            ) : filtered.map(row => (
-              <div key={row.id} className="p-4">
-                <div className="flex items-start justify-between gap-2 mb-1.5">
-                  <div>
-                    <p className="font-semibold text-sm text-slate-800">{row.namaLengkap ?? '—'}</p>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <p className="text-xs font-mono text-muted-foreground">{row.nik ?? ''}</p>
-                      {roleBadge(row.role)}
-                    </div>
-                  </div>
-                  <span className={`shrink-0 px-2 py-0.5 rounded text-xs font-semibold border ${aksiColor(row.aksi)}`}>
-                    {aksiLabel[row.aksi] ?? row.aksi}
-                  </span>
-                </div>
-                {row.detail && (
-                  <p className="text-xs text-muted-foreground mb-1 line-clamp-2">{row.detail}</p>
-                )}
-                <div className="flex gap-3 text-xs text-muted-foreground">
-                  <span>{fmtDateTime(row.createdAt)}</span>
-                  {row.ipAddress && <span className="font-mono">{row.ipAddress}</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* DESKTOP */}
-          <div className="hidden md:block overflow-x-auto">
+          {/* Table */}
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>

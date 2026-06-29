@@ -305,41 +305,8 @@ export default function BarangKeluar() {
           </p>
         )}
 
-        {/* Mobile cards */}
-        <div className="flex flex-col gap-2.5 md:hidden">
-          {loading ? (
-            <div className="flex items-center justify-center py-20 text-muted-foreground gap-2">
-              <Loader2 className="h-5 w-5 animate-spin" /><span className="text-sm">Memuat data...</span>
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-              <FileX className="h-12 w-12 mb-3 text-slate-200" />
-              <p className="font-medium text-slate-500">Tidak ada data</p>
-              <p className="text-sm text-slate-400">Coba sesuaikan filter atau tambah pengeluaran baru</p>
-            </div>
-          ) : filtered.map((trx) => (
-            <Card key={trx.id} className="p-4 border-slate-100 shadow-sm">
-              <div className="flex items-start justify-between gap-2 mb-1.5">
-                <div className="flex-1">
-                  <p className="font-semibold text-sm text-slate-800 leading-snug">{trx.namaBarang}</p>
-                  <p className="text-xs font-mono text-slate-400">{trx.nomor}</p>
-                </div>
-                <span className="font-mono text-sm font-bold text-primary bg-primary/5 border border-primary/20 px-2 py-0.5 rounded shrink-0">-{trx.jumlah}</span>
-              </div>
-              <p className="text-xs font-mono text-slate-400 mb-2">{trx.tsCode}</p>
-              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                <span>{formatWaktu(trx.createdAt)}</span>
-                <span>·</span>
-                <span>{trx.petugas}</span>
-                {trx.tujuan && <><span>·</span><span className="flex items-center gap-0.5"><MapPin className="h-3 w-3" />{trx.tujuan}</span></>}
-                <Badge variant="outline" className={`text-xs px-1.5 py-0 ${keperluanBadge[trx.keperluan ?? ''] || ''}`}>{trx.keperluan}</Badge>
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Desktop table */}
-        <Card className="hidden md:block overflow-hidden border-slate-100 shadow-sm">
+        {/* Table */}
+        <Card className="overflow-hidden border-slate-100 shadow-sm">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>

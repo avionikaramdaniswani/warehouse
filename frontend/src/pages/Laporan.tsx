@@ -477,27 +477,8 @@ export default function Laporan() {
             </CardContent>
           ) : (
             <>
-              {/* Mobile */}
-              <div className="md:hidden divide-y">
-                {pageRows.map(row => (
-                  <div key={row.key} className="p-4">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <p className="font-semibold text-sm text-slate-800 leading-tight line-clamp-2">{row.namaBarang}</p>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${row.jenis === 'Masuk' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>{row.jenis}</span>
-                        <span className={`font-mono text-sm font-bold ${row.jenis === 'Masuk' ? 'text-green-600' : 'text-orange-600'}`}>{row.jenis === 'Masuk' ? '+' : '-'}{row.jumlah}</span>
-                      </div>
-                    </div>
-                    <p className="text-xs font-mono text-muted-foreground mb-1">{row.tsCode} · {row.kategori}</p>
-                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-                      <span>{fmtWithDay(row.tanggal)}</span><span>{row.ref}</span><span>{row.petugas}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Desktop */}
-              <div className="hidden md:block overflow-x-auto">
+              {/* Table */}
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-slate-50">
                     <TableRow>

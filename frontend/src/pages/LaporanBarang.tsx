@@ -210,33 +210,8 @@ export default function LaporanBarang() {
             </CardTitle>
           </CardHeader>
 
-          {/* MOBILE */}
-          <div className="md:hidden divide-y">
-            {isLoading ? Array.from({length:4}).map((_,i) => (
-              <div key={i} className="p-4 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /></div>
-            )) : pageItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                <FileX className="h-10 w-10 mb-2 text-slate-300" />
-                <p className="font-medium text-slate-500">Tidak ada data</p>
-              </div>
-            ) : pageItems.map(item => (
-              <div key={item.tsCode} className="p-4">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <p className="font-semibold text-sm text-slate-800 break-words leading-tight">{item.nama}</p>
-                  <StatusBadge status={item.status} />
-                </div>
-                <p className="text-xs font-mono text-muted-foreground mb-2">{item.tsCode} · {item.kategori}</p>
-                <div className="flex gap-4 text-xs text-slate-600">
-                  <span>Stok: <strong className={stockColor(item)}>{item.stok}</strong> {item.uom}</span>
-                  <span className="text-muted-foreground">Min: {item.safetyStok}</span>
-                  {item.binLoc && <span className="text-muted-foreground">{item.binLoc}</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* DESKTOP */}
-          <div className="hidden md:block overflow-x-auto">
+          {/* Table */}
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>

@@ -471,71 +471,8 @@ export default function ManajemenUser() {
 
             return (
               <>
-                {/* ── MOBILE ── */}
-                <div className="flex flex-col gap-4 md:hidden">
-                  {/* Grup Admin & Kepala Gudang */}
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2 px-1">Admin & Kepala Gudang</p>
-                    <div className="flex flex-col gap-3">
-                      {filteredStaff.length === 0
-                        ? <div className="py-6 text-center text-muted-foreground text-sm bg-white rounded-lg border">Tidak ada pengguna.</div>
-                        : filteredStaff.map((u) => <UserCard key={u.id} user={u} />)}
-                    </div>
-                  </div>
-                  {/* Grup Petugas */}
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2 px-1">Petugas</p>
-                    <div className="flex flex-col gap-3">
-                      {filteredPetugas.length === 0
-                        ? <div className="py-6 text-center text-muted-foreground text-sm bg-white rounded-lg border">Tidak ada petugas.</div>
-                        : filteredPetugas.map((u) => {
-                          const perms = getEffectivePerms(u);
-                          const isSaving = savingPermIds.has(u.id);
-                          const origPerms = {
-                            transaksi_masuk: u.permissions?.transaksi_masuk ?? false,
-                            transaksi_keluar: u.permissions?.transaksi_keluar ?? false,
-                          };
-                          const isDirty = perms.transaksi_masuk !== origPerms.transaksi_masuk || perms.transaksi_keluar !== origPerms.transaksi_keluar;
-                          return (
-                            <UserCard key={u.id} user={u}>
-                              <div className="border-t pt-3 mt-2">
-                                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-2">Hak Akses Tambahan</p>
-                                <div className="flex items-center gap-3">
-                                  {(['transaksi_masuk', 'transaksi_keluar'] as const).map((field) => {
-                                    const on = perms[field];
-                                    const label = field === 'transaksi_masuk' ? 'Barang Masuk' : 'Barang Keluar';
-                                    return (
-                                      <button
-                                        key={field}
-                                        onClick={() => setPermissionsMap((m) => ({ ...m, [u.id]: { ...perms, [field]: !on } }))}
-                                        className={`flex items-center gap-1.5 text-xs font-medium rounded px-2 py-1 transition-colors ${on ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}
-                                      >
-                                        {on ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
-                                        {label}
-                                      </button>
-                                    );
-                                  })}
-                                  {isDirty && (
-                                    <button
-                                      onClick={() => handleSavePermissions(u)}
-                                      disabled={isSaving}
-                                      className="ml-auto flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded px-2 py-1"
-                                    >
-                                      {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
-                                      Simpan
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </UserCard>
-                          );
-                        })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* ── DESKTOP ── */}
-                <div className="hidden md:flex flex-col gap-5">
+                {/* ── TABEL ── */}
+                <div className="flex flex-col gap-5">
                   {/* Tabel Admin & Kepala Gudang */}
                   <div>
                     <div className="flex items-center gap-2 mb-2">
