@@ -76,7 +76,7 @@ router.post("/users", authenticate, authorize("admin"), async (req, res) => {
 
   const [inserted] = await db
     .insert(usersTable)
-    .values({ ...data, password: hashedPassword, dibuatOleh: req.user!.userId })
+    .values({ ...data, password: hashedPassword, dibuatOleh: req.user!.userId, permissions: {} })
     .returning({ id: usersTable.id });
 
   const [newUser] = await db
