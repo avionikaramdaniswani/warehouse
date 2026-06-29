@@ -174,9 +174,11 @@ function buildZip(entries: ZipEntry[]): Uint8Array {
   return out;
 }
 
-const PRINT_SETUP_XML =
+const PAGE_SETUP_XML =
   '<pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/>' +
   '<pageMargins left="0.4" right="0.4" top="0.6" bottom="0.6" header="0.3" footer="0.3"/>';
+
+const SHEET_PR_XML = '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>';
 
 function injectPrintSettings(xlsxArray: number[]): Uint8Array {
   const buf = new Uint8Array(xlsxArray);
@@ -185,10 +187,32 @@ function injectPrintSettings(xlsxArray: number[]): Uint8Array {
   for (const entry of entries) {
     if (entry.filename === 'xl/worksheets/sheet1.xml') {
       let xml = new TextDecoder().decode(entry.data);
-      xml = xml.replace(/<sheetView\b(?![^>]*fitToPage)/g, '<sheetView fitToPage="1"');
-      if (!xml.includes('<pageSetup')) {
-        xml = xml.replace('</worksheet>', PRINT_SETUP_XML + '</worksheet>');
+
+      // 1. Add <sheetPr><pageSetUpPr fitToPage="1"/></sheetPr> as first child of <worksheet>
+      //    (required for Excel to honour fitToWidth in pageSetup)
+      if (!xml.includes('<sheetPr')) {
+        // Insert before <dimension> or <sheetViews> — whichever comes first
+        if (xml.includes('<dimension')) {
+          xml = xml.replace('<dimension', SHEET_PR_XML + '<dimension');
+        } else {
+          xml = xml.replace('<sheetViews', SHEET_PR_XML + '<sheetViews');
+        }
+      } else if (!xml.includes('pageSetUpPr')) {
+        // sheetPr exists but no pageSetUpPr — inject inside it
+        xml = xml.replace('<sheetPr>', '<sheetPr><pageSetUpPr fitToPage="1"/>');
+        xml = xml.replace('<sheetPr/>', '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>');
       }
+
+      // 2. Inject <pageSetup> and <pageMargins> in correct OOXML order:
+      //    these must come BEFORE <ignoredErrors>, not at </worksheet>
+      if (!xml.includes('<pageSetup')) {
+        if (xml.includes('<ignoredErrors')) {
+          xml = xml.replace('<ignoredErrors', PAGE_SETUP_XML + '<ignoredErrors');
+        } else {
+          xml = xml.replace('</worksheet>', PAGE_SETUP_XML + '</worksheet>');
+        }
+      }
+
       const newData = new TextEncoder().encode(xml);
       entry.data = newData;
       entry.crc = crc32(newData);
