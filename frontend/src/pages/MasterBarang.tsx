@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, QrCode, FileX, MapPin, Tag, Printer, CheckSquare, Trash2, FileSpreadsheet, ChevronLeft, ChevronRight, MoreHorizontal, History } from 'lucide-react';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import {
@@ -24,6 +24,7 @@ import { ItemQRModal } from '@/components/master-barang/ItemQRModal';
 import { MobileItemSheet, SheetType } from '@/components/master-barang/MobileItemSheet';
 import { ImportExcelModal } from '@/components/master-barang/ImportExcelModal';
 import { PrintModeDialog } from '@/components/master-barang/PrintModeDialog';
+import { RiwayatItemModal } from '@/components/master-barang/RiwayatItemModal';
 
 const PAGE_SIZE_OPTIONS = [50, 100, 150, 200, 300, 400, 500];
 
@@ -119,6 +120,7 @@ export default function MasterBarang() {
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [riwayatOpen, setRiwayatOpen] = useState(false);
 
   const isAdmin = currentUser?.role === 'admin';
   const canEdit = currentUser?.role === 'admin' || currentUser?.role === 'kepala_gudang';
@@ -669,6 +671,11 @@ window.onload=function(){
                           onClick={() => { setSelectedItem(item); setQrOpen(true); }}>
                           <QrCode className="h-4 w-4" />
                         </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-violet-600 hover:bg-violet-50"
+                          title="Riwayat Transaksi"
+                          onClick={() => { setSelectedItem(item); setRiwayatOpen(true); }}>
+                          <History className="h-4 w-4" />
+                        </Button>
                         {isAdmin && (
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50"
                             onClick={() => setDeleteTarget(item)}>
@@ -772,6 +779,13 @@ window.onload=function(){
       <ItemDetailModal
         open={detailOpen}
         onClose={() => setDetailOpen(false)}
+        item={selectedItem}
+        token={token}
+        onViewRiwayat={() => { setDetailOpen(false); setRiwayatOpen(true); }}
+      />
+      <RiwayatItemModal
+        open={riwayatOpen}
+        onClose={() => setRiwayatOpen(false)}
         item={selectedItem}
         token={token}
       />

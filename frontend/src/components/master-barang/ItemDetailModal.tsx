@@ -19,6 +19,7 @@ interface Props {
   onClose: () => void;
   item: Item | null;
   token: string | null;
+  onViewRiwayat?: () => void;
 }
 
 function stockColor(item: Item) {
@@ -27,7 +28,7 @@ function stockColor(item: Item) {
   return 'text-foreground';
 }
 
-export function ItemDetailModal({ open, onClose, item, token }: Props) {
+export function ItemDetailModal({ open, onClose, item, token, onViewRiwayat }: Props) {
   const [history, setHistory] = useState<TrxRow[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -107,9 +108,19 @@ export function ItemDetailModal({ open, onClose, item, token }: Props) {
             </div>
 
             <div>
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide border-b pb-2 mb-3">
-                Riwayat Transaksi Terakhir
-              </h4>
+              <div className="flex items-center justify-between border-b pb-2 mb-3">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Riwayat Transaksi Terakhir
+                </h4>
+                {onViewRiwayat && (
+                  <button
+                    onClick={onViewRiwayat}
+                    className="text-xs text-violet-600 hover:text-violet-700 hover:underline font-medium"
+                  >
+                    Lihat semua →
+                  </button>
+                )}
+              </div>
               {loading ? (
                 <div className="space-y-2">
                   {[1, 2, 3].map((i) => <Skeleton key={i} className="h-10 w-full" />)}

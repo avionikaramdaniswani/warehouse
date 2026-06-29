@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { itemsTable } from "@workspace/db/schema";
-import { eq, asc, and, inArray, ilike, or, lte, gt, sql } from "drizzle-orm";
+import { itemsTable, transaksiMasukTable, transaksiKeluarTable, usersTable } from "@workspace/db/schema";
+import { eq, asc, and, inArray, ilike, or, lte, gt, sql, desc } from "drizzle-orm";
 import { z } from "zod";
 import { authenticate } from "../middlewares/authenticate.js";
 import { authorize } from "../middlewares/authorize.js";
@@ -284,6 +284,69 @@ router.delete("/items/:tsCode", authenticate, authorize("admin"), async (req, re
 
   await logActivity(req.user!.userId, "DELETE_ITEM", `Hapus barang: ${existing.tsCode} - ${existing.nama}`, req);
   res.json({ message: "Barang berhasil dihapus" });
+});
+
+router.get("/items/:id/riwayat", authenticate, async (req, res) => {
+  const id = Number(req.params.id);
+  if (isNaN(id)) { res.status(400).json({ message: "ID tidak valid" }); return; }
+
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 15));
+  const type = (req.query.type as string) || "all";
+
+  const [item] = await db.select({ id: itemsTable.id })
+    .from(itemsTable).where(eq(itemsTable.id, id)).limit(1);
+  if (!item) { res.status(404).json({ message: "Barang tidak ditemukan" }); return; }
+
+  const combined: Array<{
+    id: number; nomor: string; jumlah: number; tanggal: string;
+    createdAt: Date; jenis: "Masuk" | "Keluar"; petugas: string;
+    keterangan: string | null; noPo: string | null;
+    keperluan: string | null; tujuan: string | null;
+  }> = [];
+
+  if (type !== "keluar") {
+    const masuk = await db.select({
+      id: transaksiMasukTable.id,
+      nomor: transaksiMasukTable.nomor,
+      jumlah: transaksiMasukTable.jumlah,
+      tanggal: transaksiMasukTable.tanggal,
+      createdAt: transaksiMasukTable.createdAt,
+      petugas: usersTable.namaLengkap,
+      keterangan: transaksiMasukTable.keterangan,
+      noPo: transaksiMasukTable.noPo,
+    })
+      .from(transaksiMasukTable)
+      .innerJoin(usersTable, eq(transaksiMasukTable.userId, usersTable.id))
+      .where(eq(transaksiMasukTable.itemId, id));
+    combined.push(...masuk.map(r => ({ ...r, jenis: "Masuk" as const, keperluan: null, tujuan: null })));
+  }
+
+  if (type !== "masuk") {
+    const keluar = await db.select({
+      id: transaksiKeluarTable.id,
+      nomor: transaksiKeluarTable.nomor,
+      jumlah: transaksiKeluarTable.jumlah,
+      tanggal: transaksiKeluarTable.tanggal,
+      createdAt: transaksiKeluarTable.createdAt,
+      petugas: usersTable.namaLengkap,
+      keterangan: transaksiKeluarTable.keterangan,
+      keperluan: transaksiKeluarTable.keperluan,
+      tujuan: transaksiKeluarTable.tujuan,
+    })
+      .from(transaksiKeluarTable)
+      .innerJoin(usersTable, eq(transaksiKeluarTable.userId, usersTable.id))
+      .where(eq(transaksiKeluarTable.itemId, id));
+    combined.push(...keluar.map(r => ({ ...r, jenis: "Keluar" as const, noPo: null })));
+  }
+
+  combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const total = combined.length;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const data = combined.slice((page - 1) * limit, page * limit);
+
+  res.json({ data, total, page, limit, totalPages });
 });
 
 export default router;
