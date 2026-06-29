@@ -24,14 +24,16 @@ import Pengaturan from "@/pages/Pengaturan";
 
 const queryClient = new QueryClient();
 
-// A simple wrapper to protect routes
 function ProtectedRoute({ component: Component, ...rest }: any) {
   const { currentUser } = useAppContext();
-  
-  if (!currentUser) {
-    return <Redirect to="/login" />;
-  }
-  
+  if (!currentUser) return <Redirect to="/login" />;
+  return <Component {...rest} />;
+}
+
+function AdminOrKepalaRoute({ component: Component, ...rest }: any) {
+  const { currentUser } = useAppContext();
+  if (!currentUser) return <Redirect to="/login" />;
+  if (currentUser.role === 'petugas') return <Redirect to="/dashboard" />;
   return <Component {...rest} />;
 }
 
@@ -47,12 +49,12 @@ function Router() {
       <Route path="/barang" component={() => <ProtectedRoute component={MasterBarang} />} />
       <Route path="/barang-masuk" component={() => <ProtectedRoute component={BarangMasuk} />} />
       <Route path="/barang-keluar" component={() => <ProtectedRoute component={BarangKeluar} />} />
-      <Route path="/laporan" component={() => <ProtectedRoute component={Laporan} />} />
-      <Route path="/laporan/barang" component={() => <ProtectedRoute component={LaporanBarang} />} />
-      <Route path="/laporan/barang-masuk" component={() => <ProtectedRoute component={LaporanBarangMasuk} />} />
-      <Route path="/laporan/barang-keluar" component={() => <ProtectedRoute component={LaporanBarangKeluar} />} />
-      <Route path="/laporan/pengguna" component={() => <ProtectedRoute component={LaporanPengguna} />} />
-      <Route path="/laporan/aktivitas" component={() => <ProtectedRoute component={RiwayatAktivitas} />} />
+      <Route path="/laporan" component={() => <AdminOrKepalaRoute component={Laporan} />} />
+      <Route path="/laporan/barang" component={() => <AdminOrKepalaRoute component={LaporanBarang} />} />
+      <Route path="/laporan/barang-masuk" component={() => <AdminOrKepalaRoute component={LaporanBarangMasuk} />} />
+      <Route path="/laporan/barang-keluar" component={() => <AdminOrKepalaRoute component={LaporanBarangKeluar} />} />
+      <Route path="/laporan/pengguna" component={() => <AdminOrKepalaRoute component={LaporanPengguna} />} />
+      <Route path="/laporan/aktivitas" component={() => <AdminOrKepalaRoute component={RiwayatAktivitas} />} />
       <Route path="/users" component={() => <ProtectedRoute component={ManajemenUser} />} />
       <Route path="/pengaturan" component={() => <ProtectedRoute component={Pengaturan} />} />
       

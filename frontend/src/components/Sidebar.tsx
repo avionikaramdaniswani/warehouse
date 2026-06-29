@@ -125,8 +125,8 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
             {/* Top items */}
             {topNavItems.map(renderSimpleItem)}
 
-            {/* Laporan dropdown */}
-            {collapsed ? (
+            {/* Laporan dropdown — disembunyikan untuk petugas */}
+            {!isPetugas && (collapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
@@ -180,7 +180,7 @@ export function Sidebar({ className, collapsed = false }: SidebarProps) {
                   </div>
                 )}
               </div>
-            )}
+            ))}
 
             {/* Bottom items */}
             {bottomNavItems.map(renderSimpleItem)}
