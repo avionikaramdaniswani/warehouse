@@ -166,7 +166,7 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
   const [fileName, setFileName] = useState('');
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
-  const [result, setResult] = useState<{ inserted: number; skipped: number; errors: { tsCode: string; reason: string }[] } | null>(null);
+  const [result, setResult] = useState<{ inserted: number; updated: number; errors: { tsCode: string; reason: string }[] } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
@@ -247,7 +247,7 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
       const data = await res.json();
       if (!res.ok) { toast.error(data.message ?? 'Gagal import'); return; }
       setResult(data);
-      if (data.inserted > 0) onImported();
+      if (data.inserted > 0 || data.updated > 0) onImported();
     } catch {
       toast.error('Terjadi kesalahan saat import');
     } finally {
@@ -273,8 +273,9 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
               <p className="font-semibold text-green-800 flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" /> Import selesai
               </p>
-              <p className="text-sm text-green-700">✅ {result.inserted} barang berhasil ditambahkan</p>
-              {result.skipped > 0 && <p className="text-sm text-amber-700">⏭ {result.skipped} dilewati (TS Code sudah ada)</p>}
+              {result.inserted > 0 && <p className="text-sm text-green-700">✅ {result.inserted} barang baru berhasil ditambahkan</p>}
+              {result.updated > 0 && <p className="text-sm text-blue-700">🔄 {result.updated} barang diperbarui (stok & data disinkronkan)</p>}
+              {result.inserted === 0 && result.updated === 0 && <p className="text-sm text-slate-600">Tidak ada perubahan data.</p>}
               {result.errors.length > 0 && <p className="text-sm text-red-700">❌ {result.errors.length} gagal disimpan</p>}
             </div>
           )}

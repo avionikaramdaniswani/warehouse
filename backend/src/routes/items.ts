@@ -215,21 +215,23 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
   const { items } = parsed.data;
   const errors: { tsCode: string; reason: string }[] = [];
 
-  // 1. Satu query untuk ambil semua TS Code yang sudah ada
+  // 1. Ambil semua item yang sudah ada di DB (dengan field-nya)
   const allTsCodes = items.map((i) => i.tsCode);
   const existingRows = await db
-    .select({ tsCode: itemsTable.tsCode })
+    .select({ tsCode: itemsTable.tsCode, msCode: itemsTable.msCode, binLoc: itemsTable.binLoc })
     .from(itemsTable)
     .where(inArray(itemsTable.tsCode, allTsCodes));
-  const existingSet = new Set(existingRows.map((r) => r.tsCode));
+  const existingMap = new Map(existingRows.map((r) => [r.tsCode, r]));
 
-  // 2. Pisahkan item baru vs duplikat
-  const newItems = items.filter((i) => !existingSet.has(i.tsCode));
-  const skipped = items.length - newItems.length;
+  // 2. Pisahkan item baru vs yang perlu di-update
+  const newItems = items.filter((i) => !existingMap.has(i.tsCode));
+  const updateItems = items.filter((i) => existingMap.has(i.tsCode));
 
-  // 3. Satu INSERT bulk untuk semua item baru (dalam chunk 200)
-  let inserted = 0;
   const CHUNK = 200;
+  let inserted = 0;
+  let updated = 0;
+
+  // 3. INSERT bulk untuk item baru
   for (let i = 0; i < newItems.length; i += CHUNK) {
     const chunk = newItems.slice(i, i + CHUNK);
     try {
@@ -252,16 +254,41 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
     }
   }
 
-  if (inserted > 0) {
+  // 4. UPDATE satu per satu untuk item yang sudah ada
+  //    Field optional kosong di Excel → pertahankan nilai di DB (tidak di-overwrite)
+  for (const item of updateItems) {
+    const existing = existingMap.get(item.tsCode)!;
+    try {
+      await db
+        .update(itemsTable)
+        .set({
+          nama: item.nama,
+          kategori: item.kategori,
+          uom: item.uom,
+          stok: item.stok,
+          safetyStok: item.safetyStok,
+          status: computeStatus(item.stok, item.safetyStok),
+          // Field optional: hanya update jika Excel memberikan nilai, jika kosong pertahankan DB
+          ...(item.msCode ? { msCode: item.msCode } : {}),
+          ...(item.binLoc ? { binLoc: item.binLoc } : {}),
+        })
+        .where(eq(itemsTable.tsCode, item.tsCode));
+      updated++;
+    } catch {
+      errors.push({ tsCode: item.tsCode, reason: "Gagal diupdate" });
+    }
+  }
+
+  if (inserted > 0 || updated > 0) {
     await logActivity(
       req.user!.userId,
       "IMPORT_ITEMS",
-      `Import barang: ${inserted} ditambahkan, ${skipped} dilewati`,
+      `Import barang: ${inserted} ditambahkan, ${updated} diperbarui, ${errors.length} gagal`,
       req
     );
   }
 
-  res.json({ inserted, skipped, errors });
+  res.json({ inserted, updated, errors });
 });
 
 router.delete("/items/:tsCode", authenticate, authorize("admin"), async (req, res) => {
