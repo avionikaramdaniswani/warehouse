@@ -215,23 +215,49 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
   const { items } = parsed.data;
   const errors: { tsCode: string; reason: string }[] = [];
 
-  // 1. Ambil semua item yang sudah ada di DB (dengan field-nya)
+  // 1. Ambil semua field item yang sudah ada di DB untuk perbandingan lengkap
   const allTsCodes = items.map((i) => i.tsCode);
   const existingRows = await db
-    .select({ tsCode: itemsTable.tsCode, msCode: itemsTable.msCode, binLoc: itemsTable.binLoc })
+    .select({
+      tsCode: itemsTable.tsCode,
+      msCode: itemsTable.msCode,
+      nama: itemsTable.nama,
+      kategori: itemsTable.kategori,
+      binLoc: itemsTable.binLoc,
+      uom: itemsTable.uom,
+      stok: itemsTable.stok,
+      safetyStok: itemsTable.safetyStok,
+    })
     .from(itemsTable)
     .where(inArray(itemsTable.tsCode, allTsCodes));
   const existingMap = new Map(existingRows.map((r) => [r.tsCode, r]));
 
-  // 2. Pisahkan item baru vs yang perlu di-update
+  // 2. Pisahkan item baru vs yang sudah ada
   const newItems = items.filter((i) => !existingMap.has(i.tsCode));
-  const updateItems = items.filter((i) => existingMap.has(i.tsCode));
+  const existingItems = items.filter((i) => existingMap.has(i.tsCode));
+
+  // 3. Smart diff: hanya update jika ada field yang benar-benar berubah
+  //    Field optional kosong di Excel → pertahankan nilai di DB (tidak dianggap perubahan)
+  function hasChanged(incoming: typeof items[0], existing: typeof existingRows[0]): boolean {
+    return (
+      incoming.nama !== existing.nama ||
+      incoming.kategori !== existing.kategori ||
+      incoming.uom !== existing.uom ||
+      incoming.stok !== existing.stok ||
+      incoming.safetyStok !== existing.safetyStok ||
+      (incoming.msCode != null && incoming.msCode !== (existing.msCode ?? "")) ||
+      (incoming.binLoc != null && incoming.binLoc !== (existing.binLoc ?? ""))
+    );
+  }
+
+  const itemsToUpdate = existingItems.filter((i) => hasChanged(i, existingMap.get(i.tsCode)!));
+  const unchanged = existingItems.length - itemsToUpdate.length;
 
   const CHUNK = 200;
   let inserted = 0;
   let updated = 0;
 
-  // 3. INSERT bulk untuk item baru
+  // 4. INSERT bulk untuk item baru
   for (let i = 0; i < newItems.length; i += CHUNK) {
     const chunk = newItems.slice(i, i + CHUNK);
     try {
@@ -254,10 +280,8 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
     }
   }
 
-  // 4. UPDATE satu per satu untuk item yang sudah ada
-  //    Field optional kosong di Excel → pertahankan nilai di DB (tidak di-overwrite)
-  for (const item of updateItems) {
-    const existing = existingMap.get(item.tsCode)!;
+  // 5. UPDATE hanya item yang benar-benar berubah
+  for (const item of itemsToUpdate) {
     try {
       await db
         .update(itemsTable)
@@ -268,7 +292,7 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
           stok: item.stok,
           safetyStok: item.safetyStok,
           status: computeStatus(item.stok, item.safetyStok),
-          // Field optional: hanya update jika Excel memberikan nilai, jika kosong pertahankan DB
+          updatedAt: new Date(),
           ...(item.msCode ? { msCode: item.msCode } : {}),
           ...(item.binLoc ? { binLoc: item.binLoc } : {}),
         })
@@ -283,12 +307,12 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
     await logActivity(
       req.user!.userId,
       "IMPORT_ITEMS",
-      `Import barang: ${inserted} ditambahkan, ${updated} diperbarui, ${errors.length} gagal`,
+      `Import barang: ${inserted} ditambahkan, ${updated} diperbarui, ${unchanged} tidak berubah, ${errors.length} gagal`,
       req
     );
   }
 
-  res.json({ inserted, updated, errors });
+  res.json({ inserted, updated, unchanged, errors });
 });
 
 router.delete("/items/:tsCode", authenticate, authorize("admin"), async (req, res) => {
