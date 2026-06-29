@@ -1,0 +1,311 @@
+PS D:\warehouse> pnpm run dev:backend
+$ cross-env PORT=8082 pnpm --filter @workspace/backend run dev
+$ cross-env NODE_ENV=development pnpm run build && pnpm run start
+$ node ./build.mjs
+
+  dist\index.mjs                   2.2mb
+  dist\pino-worker.mjs           153.2kb
+  dist\pino-file.mjs             141.9kb
+  dist\pino-pretty.mjs           114.4kb
+  dist\thread-stream-worker.mjs    7.3kb
+  dist\index.mjs.map               3.7mb
+  ...and 4 more output files...
+
+Done in 1126ms
+$ node --enable-source-maps ./dist/index.mjs
+[08:41:49.798] INFO (17948): Server listening
+    port: 8082
+[08:41:51.430] ERROR (17948): Unhandled error
+    method: "POST"
+    url: "/api/users"
+    err: {
+      "type": "_DrizzleQueryError",
+      "message": "Failed query: insert into \"users\" (\"id\", \"nik\", \"nama_lengkap\", \"email\", \"password\", \"role\", \"no_hp\", \"departemen\", \"jabatan\", \"seksi\", \"status\", \"dibuat_oleh\", \"permissions\", \"tanggal_gabung\", \"login_terakhir\", \"created_at\", \"updated_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, default, default, default, default, default) returning \"id\"\nparams: 12345,petugas 1,petugas@gmail.com,$2b$12$6OHav/ht/MZ5.8SDzCmdPOI1yf5sBy23j2O5JHH8KOP5.5rSOvffu,petugas,,,,,active,1: invalid input value for enum role: \"petugas\"",
+      "stack":
+          Error: Failed query: insert into "users" ("id", "nik", "nama_lengkap", "email", "password", "role", "no_hp", "departemen", "jabatan", "seksi", "status", "dibuat_oleh", "permissions", "tanggal_gabung", "login_terakhir", "created_at", "updated_at") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, default, default, default, default, default) returning "id"
+          params: 12345,petugas 1,petugas@gmail.com,$2b$12$6OHav/ht/MZ5.8SDzCmdPOI1yf5sBy23j2O5JHH8KOP5.5rSOvffu,petugas,,,,,active,1
+              at NodePgPreparedQuery.queryWithCache (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\pg-core\session.ts:73:11)
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:154:19)
+              at async <anonymous> (D:\warehouse\backend\src\routes\users.ts:77:22)
+          caused by: error: invalid input value for enum role: "petugas"
+              at <anonymous> (D:\warehouse\node_modules\.pnpm\pg-pool@3.13.0_pg@8.20.0\node_modules\pg-pool\index.js:45:11)
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:161:13)
+              at async NodePgPreparedQuery.queryWithCache (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\pg-core\session.ts:71:12)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:154:19)
+              at async <anonymous> (D:\warehouse\backend\src\routes\users.ts:77:22)
+      "query": "insert into \"users\" (\"id\", \"nik\", \"nama_lengkap\", \"email\", \"password\", \"role\", \"no_hp\", \"departemen\", \"jabatan\", \"seksi\", \"status\", \"dibuat_oleh\", \"permissions\", \"tanggal_gabung\", \"login_terakhir\", \"created_at\", \"updated_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, default, default, default, default, default) returning \"id\"",
+      "params": [
+        "12345",
+        "petugas 1",
+        "petugas@gmail.com",
+        "$2b$12$6OHav/ht/MZ5.8SDzCmdPOI1yf5sBy23j2O5JHH8KOP5.5rSOvffu",
+        "petugas",
+        "",
+        "",
+        "",
+        "",
+        "active",
+        1
+      ]
+    }
+[08:41:51.440] INFO (17948): request errored
+    req: {
+      "id": 1,
+      "method": "POST",
+      "url": "/api/users"
+    }
+    res: {
+      "statusCode": 500
+    }
+    responseTime: 724
+    err: {
+      "type": "Error",
+      "message": "failed with status code 500",
+      "stack":
+          Error: failed with status code 500
+              at onResFinished (D:\warehouse\node_modules\.pnpm\pino-http@10.5.0\node_modules\pino-http\logger.js:115:39)
+              at ServerResponse.onResponseComplete (D:\warehouse\node_modules\.pnpm\pino-http@10.5.0\node_modules\pino-http\logger.js:178:14)
+              at ServerResponse.emit (node:events:531:35)
+              at onFinish (node:_http_outgoing:1082:10)
+              at callback (node:internal/streams/writable:766:21)
+              at afterWrite (node:internal/streams/writable:710:5)
+              at afterWriteTick (node:internal/streams/writable:696:10)
+              at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+    }
+[08:41:53.475] ERROR (17948): Unhandled error
+    method: "POST"
+    url: "/api/users"
+    err: {
+      "type": "_DrizzleQueryError",
+      "message": "Failed query: insert into \"users\" (\"id\", \"nik\", \"nama_lengkap\", \"email\", \"password\", \"role\", \"no_hp\", \"departemen\", \"jabatan\", \"seksi\", \"status\", \"dibuat_oleh\", \"permissions\", \"tanggal_gabung\", \"login_terakhir\", \"created_at\", \"updated_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, default, default, default, default, default) returning \"id\"\nparams: 12345,petugas 1,petugas@gmail.com,$2b$12$k5AzivSjW9RMqF9LQf.YgOqtMZRM.NOWBX3v4AsbPoFCn6XdCygYK,petugas,,,,,active,1: invalid input value for enum role: \"petugas\"",
+      "stack":
+          Error: Failed query: insert into "users" ("id", "nik", "nama_lengkap", "email", "password", "role", "no_hp", "departemen", "jabatan", "seksi", "status", "dibuat_oleh", "permissions", "tanggal_gabung", "login_terakhir", "created_at", "updated_at") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, default, default, default, default, default) returning "id"
+          params: 12345,petugas 1,petugas@gmail.com,$2b$12$k5AzivSjW9RMqF9LQf.YgOqtMZRM.NOWBX3v4AsbPoFCn6XdCygYK,petugas,,,,,active,1
+              at NodePgPreparedQuery.queryWithCache (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\pg-core\session.ts:73:11)
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:154:19)
+              at async <anonymous> (D:\warehouse\backend\src\routes\users.ts:77:22)
+          caused by: error: invalid input value for enum role: "petugas"
+              at <anonymous> (D:\warehouse\node_modules\.pnpm\pg-pool@3.13.0_pg@8.20.0\node_modules\pg-pool\index.js:45:11)
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:161:13)
+              at async NodePgPreparedQuery.queryWithCache (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\pg-core\session.ts:71:12)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:154:19)
+              at async <anonymous> (D:\warehouse\backend\src\routes\users.ts:77:22)
+      "query": "insert into \"users\" (\"id\", \"nik\", \"nama_lengkap\", \"email\", \"password\", \"role\", \"no_hp\", \"departemen\", \"jabatan\", \"seksi\", \"status\", \"dibuat_oleh\", \"permissions\", \"tanggal_gabung\", \"login_terakhir\", \"created_at\", \"updated_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, default, default, default, default, default) returning \"id\"",
+      "params": [
+        "12345",
+        "petugas 1",
+        "petugas@gmail.com",
+        "$2b$12$k5AzivSjW9RMqF9LQf.YgOqtMZRM.NOWBX3v4AsbPoFCn6XdCygYK",
+        "petugas",
+        "",
+        "",
+        "",
+        "",
+        "active",
+        1
+      ]
+    }
+[08:41:53.480] INFO (17948): request errored
+    req: {
+      "id": 2,
+      "method": "POST",
+      "url": "/api/users"
+    }
+    res: {
+      "statusCode": 500
+    }
+    responseTime: 715
+    err: {
+      "type": "Error",
+      "message": "failed with status code 500",
+      "stack":
+          Error: failed with status code 500
+              at onResFinished (D:\warehouse\node_modules\.pnpm\pino-http@10.5.0\node_modules\pino-http\logger.js:115:39)
+              at ServerResponse.onResponseComplete (D:\warehouse\node_modules\.pnpm\pino-http@10.5.0\node_modules\pino-http\logger.js:178:14)
+              at ServerResponse.emit (node:events:531:35)
+              at onFinish (node:_http_outgoing:1082:10)
+              at callback (node:internal/streams/writable:766:21)
+              at afterWrite (node:internal/streams/writable:710:5)
+              at afterWriteTick (node:internal/streams/writable:696:10)
+              at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+    }
+[08:41:56.089] INFO (17948): request completed
+    req: {
+      "id": 4,
+      "method": "GET",
+      "url": "/api/users"
+    }
+    res: {
+      "statusCode": 304
+    }
+    responseTime: 107
+[08:41:56.118] INFO (17948): request completed
+    req: {
+      "id": 3,
+      "method": "GET",
+      "url": "/api/items"
+    }
+    res: {
+      "statusCode": 304
+    }
+    responseTime: 148
+[08:42:16.502] ERROR (17948): Unhandled error
+    method: "POST"
+    url: "/api/users"
+    err: {
+      "type": "_DrizzleQueryError",
+      "message": "Failed query: insert into \"users\" (\"id\", \"nik\", \"nama_lengkap\", \"email\", \"password\", \"role\", \"no_hp\", \"departemen\", \"jabatan\", \"seksi\", \"status\", \"dibuat_oleh\", \"permissions\", \"tanggal_gabung\", \"login_terakhir\", \"created_at\", \"updated_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, default, default, default, default, default) returning \"id\"\nparams: 12345,Petugas 1,petugas@gmail.com,$2b$12$ZexDzlwWN0w03BaGhhMyVOXtSjVzP/upAYHAktnypTz4lzoi6K8fO,petugas,,,,,active,1: invalid input value for enum role: \"petugas\"",
+      "stack":
+          Error: Failed query: insert into "users" ("id", "nik", "nama_lengkap", "email", "password", "role", "no_hp", "departemen", "jabatan", "seksi", "status", "dibuat_oleh", "permissions", "tanggal_gabung", "login_terakhir", "created_at", "updated_at") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, default, default, default, default, default) returning "id"
+          params: 12345,Petugas 1,petugas@gmail.com,$2b$12$ZexDzlwWN0w03BaGhhMyVOXtSjVzP/upAYHAktnypTz4lzoi6K8fO,petugas,,,,,active,1
+              at NodePgPreparedQuery.queryWithCache (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\pg-core\session.ts:73:11)
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:154:19)
+              at async <anonymous> (D:\warehouse\backend\src\routes\users.ts:77:22)
+          caused by: error: invalid input value for enum role: "petugas"
+              at <anonymous> (D:\warehouse\node_modules\.pnpm\pg-pool@3.13.0_pg@8.20.0\node_modules\pg-pool\index.js:45:11)
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:161:13)
+              at async NodePgPreparedQuery.queryWithCache (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\pg-core\session.ts:71:12)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:154:19)
+              at async <anonymous> (D:\warehouse\backend\src\routes\users.ts:77:22)
+      "query": "insert into \"users\" (\"id\", \"nik\", \"nama_lengkap\", \"email\", \"password\", \"role\", \"no_hp\", \"departemen\", \"jabatan\", \"seksi\", \"status\", \"dibuat_oleh\", \"permissions\", \"tanggal_gabung\", \"login_terakhir\", \"created_at\", \"updated_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, default, default, default, default, default) returning \"id\"",
+      "params": [
+        "12345",
+        "Petugas 1",
+        "petugas@gmail.com",
+        "$2b$12$ZexDzlwWN0w03BaGhhMyVOXtSjVzP/upAYHAktnypTz4lzoi6K8fO",
+        "petugas",
+        "",
+        "",
+        "",
+        "",
+        "active",
+        1
+      ]
+    }
+[08:42:16.505] INFO (17948): request errored
+    req: {
+      "id": 5,
+      "method": "POST",
+      "url": "/api/users"
+    }
+    res: {
+      "statusCode": 500
+    }
+    responseTime: 817
+    err: {
+      "type": "Error",
+      "message": "failed with status code 500",
+      "stack":
+          Error: failed with status code 500
+              at onResFinished (D:\warehouse\node_modules\.pnpm\pino-http@10.5.0\node_modules\pino-http\logger.js:115:39)
+              at ServerResponse.onResponseComplete (D:\warehouse\node_modules\.pnpm\pino-http@10.5.0\node_modules\pino-http\logger.js:178:14)
+              at ServerResponse.emit (node:events:531:35)
+              at onFinish (node:_http_outgoing:1082:10)
+              at callback (node:internal/streams/writable:766:21)
+              at afterWrite (node:internal/streams/writable:710:5)
+              at afterWriteTick (node:internal/streams/writable:696:10)
+              at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+    }
+PS D:\warehouse> pnpm run dev:backend
+$ cross-env PORT=8082 pnpm --filter @workspace/backend run dev
+$ cross-env NODE_ENV=development pnpm run build && pnpm run start
+$ node ./build.mjs
+
+  dist\index.mjs                   2.2mb
+  dist\pino-worker.mjs           153.2kb
+  dist\pino-file.mjs             141.9kb
+  dist\pino-pretty.mjs           114.4kb
+  dist\thread-stream-worker.mjs    7.3kb
+  dist\index.mjs.map               3.7mb
+  ...and 4 more output files...
+
+Done in 853ms
+$ node --enable-source-maps ./dist/index.mjs
+[08:47:36.754] INFO (23452): Server listening
+    port: 8082
+[08:48:03.824] INFO (23452): request completed
+    req: {
+      "id": 1,
+      "method": "GET",
+      "url": "/api/users"
+    }
+    res: {
+      "statusCode": 304
+    }
+    responseTime: 166
+[08:48:03.893] INFO (23452): request completed
+    req: {
+      "id": 2,
+      "method": "GET",
+      "url": "/api/items"
+    }
+    res: {
+      "statusCode": 304
+    }
+    responseTime: 200
+[08:48:21.921] ERROR (23452): Unhandled error
+    method: "POST"
+    url: "/api/users"
+    err: {
+      "type": "_DrizzleQueryError",
+      "message": "Failed query: insert into \"users\" (\"id\", \"nik\", \"nama_lengkap\", \"email\", \"password\", \"role\", \"no_hp\", \"departemen\", \"jabatan\", \"seksi\", \"status\", \"dibuat_oleh\", \"permissions\", \"tanggal_gabung\", \"login_terakhir\", \"created_at\", \"updated_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, default, default, default, default) returning \"id\"\nparams: 12345,Petugas 1,petugas@gmail.com,$2b$12$yJ4hpAU6nzuDPo2Vzz/pBeAVmNfGnvd6.brwDnecdznaQ5HnzqFnG,petugas,,,,,active,1,{}: invalid input value for enum role: \"petugas\"",
+      "stack":
+          Error: Failed query: insert into "users" ("id", "nik", "nama_lengkap", "email", "password", "role", "no_hp", "departemen", "jabatan", "seksi", "status", "dibuat_oleh", "permissions", "tanggal_gabung", "login_terakhir", "created_at", "updated_at") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, default, default, default, default) returning "id"
+          params: 12345,Petugas 1,petugas@gmail.com,$2b$12$yJ4hpAU6nzuDPo2Vzz/pBeAVmNfGnvd6.brwDnecdznaQ5HnzqFnG,petugas,,,,,active,1,{}
+              at NodePgPreparedQuery.queryWithCache (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\pg-core\session.ts:73:11)
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:154:19)
+              at async <anonymous> (D:\warehouse\backend\src\routes\users.ts:77:22)
+          caused by: error: invalid input value for enum role: "petugas"
+              at <anonymous> (D:\warehouse\node_modules\.pnpm\pg-pool@3.13.0_pg@8.20.0\node_modules\pg-pool\index.js:45:11)
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:161:13)
+              at async NodePgPreparedQuery.queryWithCache (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\pg-core\session.ts:71:12)
+              at async <anonymous> (D:\warehouse\node_modules\.pnpm\drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0\node_modules\src\node-postgres\session.ts:154:19)
+              at async <anonymous> (D:\warehouse\backend\src\routes\users.ts:77:22)
+      "query": "insert into \"users\" (\"id\", \"nik\", \"nama_lengkap\", \"email\", \"password\", \"role\", \"no_hp\", \"departemen\", \"jabatan\", \"seksi\", \"status\", \"dibuat_oleh\", \"permissions\", \"tanggal_gabung\", \"login_terakhir\", \"created_at\", \"updated_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, default, default, default, default) returning \"id\"",
+      "params": [
+        "12345",
+        "Petugas 1",
+        "petugas@gmail.com",
+        "$2b$12$yJ4hpAU6nzuDPo2Vzz/pBeAVmNfGnvd6.brwDnecdznaQ5HnzqFnG",
+        "petugas",
+        "",
+        "",
+        "",
+        "",
+        "active",
+        1,
+        "{}"
+      ]
+    }
+[08:48:21.923] INFO (23452): request errored
+    req: {
+      "id": 3,
+      "method": "POST",
+      "url": "/api/users"
+    }
+    res: {
+      "statusCode": 500
+    }
+    responseTime: 728
+    err: {
+      "type": "Error",
+      "message": "failed with status code 500",
+      "stack":
+          Error: failed with status code 500
+              at onResFinished (D:\warehouse\node_modules\.pnpm\pino-http@10.5.0\node_modules\pino-http\logger.js:115:39)
+              at ServerResponse.onResponseComplete (D:\warehouse\node_modules\.pnpm\pino-http@10.5.0\node_modules\pino-http\logger.js:178:14)
+              at ServerResponse.emit (node:events:531:35)
+              at onFinish (node:_http_outgoing:1082:10)
+              at callback (node:internal/streams/writable:766:21)
+              at afterWrite (node:internal/streams/writable:710:5)
+              at afterWriteTick (node:internal/streams/writable:696:10)
+              at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+    }
