@@ -403,7 +403,7 @@ export default function BarangMasuk() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium">Jumlah Masuk <span className="text-red-500">*</span></Label>
                 <div className="flex gap-2 items-center">

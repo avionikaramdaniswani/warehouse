@@ -424,7 +424,7 @@ export default function BarangKeluar() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium">Jumlah Keluar <span className="text-red-500">*</span></Label>
                 <div className="flex gap-2 items-center">
@@ -455,7 +455,7 @@ export default function BarangKeluar() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium flex items-center gap-1">
                   <CalendarDays className="h-3.5 w-3.5" />Tanggal Keluar <span className="text-red-500">*</span>
