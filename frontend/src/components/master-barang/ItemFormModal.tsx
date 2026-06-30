@@ -83,7 +83,7 @@ export function ItemFormModal({ mode, open, onClose, onSave, initialData, katego
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Kategori</Label>
+              <Label>Kategori <span className="text-red-500">*</span></Label>
               <Select value={form.kategori as string} onValueChange={(v) => set({ kategori: v as any })}>
                 <SelectTrigger><SelectValue placeholder="Pilih Kategori" /></SelectTrigger>
                 <SelectContent>
@@ -105,7 +105,7 @@ export function ItemFormModal({ mode, open, onClose, onSave, initialData, katego
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="uom">Satuan (UOM)</Label>
+              <Label htmlFor="uom">Satuan (UOM) <span className="text-red-500">*</span></Label>
               <Input
                 id="uom"
                 value={form.uom || ''}
@@ -113,7 +113,7 @@ export function ItemFormModal({ mode, open, onClose, onSave, initialData, katego
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="stok">Stok Awal</Label>
+              <Label htmlFor="stok">Stok Awal <span className="text-red-500">*</span></Label>
               <Input
                 id="stok"
                 type="number"
@@ -123,7 +123,7 @@ export function ItemFormModal({ mode, open, onClose, onSave, initialData, katego
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="safetyStok">Safety Stok</Label>
+              <Label htmlFor="safetyStok">Safety Stok <span className="text-red-500">*</span></Label>
               <Input
                 id="safetyStok"
                 type="number"

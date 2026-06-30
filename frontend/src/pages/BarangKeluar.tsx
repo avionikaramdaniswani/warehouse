@@ -441,7 +441,7 @@ export default function BarangKeluar() {
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium">Keperluan</Label>
+                <Label className="text-sm font-medium">Keperluan <span className="text-red-500">*</span></Label>
                 <Select value={formData.keperluan} onValueChange={(v) => setFormData({ ...formData, keperluan: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -458,7 +458,7 @@ export default function BarangKeluar() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium flex items-center gap-1">
-                  <CalendarDays className="h-3.5 w-3.5" />Tanggal Keluar
+                  <CalendarDays className="h-3.5 w-3.5" />Tanggal Keluar <span className="text-red-500">*</span>
                 </Label>
                 <Input type="date" value={formData.tanggal} onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })} />
               </div>

@@ -415,7 +415,7 @@ export default function BarangMasuk() {
               </div>
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium flex items-center gap-1">
-                  <CalendarDays className="h-3.5 w-3.5" />Tanggal Terima
+                  <CalendarDays className="h-3.5 w-3.5" />Tanggal Terima <span className="text-red-500">*</span>
                 </Label>
                 <Input type="date" value={formData.tanggal} onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })} />
               </div>

@@ -736,7 +736,7 @@ export default function ManajemenUser() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Role Akses</Label>
+                  <Label>Role Akses <span className="text-red-500">*</span></Label>
                   <Select value={formData.role} onValueChange={(v: any) => setFormData({ ...formData, role: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -747,7 +747,7 @@ export default function ManajemenUser() {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>Status</Label>
+                  <Label>Status <span className="text-red-500">*</span></Label>
                   <Select value={formData.status} onValueChange={(v: any) => setFormData({ ...formData, status: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>

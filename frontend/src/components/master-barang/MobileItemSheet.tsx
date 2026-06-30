@@ -244,7 +244,7 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Kategori</Label>
+                  <Label className="text-xs">Kategori <span className="text-red-500">*</span></Label>
                   <Select value={formData.kategori as string} onValueChange={(v) => set({ kategori: v as any })}>
                     <SelectTrigger className="h-9"><SelectValue placeholder="Pilih Kategori" /></SelectTrigger>
                     <SelectContent>
@@ -259,11 +259,11 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">UOM</Label>
+                  <Label className="text-xs">UOM <span className="text-red-500">*</span></Label>
                   <Input value={formData.uom || ''} onChange={(e) => set({ uom: e.target.value })} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Stok</Label>
+                  <Label className="text-xs">Stok <span className="text-red-500">*</span></Label>
                   <Input
                     type="number" min="0"
                     value={formData.stok ?? ''}
@@ -271,7 +271,7 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Min. Stok</Label>
+                  <Label className="text-xs">Min. Stok <span className="text-red-500">*</span></Label>
                   <Input
                     type="number" min="0"
                     value={formData.safetyStok ?? ''}
