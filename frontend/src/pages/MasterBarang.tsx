@@ -554,6 +554,7 @@ window.onload=function(){
                       TS Code
                     </div>
                   </TableHead>
+                  <TableHead className="min-w-[110px]">MS Code</TableHead>
                   <TableHead className="min-w-[220px]">Nama Barang</TableHead>
                   <TableHead className="min-w-[130px]">Kategori</TableHead>
                   <TableHead className="min-w-[90px]">BIN LOC</TableHead>
@@ -568,12 +569,12 @@ window.onload=function(){
                 {isLoading ? (
                   Array.from({ length: 8 }).map((_, i) => (
                     <TableRow key={i}>
-                      {Array.from({ length: 9 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}
+                      {Array.from({ length: 10 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}
                     </TableRow>
                   ))
                 ) : pageItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-64 text-center">
+                    <TableCell colSpan={10} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground">
                         <FileX className="h-12 w-12 mb-2 text-slate-300" />
                         <p className="text-lg font-medium text-slate-500">Tidak ada data ditemukan</p>
@@ -594,6 +595,7 @@ window.onload=function(){
                         {item.tsCode}
                       </div>
                     </TableCell>
+                    <TableCell className="font-mono text-sm text-slate-500">{item.msCode || <span className="text-slate-300">—</span>}</TableCell>
                     <TableCell className="font-semibold text-slate-800 max-w-[260px]">
                       <span className="block truncate" title={item.nama}>{item.nama}</span>
                     </TableCell>
