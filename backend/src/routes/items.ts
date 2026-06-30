@@ -98,14 +98,26 @@ router.post("/items", authenticate, authorize("admin", "kepala_gudang"), async (
     return;
   }
 
-  const existing = await db
+  const existingTs = await db
     .select()
     .from(itemsTable)
-    .where(eq(itemsTable.tsCode, parsed.data.tsCode))
+    .where(sql`lower(${itemsTable.tsCode}) = lower(${parsed.data.tsCode})`)
     .limit(1);
-  if (existing.length > 0) {
+  if (existingTs.length > 0) {
     res.status(409).json({ message: "TS Code sudah terdaftar" });
     return;
+  }
+
+  if (parsed.data.msCode) {
+    const existingMs = await db
+      .select()
+      .from(itemsTable)
+      .where(sql`lower(${itemsTable.msCode}) = lower(${parsed.data.msCode})`)
+      .limit(1);
+    if (existingMs.length > 0) {
+      res.status(409).json({ message: "MS Code sudah terdaftar" });
+      return;
+    }
   }
 
   const { stok, safetyStok } = parsed.data;
@@ -145,6 +157,23 @@ router.put("/items/:tsCode", authenticate, authorize("admin", "kepala_gudang"), 
   if (!existing) {
     res.status(404).json({ message: "Barang tidak ditemukan" });
     return;
+  }
+
+  if (parsed.data.msCode) {
+    const existingMs = await db
+      .select()
+      .from(itemsTable)
+      .where(
+        and(
+          sql`lower(${itemsTable.msCode}) = lower(${parsed.data.msCode})`,
+          sql`lower(${itemsTable.tsCode}) != lower(${tsCode})`
+        )
+      )
+      .limit(1);
+    if (existingMs.length > 0) {
+      res.status(409).json({ message: "MS Code sudah dipakai barang lain" });
+      return;
+    }
   }
 
   const newStok = parsed.data.stok ?? existing.stok;
