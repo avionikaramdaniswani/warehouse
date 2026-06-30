@@ -117,6 +117,8 @@ export default function MasterBarang() {
   const [sheetType, setSheetType] = useState<SheetType | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [riwayatOpen, setRiwayatOpen] = useState(false);
 
@@ -434,6 +436,33 @@ window.onload=function(){
     }
   };
 
+  const handleBulkDelete = async () => {
+    const codes = Array.from(selectedForPrint);
+    setBulkDeleting(true);
+    let failed = 0;
+    for (const tsCode of codes) {
+      try {
+        const res = await fetch(`/api/items/${tsCode}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) failed++;
+      } catch {
+        failed++;
+      }
+    }
+    setBulkDeleting(false);
+    setBulkDeleteOpen(false);
+    exitSelectMode();
+    if (failed === 0) {
+      toast.success(`${codes.length} barang berhasil dihapus`);
+    } else {
+      toast.warning(`${codes.length - failed} berhasil, ${failed} gagal dihapus`);
+    }
+    fetchPage(1, searchTerm, categoryFilter, statusFilter, pageSize);
+    refreshItems();
+  };
+
   const startEntry = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const endEntry = Math.min(currentPage * pageSize, total);
 
@@ -525,9 +554,21 @@ window.onload=function(){
         {isSelectMode && (
           <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-lg px-4 py-2.5 flex-wrap">
             <span className="text-sm font-medium text-primary flex-1">
-              {selectedForPrint.size > 0 ? `${selectedForPrint.size} barang dipilih` : 'Pilih barang untuk dicetak labelnya'}
+              {selectedForPrint.size > 0 ? `${selectedForPrint.size} barang dipilih` : 'Pilih barang untuk dicetak label atau dihapus'}
             </span>
             <Button size="sm" variant="outline" className="h-8 text-xs" onClick={exitSelectMode}>Batal</Button>
+            {canEdit && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 text-xs text-red-600 border-red-200 hover:bg-red-50"
+                disabled={selectedForPrint.size === 0}
+                onClick={() => setBulkDeleteOpen(true)}
+              >
+                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                Hapus {selectedForPrint.size > 0 ? `${selectedForPrint.size} ` : ''}Barang
+              </Button>
+            )}
             <Button
               size="sm"
               className="h-8 text-xs bg-primary hover:bg-primary/90"
@@ -823,6 +864,31 @@ window.onload=function(){
               className="bg-red-600 hover:bg-red-700"
             >
               {deleting ? 'Menghapus…' : 'Hapus'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk delete confirmation */}
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={(open) => { if (!open && !bulkDeleting) setBulkDeleteOpen(false); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-red-500" />
+              Hapus {selectedForPrint.size} Barang
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Yakin ingin menghapus <strong>{selectedForPrint.size} barang</strong> yang dipilih? Riwayat transaksi tetap tersimpan, namun data barang tidak dapat dikembalikan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkDeleting}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={bulkDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {bulkDeleting ? 'Menghapus…' : `Hapus ${selectedForPrint.size} Barang`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
