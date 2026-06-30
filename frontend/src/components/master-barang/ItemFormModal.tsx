@@ -65,7 +65,7 @@ export function ItemFormModal({ mode, open, onClose, onSave, initialData, katego
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="msCode">MS Code</Label>
+              <Label htmlFor="msCode">MS Code <span className="text-red-500">*</span></Label>
               <Input
                 id="msCode"
                 value={form.msCode || ''}

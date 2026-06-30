@@ -235,7 +235,7 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
                 <Input value={formData.tsCode || ''} disabled className="bg-slate-50" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">MS Code</Label>
+                <Label className="text-xs">MS Code <span className="text-red-500">*</span></Label>
                 <Input value={formData.msCode || ''} onChange={(e) => set({ msCode: e.target.value })} />
               </div>
               <div className="space-y-1.5">
