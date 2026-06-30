@@ -374,7 +374,7 @@ window.onload=function(){
     if (!res.ok) {
       const err = await res.json();
       toast.error(err.message ?? 'Gagal menyimpan perubahan');
-      throw new Error('save failed');
+      return;
     }
     setEditOpen(false);
     toast.success('Data barang berhasil diperbarui');
@@ -385,7 +385,7 @@ window.onload=function(){
   const handleSaveAdd = async (data: Partial<Item>) => {
     if (!data.tsCode || !data.nama) {
       toast.error('TS Code dan Nama Barang wajib diisi');
-      throw new Error('validation failed');
+      return;
     }
     const res = await fetch('/api/items', {
       method: 'POST',
@@ -398,7 +398,7 @@ window.onload=function(){
     if (!res.ok) {
       const err = await res.json();
       toast.error(err.message ?? 'Gagal menambah barang');
-      throw new Error('save failed');
+      return;
     }
     setAddOpen(false);
     toast.success('Barang baru berhasil ditambahkan');
