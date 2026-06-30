@@ -412,14 +412,14 @@ export default function BarangKeluar() {
                   )}
                 </div>
               ) : (
-                <div className="bg-primary/5 border border-primary/20 rounded-lg px-4 py-3 flex items-center justify-between gap-3">
-                  <div>
-                    <p className="font-semibold text-sm text-slate-800">{selectedItem.nama}</p>
-                    <p className="text-xs font-mono text-slate-500 mt-0.5">
+                <div className="bg-primary/5 border border-primary/20 rounded-lg px-4 py-3 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm text-slate-800 break-words">{selectedItem.nama}</p>
+                    <p className="text-xs font-mono text-slate-500 mt-0.5 break-all">
                       {selectedItem.tsCode} · Stok tersedia: <strong className="text-primary">{selectedItem.stok}</strong> {selectedItem.uom}
                     </p>
                   </div>
-                  <button className="text-xs text-slate-400 hover:text-red-500 shrink-0 transition-colors" onClick={() => setSelectedItem(null)}>Ganti</button>
+                  <button className="text-xs text-slate-400 hover:text-red-500 shrink-0 transition-colors pt-0.5" onClick={() => setSelectedItem(null)}>Ganti</button>
                 </div>
               )}
             </div>
