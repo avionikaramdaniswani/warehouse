@@ -49,5 +49,11 @@ export const transaksiKeluarTable = pgTable("transaksi_keluar", {
   tujuan: text("tujuan"),
   tanggal: date("tanggal").notNull(),
   keterangan: text("keterangan"),
+  maintenanceOrder: text("maintenance_order"),
+  functionalLocation: text("functional_location"),
+  equipment: text("equipment"),
+  movementType: text("movement_type"),
+  orderType: text("order_type"),
+  activityType: text("activity_type"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

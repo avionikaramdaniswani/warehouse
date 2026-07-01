@@ -27,10 +27,18 @@ interface TransaksiKeluar {
   tujuan: string | null;
   tanggal: string;
   keterangan: string | null;
+  maintenanceOrder: string | null;
+  functionalLocation: string | null;
+  equipment: string | null;
+  movementType: string | null;
+  orderType: string | null;
+  activityType: string | null;
   createdAt: string;
   itemCode: string;
   tsCode: string | null;
   namaBarang: string;
+  uom: string;
+  binLoc: string | null;
   petugas: string;
 }
 
@@ -392,6 +400,12 @@ export default function BarangKeluar() {
           tujuan: formData.tujuan || undefined,
           tanggal: formData.tanggal,
           keterangan: formData.keterangan || undefined,
+          maintenanceOrder: formData.maintenanceOrder || undefined,
+          functionalLocation: formData.functionalLocation || undefined,
+          equipment: formData.equipment || undefined,
+          movementType: formData.movementType || undefined,
+          orderType: formData.orderType || undefined,
+          activityType: formData.activityType || undefined,
         }),
       });
       if (!res.ok) {
@@ -576,14 +590,20 @@ export default function BarangKeluar() {
                               tanggal: trx.tanggal,
                               itemCode: trx.itemCode,
                               namaBarang: trx.namaBarang,
-                              uom: item?.uom ?? '',
-                              binLoc: item?.binLoc,
+                              uom: trx.uom || item?.uom || '',
+                              binLoc: trx.binLoc ?? item?.binLoc,
                               qtyOnHand: item?.stok ?? 0,
                               qtyIssued: trx.jumlah,
                               keperluan: trx.keperluan ?? '',
                               tujuan: trx.tujuan ?? undefined,
-                              keterangan: undefined,
+                              keterangan: trx.keterangan ?? undefined,
                               petugasNama: trx.petugas,
+                              maintenanceOrder: trx.maintenanceOrder ?? undefined,
+                              functionalLocation: trx.functionalLocation ?? undefined,
+                              equipment: trx.equipment ?? undefined,
+                              movementType: trx.movementType ?? undefined,
+                              orderType: trx.orderType ?? undefined,
+                              activityType: trx.activityType ?? undefined,
                             });
                           }}>
                           <Printer className="h-3.5 w-3.5" />

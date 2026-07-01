@@ -30,6 +30,12 @@ const createSchema = z.object({
   tujuan: z.string().optional(),
   tanggal: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format tanggal YYYY-MM-DD"),
   keterangan: z.string().optional(),
+  maintenanceOrder: z.string().optional(),
+  functionalLocation: z.string().optional(),
+  equipment: z.string().optional(),
+  movementType: z.string().optional(),
+  orderType: z.string().optional(),
+  activityType: z.string().optional(),
 });
 
 router.get("/transaksi-keluar", authenticate, async (req, res) => {
@@ -44,6 +50,12 @@ router.get("/transaksi-keluar", authenticate, async (req, res) => {
       tujuan: transaksiKeluarTable.tujuan,
       tanggal: transaksiKeluarTable.tanggal,
       keterangan: transaksiKeluarTable.keterangan,
+      maintenanceOrder: transaksiKeluarTable.maintenanceOrder,
+      functionalLocation: transaksiKeluarTable.functionalLocation,
+      equipment: transaksiKeluarTable.equipment,
+      movementType: transaksiKeluarTable.movementType,
+      orderType: transaksiKeluarTable.orderType,
+      activityType: transaksiKeluarTable.activityType,
       createdAt: transaksiKeluarTable.createdAt,
       itemCode: itemsTable.itemCode,
       tsCode: itemsTable.tsCode,
@@ -90,7 +102,8 @@ router.post("/transaksi-keluar", authenticate, authorize("admin", "kepala_gudang
     return;
   }
 
-  const { itemCode, jumlah, keperluan, tujuan, tanggal, keterangan } = parsed.data;
+  const { itemCode, jumlah, keperluan, tujuan, tanggal, keterangan,
+          maintenanceOrder, functionalLocation, equipment, movementType, orderType, activityType } = parsed.data;
 
   const [item] = await db
     .select()
@@ -126,6 +139,12 @@ router.post("/transaksi-keluar", authenticate, authorize("admin", "kepala_gudang
       tujuan: tujuan || null,
       tanggal,
       keterangan: keterangan || null,
+      maintenanceOrder: maintenanceOrder || null,
+      functionalLocation: functionalLocation || null,
+      equipment: equipment || null,
+      movementType: movementType || null,
+      orderType: orderType || null,
+      activityType: activityType || null,
     })
     .returning();
 
