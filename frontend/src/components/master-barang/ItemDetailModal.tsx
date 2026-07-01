@@ -36,10 +36,10 @@ export function ItemDetailModal({ open, onClose, item, token, onViewRiwayat }: P
     if (!open || !item || !token) return;
     setLoading(true);
     Promise.all([
-      fetch(`/api/transaksi-masuk?tsCode=${encodeURIComponent(item.tsCode)}`, {
+      fetch(`/api/transaksi-masuk?itemCode=${encodeURIComponent(item.itemCode)}`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then((r) => (r.ok ? r.json() : [])),
-      fetch(`/api/transaksi-keluar?tsCode=${encodeURIComponent(item.tsCode)}`, {
+      fetch(`/api/transaksi-keluar?itemCode=${encodeURIComponent(item.itemCode)}`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then((r) => (r.ok ? r.json() : [])),
     ])
@@ -54,13 +54,13 @@ export function ItemDetailModal({ open, onClose, item, token, onViewRiwayat }: P
       })
       .catch(() => setHistory([]))
       .finally(() => setLoading(false));
-  }, [open, item?.tsCode, token]);
+  }, [open, item?.itemCode, token]);
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="text-xl border-b pb-4">Detail Barang: {item?.tsCode}</DialogTitle>
+          <DialogTitle className="text-xl border-b pb-4">Detail Barang: {item?.itemCode}</DialogTitle>
         </DialogHeader>
         {item && (
           <div className="grid gap-5 py-4">
@@ -70,8 +70,12 @@ export function ItemDetailModal({ open, onClose, item, token, onViewRiwayat }: P
                 <p className="font-semibold text-base leading-snug">{item.nama}</p>
               </div>
               <div>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Item Code</h4>
+                <p className="font-mono font-medium">{item.itemCode}</p>
+              </div>
+              <div>
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">TS Code</h4>
-                <p className="font-mono font-medium">{item.tsCode}</p>
+                <p className="font-mono font-medium">{item.tsCode || <span className="text-muted-foreground italic">—</span>}</p>
               </div>
               <div>
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">MS Code</h4>

@@ -3,7 +3,8 @@ import { useParams } from 'wouter';
 import { Package, AlertTriangle, XCircle, CheckCircle2, MapPin, ArrowLeft } from 'lucide-react';
 
 interface BinItem {
-  tsCode: string;
+  itemCode: string;
+  tsCode: string | null;
   msCode: string | null;
   nama: string;
   kategori: string;
@@ -134,7 +135,7 @@ export default function BinPage() {
             <div className="space-y-2.5">
               {items.map(item => (
                 <div
-                  key={item.tsCode}
+                  key={item.itemCode}
                   className={`bg-white rounded-xl p-4 shadow-sm border-l-4 ${
                     item.status === 'Critical' ? 'border-red-400' :
                     item.status === 'Warning' ? 'border-amber-400' :
@@ -142,7 +143,7 @@ export default function BinPage() {
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <p className="font-mono text-xs font-bold text-[#1B3A2D]">{item.tsCode}</p>
+                    <p className="font-mono text-xs font-bold text-[#1B3A2D]">{item.itemCode}</p>
                     <StatusBadge status={item.status} />
                   </div>
                   <p className="text-sm font-medium text-slate-800 leading-snug mb-2">{item.nama}</p>
@@ -159,6 +160,7 @@ export default function BinPage() {
                       </span>
                       {' '}{item.uom}
                     </span>
+                    {item.tsCode && <span className="text-slate-400 truncate">TS: {item.tsCode}</span>}
                     {item.msCode && <span className="text-slate-400 truncate">MS: {item.msCode}</span>}
                   </div>
                 </div>

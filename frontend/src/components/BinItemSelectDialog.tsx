@@ -27,9 +27,10 @@ export function BinItemSelectDialog({ open, binLoc, items, onSelect, onClose }: 
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return (
-      i.tsCode.toLowerCase().includes(q) ||
+      i.itemCode.toLowerCase().includes(q) ||
+      (i.tsCode ?? '').toLowerCase().includes(q) ||
       i.nama.toLowerCase().includes(q) ||
-      i.msCode.toLowerCase().includes(q)
+      (i.msCode ?? '').toLowerCase().includes(q)
     );
   });
 
@@ -61,7 +62,7 @@ export function BinItemSelectDialog({ open, binLoc, items, onSelect, onClose }: 
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
             <Input
               autoFocus
-              placeholder="Cari TS Code / nama barang…"
+              placeholder="Cari Item Code / nama barang…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-8 h-8 text-xs"
@@ -79,13 +80,13 @@ export function BinItemSelectDialog({ open, binLoc, items, onSelect, onClose }: 
             <div className="divide-y divide-slate-100">
               {filtered.map((item) => (
                 <button
-                  key={item.tsCode}
+                  key={item.itemCode}
                   onClick={() => handleSelect(item)}
                   className="w-full text-left px-4 py-3 hover:bg-slate-50 active:bg-slate-100 transition-colors flex items-center gap-3 group"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="font-mono text-xs font-bold text-[#1B3A2D]">{item.tsCode}</span>
+                      <span className="font-mono text-xs font-bold text-[#1B3A2D]">{item.itemCode}</span>
                       {statusBadge(item)}
                     </div>
                     <p className="text-xs text-slate-600 leading-snug line-clamp-2">{item.nama}</p>

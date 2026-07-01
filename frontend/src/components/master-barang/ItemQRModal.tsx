@@ -97,7 +97,7 @@ export function ItemQRModal({ open, onClose, item, canPrint = true }: Props) {
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Label ${item.tsCode}</title>
+  <title>Label ${item.itemCode}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -190,7 +190,7 @@ export function ItemQRModal({ open, onClose, item, canPrint = true }: Props) {
     </div>
     <div class="body">
       <div class="qr">${svgHtml}</div>
-      <div class="ts">${item.tsCode}</div>
+      <div class="ts">${item.itemCode}</div>
       <div class="nama">${item.nama}</div>
       <div class="divider"></div>
       <div class="row">
@@ -250,10 +250,10 @@ export function ItemQRModal({ open, onClose, item, canPrint = true }: Props) {
 
               {/* QR + info */}
               <div className="bg-white px-4 py-3 flex flex-col items-center">
-                <QRCodeSVG value={item.tsCode} size={120} level="M" />
+                <QRCodeSVG value={item.itemCode} size={120} level="M" />
 
                 <p className="font-mono font-bold text-lg tracking-[0.2em] mt-2 mb-0.5 text-black">
-                  {item.tsCode}
+                  {item.itemCode}
                 </p>
                 <p className="text-[9.5px] font-semibold text-slate-600 text-center leading-snug mb-2.5 px-1">
                   {item.nama}

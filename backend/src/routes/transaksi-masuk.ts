@@ -24,7 +24,7 @@ async function generateNomor(): Promise<string> {
 }
 
 const createSchema = z.object({
-  tsCode: z.string().min(1),
+  itemCode: z.string().min(1),
   jumlah: z.number().int().positive("Jumlah harus lebih dari 0"),
   tanggal: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format tanggal YYYY-MM-DD"),
   noPo: z.string().optional(),
@@ -32,7 +32,7 @@ const createSchema = z.object({
 });
 
 router.get("/transaksi-masuk", authenticate, async (req, res) => {
-  const { search, tanggal, tsCode: tsCodeFilter } = req.query as Record<string, string>;
+  const { search, tanggal, itemCode: itemCodeFilter } = req.query as Record<string, string>;
 
   const rows = await db
     .select({
@@ -43,6 +43,7 @@ router.get("/transaksi-masuk", authenticate, async (req, res) => {
       noPo: transaksiMasukTable.noPo,
       keterangan: transaksiMasukTable.keterangan,
       createdAt: transaksiMasukTable.createdAt,
+      itemCode: itemsTable.itemCode,
       tsCode: itemsTable.tsCode,
       msCode: itemsTable.msCode,
       namaBarang: itemsTable.nama,
@@ -63,12 +64,12 @@ router.get("/transaksi-masuk", authenticate, async (req, res) => {
     result = result.filter(
       (r: Row) =>
         r.namaBarang.toLowerCase().includes(q) ||
-        r.tsCode.toLowerCase().includes(q) ||
+        r.itemCode.toLowerCase().includes(q) ||
         (r.noPo ?? "").toLowerCase().includes(q)
     );
   }
-  if (tsCodeFilter) {
-    result = result.filter((r: Row) => r.tsCode === tsCodeFilter);
+  if (itemCodeFilter) {
+    result = result.filter((r: Row) => r.itemCode === itemCodeFilter);
   }
   if (tanggal) {
     result = result.filter((r: Row) => r.tanggal === tanggal);
@@ -84,12 +85,12 @@ router.post("/transaksi-masuk", authenticate, authorize("admin", "kepala_gudang"
     return;
   }
 
-  const { tsCode, jumlah, tanggal, noPo, keterangan } = parsed.data;
+  const { itemCode, jumlah, tanggal, noPo, keterangan } = parsed.data;
 
   const [item] = await db
     .select()
     .from(itemsTable)
-    .where(and(eq(itemsTable.tsCode, tsCode), eq(itemsTable.isActive, true)))
+    .where(and(eq(itemsTable.itemCode, itemCode), eq(itemsTable.isActive, true)))
     .limit(1);
   if (!item) {
     res.status(404).json({ message: "Barang tidak ditemukan" });
@@ -117,8 +118,8 @@ router.post("/transaksi-masuk", authenticate, authorize("admin", "kepala_gudang"
     })
     .returning();
 
-  await logActivity(req.user!.userId, "BARANG_MASUK", `${nomor}: ${item.tsCode} +${jumlah}`, req);
-  res.status(201).json({ ...trx, tsCode: item.tsCode, namaBarang: item.nama, stokBaru: newStok });
+  await logActivity(req.user!.userId, "BARANG_MASUK", `${nomor}: ${item.itemCode} +${jumlah}`, req);
+  res.status(201).json({ ...trx, itemCode: item.itemCode, tsCode: item.tsCode, namaBarang: item.nama, stokBaru: newStok });
 });
 
 export default router;

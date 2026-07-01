@@ -52,10 +52,10 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
     if (type !== 'detail' || !item || !token) return;
     setHistLoading(true);
     Promise.all([
-      fetch(`/api/transaksi-masuk?tsCode=${encodeURIComponent(item.tsCode)}`, {
+      fetch(`/api/transaksi-masuk?itemCode=${encodeURIComponent(item.itemCode)}`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then((r) => (r.ok ? r.json() : [])),
-      fetch(`/api/transaksi-keluar?tsCode=${encodeURIComponent(item.tsCode)}`, {
+      fetch(`/api/transaksi-keluar?itemCode=${encodeURIComponent(item.itemCode)}`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then((r) => (r.ok ? r.json() : [])),
     ])
@@ -70,7 +70,7 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
       })
       .catch(() => setHistory([]))
       .finally(() => setHistLoading(false));
-  }, [type, item?.tsCode, token]);
+  }, [type, item?.itemCode, token]);
 
   const set = (patch: Partial<Item>) => setFormData((prev) => ({ ...prev, ...patch }));
 
@@ -97,7 +97,7 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
     if (!win) { toast.error('Popup diblokir — izinkan popup di browser lalu coba lagi'); return; }
     win.document.write(`<!DOCTYPE html><html><head>
 <meta charset="UTF-8">
-<title>Label ${item.tsCode}</title>
+<title>Label ${item.itemCode}</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:#fff;display:flex;justify-content:center;padding:10mm;font-family:'Courier New',Courier,monospace}
@@ -121,7 +121,7 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
     <div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div>
   </div>
   <div class="qr">${svgHtml}</div>
-  <div class="ts">${item.tsCode}</div>
+  <div class="ts">${item.itemCode}</div>
   <div class="nama">${item.nama}</div>
   <div class="divider"></div>
   <div class="row"><span>Kategori</span><span class="val">${item.kategori || '—'}</span></div>
@@ -147,7 +147,7 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
         <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-100 shrink-0">
           <div>
             <p className="font-bold text-base text-slate-800 leading-tight">{sheetTitle}</p>
-            <p className="text-xs font-mono text-slate-400 mt-0.5">{item.tsCode}</p>
+            <p className="text-xs font-mono text-slate-400 mt-0.5">{item.itemCode}</p>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400">
             <X className="h-5 w-5" />
@@ -163,6 +163,7 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {[
+                  { label: 'TS Code', value: item.tsCode || '-' },
                   { label: 'Kategori', value: item.kategori },
                   { label: 'BIN LOC', value: item.binLoc || '-' },
                   { label: 'UOM', value: item.uom },
@@ -231,11 +232,15 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
           {type === 'edit' && (
             <div className="px-5 py-4 space-y-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">TS Code</Label>
-                <Input value={formData.tsCode || ''} disabled className="bg-slate-50" />
+                <Label className="text-xs">Item Code</Label>
+                <Input value={formData.itemCode || ''} disabled className="bg-slate-50" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">MS Code <span className="text-red-500">*</span></Label>
+                <Label className="text-xs">TS Code</Label>
+                <Input value={formData.tsCode || ''} onChange={(e) => set({ tsCode: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">MS Code</Label>
                 <Input value={formData.msCode || ''} onChange={(e) => set({ msCode: e.target.value })} />
               </div>
               <div className="space-y-1.5">
@@ -298,9 +303,9 @@ export function MobileItemSheet({ type, item, token, kategoris, onClose, canPrin
                 id="qr-mobile-box"
                 className="bg-white border rounded-xl shadow-sm p-6 flex flex-col items-center w-full max-w-[280px]"
               >
-                <QRCodeSVG value={item.tsCode} size={180} />
+                <QRCodeSVG value={item.itemCode} size={180} />
                 <div className="mt-5 w-full text-center space-y-1">
-                  <p className="font-mono font-bold text-lg tracking-widest">{item.tsCode}</p>
+                  <p className="font-mono font-bold text-lg tracking-widest">{item.itemCode}</p>
                   <p className="text-sm font-semibold text-slate-700 truncate">{item.nama}</p>
                   <div className="flex justify-between border-t mt-3 pt-3 text-xs text-slate-500">
                     <span>Lokasi:</span>

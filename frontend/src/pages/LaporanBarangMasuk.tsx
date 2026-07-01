@@ -19,7 +19,8 @@ interface TransaksiMasuk {
   noPo: string | null;
   keterangan: string | null;
   createdAt: string;
-  tsCode: string;
+  itemCode: string;
+  tsCode: string | null;
   msCode: string | null;
   namaBarang: string;
   kategori: string;
@@ -86,7 +87,8 @@ export default function LaporanBarangMasuk() {
       const q = search.toLowerCase();
       const matchSearch = !q ||
         row.nomor.toLowerCase().includes(q) ||
-        row.tsCode.toLowerCase().includes(q) ||
+        row.itemCode.toLowerCase().includes(q) ||
+        (row.tsCode ?? '').toLowerCase().includes(q) ||
         row.namaBarang.toLowerCase().includes(q) ||
         row.petugas.toLowerCase().includes(q) ||
         (row.noPo ?? '').toLowerCase().includes(q);
@@ -112,7 +114,8 @@ export default function LaporanBarangMasuk() {
       'Nomor Transaksi': r.nomor,
       'Tanggal': fmtTglHari(r.tanggal),
       'Waktu Pencatatan': fmtWaktu(r.createdAt),
-      'TS Code': r.tsCode,
+      'Item Code': r.itemCode,
+      'TS Code': r.tsCode ?? '',
       'MS Code': r.msCode ?? '',
       'Nama Barang': r.namaBarang,
       'Kategori': r.kategori,
@@ -126,7 +129,7 @@ export default function LaporanBarangMasuk() {
     const tgl = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
     exportStyledExcel({
       rows,
-      colWidths: [4, 22, 24, 14, 12, 14, 45, 18, 10, 14, 10, 18, 30, 22],
+      colWidths: [4, 22, 24, 14, 12, 12, 14, 45, 18, 10, 14, 10, 18, 30, 22],
       sheetName: 'Barang Masuk',
       fileName: `Laporan_Barang_Masuk_${tgl}.xlsx`,
     });
@@ -198,7 +201,7 @@ export default function LaporanBarangMasuk() {
           <div className="flex gap-2 items-center flex-1 min-w-0">
             <div className="relative flex-1 min-w-0">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Cari nomor, TS Code, nama, petugas..." className="pl-9 bg-white" value={search} onChange={e => setSearch(e.target.value)} />
+              <Input placeholder="Cari nomor, Item Code, nama, petugas..." className="pl-9 bg-white" value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <Button variant="outline" size="icon" onClick={handleExportExcel} className="sm:hidden shrink-0 h-9 w-9 text-green-700 border-green-200 hover:bg-green-50" title="Export Excel">
               <FileDown className="h-4 w-4" />
@@ -231,7 +234,7 @@ export default function LaporanBarangMasuk() {
                   <TableHead className="w-8 text-center text-xs">#</TableHead>
                   <TableHead className="whitespace-nowrap">Nomor Transaksi</TableHead>
                   <TableHead className="whitespace-nowrap">Tanggal</TableHead>
-                  <TableHead>TS Code</TableHead>
+                  <TableHead>Item Code</TableHead>
                   <TableHead className="min-w-[260px]">Nama Barang</TableHead>
                   <TableHead className="text-right">Jumlah</TableHead>
                   <TableHead>No. PO</TableHead>
@@ -256,7 +259,7 @@ export default function LaporanBarangMasuk() {
                     <TableCell className="text-center text-xs text-muted-foreground">{startEntry + idx}</TableCell>
                     <TableCell className="font-mono text-sm font-medium text-slate-700 whitespace-nowrap">{row.nomor}</TableCell>
                     <TableCell className="text-sm whitespace-nowrap">{fmtTgl(row.tanggal)}</TableCell>
-                    <TableCell className="font-mono text-sm text-slate-600 whitespace-nowrap">{row.tsCode}</TableCell>
+                    <TableCell className="font-mono text-sm text-slate-600 whitespace-nowrap">{row.itemCode}</TableCell>
                     <TableCell className="font-medium text-slate-800">{row.namaBarang}</TableCell>
                     <TableCell className="text-right font-bold text-green-700">+{row.jumlah}</TableCell>
                     <TableCell className="font-mono text-sm text-blue-600">{row.noPo || '—'}</TableCell>

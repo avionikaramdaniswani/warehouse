@@ -365,7 +365,7 @@ export default function Dashboard() {
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
-                      <TableHead className="font-semibold">TS Code</TableHead>
+                      <TableHead className="font-semibold">Item Code</TableHead>
                       <TableHead className="font-semibold">Nama Barang</TableHead>
                       <TableHead className="font-semibold">Kategori</TableHead>
                       <TableHead className="text-right font-semibold">Stok Saat Ini</TableHead>
@@ -375,8 +375,8 @@ export default function Dashboard() {
                   </TableHeader>
                   <TableBody>
                     {lowStockItems.slice(0, 5).map((item) => (
-                      <TableRow key={item.tsCode}>
-                        <TableCell className="font-mono text-sm">{item.tsCode}</TableCell>
+                      <TableRow key={item.itemCode}>
+                        <TableCell className="font-mono text-sm">{item.itemCode}</TableCell>
                         <TableCell className="font-medium">{item.nama}</TableCell>
                         <TableCell>{item.kategori}</TableCell>
                         <TableCell className="text-right font-bold text-red-600">{item.stok}</TableCell>

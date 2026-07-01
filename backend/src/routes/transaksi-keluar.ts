@@ -24,7 +24,7 @@ async function generateNomor(): Promise<string> {
 }
 
 const createSchema = z.object({
-  tsCode: z.string().min(1),
+  itemCode: z.string().min(1),
   jumlah: z.number().int().positive("Jumlah harus lebih dari 0"),
   keperluan: z.enum(["Perbaikan", "Penggantian", "Proyek Baru", "Peminjaman", "Lainnya"]).default("Perbaikan"),
   tujuan: z.string().optional(),
@@ -33,7 +33,7 @@ const createSchema = z.object({
 });
 
 router.get("/transaksi-keluar", authenticate, async (req, res) => {
-  const { search, keperluan, tanggal, tsCode: tsCodeFilter } = req.query as Record<string, string>;
+  const { search, keperluan, tanggal, itemCode: itemCodeFilter } = req.query as Record<string, string>;
 
   const rows = await db
     .select({
@@ -45,6 +45,7 @@ router.get("/transaksi-keluar", authenticate, async (req, res) => {
       tanggal: transaksiKeluarTable.tanggal,
       keterangan: transaksiKeluarTable.keterangan,
       createdAt: transaksiKeluarTable.createdAt,
+      itemCode: itemsTable.itemCode,
       tsCode: itemsTable.tsCode,
       msCode: itemsTable.msCode,
       namaBarang: itemsTable.nama,
@@ -65,12 +66,12 @@ router.get("/transaksi-keluar", authenticate, async (req, res) => {
     result = result.filter(
       (r: Row) =>
         r.namaBarang.toLowerCase().includes(q) ||
-        r.tsCode.toLowerCase().includes(q) ||
+        r.itemCode.toLowerCase().includes(q) ||
         (r.tujuan ?? "").toLowerCase().includes(q)
     );
   }
-  if (tsCodeFilter) {
-    result = result.filter((r: Row) => r.tsCode === tsCodeFilter);
+  if (itemCodeFilter) {
+    result = result.filter((r: Row) => r.itemCode === itemCodeFilter);
   }
   if (keperluan && keperluan !== "Semua") {
     result = result.filter((r: Row) => r.keperluan === keperluan);
@@ -89,12 +90,12 @@ router.post("/transaksi-keluar", authenticate, authorize("admin", "kepala_gudang
     return;
   }
 
-  const { tsCode, jumlah, keperluan, tujuan, tanggal, keterangan } = parsed.data;
+  const { itemCode, jumlah, keperluan, tujuan, tanggal, keterangan } = parsed.data;
 
   const [item] = await db
     .select()
     .from(itemsTable)
-    .where(and(eq(itemsTable.tsCode, tsCode), eq(itemsTable.isActive, true)))
+    .where(and(eq(itemsTable.itemCode, itemCode), eq(itemsTable.isActive, true)))
     .limit(1);
   if (!item) {
     res.status(404).json({ message: "Barang tidak ditemukan" });
@@ -128,8 +129,8 @@ router.post("/transaksi-keluar", authenticate, authorize("admin", "kepala_gudang
     })
     .returning();
 
-  await logActivity(req.user!.userId, "BARANG_KELUAR", `${nomor}: ${item.tsCode} -${jumlah}`, req);
-  res.status(201).json({ ...trx, tsCode: item.tsCode, namaBarang: item.nama, stokBaru: newStok });
+  await logActivity(req.user!.userId, "BARANG_KELUAR", `${nomor}: ${item.itemCode} -${jumlah}`, req);
+  res.status(201).json({ ...trx, itemCode: item.itemCode, tsCode: item.tsCode, namaBarang: item.nama, stokBaru: newStok });
 });
 
 export default router;

@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, ReactNode 
 
 export interface Item {
   id?: number;
+  itemCode: string;
   tsCode: string;
   msCode: string;
   nama: string;
@@ -53,7 +54,8 @@ const USER_KEY = 'tel_gudang_user';
 function mapRow(row: Record<string, unknown>): Item {
   return {
     id: row.id as number,
-    tsCode: (row.tsCode ?? row.ts_code) as string,
+    itemCode: (row.itemCode ?? row.item_code) as string,
+    tsCode: ((row.tsCode ?? row.ts_code) as string) ?? '',
     msCode: ((row.msCode ?? row.ms_code) as string) ?? '',
     nama: row.nama as string,
     kategori: (row.kategori as string) ?? '',

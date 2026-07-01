@@ -12,7 +12,8 @@ export const kategoriTable = pgTable("kategori", {
 
 export const itemsTable = pgTable("items", {
   id: serial("id").primaryKey(),
-  tsCode: text("ts_code").notNull().unique(),
+  itemCode: text("item_code").notNull().unique(),
+  tsCode: text("ts_code"),
   msCode: text("ms_code"),
   nama: text("nama").notNull(),
   kategori: text("kategori").notNull().default(""),

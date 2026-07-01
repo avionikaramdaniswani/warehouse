@@ -84,7 +84,7 @@ export function RiwayatItemModal({ open, onClose, item, token }: Props) {
         <DialogHeader className="shrink-0 border-b pb-3">
           <DialogTitle className="text-base font-semibold">
             Riwayat Transaksi —{' '}
-            <span className="font-mono text-slate-600">{item?.tsCode}</span>
+            <span className="font-mono text-slate-600">{item?.itemCode}</span>
           </DialogTitle>
           <p className="text-sm text-muted-foreground truncate">{item?.nama}</p>
         </DialogHeader>

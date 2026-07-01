@@ -16,7 +16,8 @@ function computeStatus(stok: number, safetyStok: number): string {
 }
 
 const itemSchema = z.object({
-  tsCode: z.string().min(1, "TS Code tidak boleh kosong").max(50),
+  itemCode: z.string().min(1, "Item Code tidak boleh kosong").max(50),
+  tsCode: z.string().optional(),
   msCode: z.string().optional(),
   nama: z.string().min(1, "Nama barang tidak boleh kosong").max(255),
   kategori: z.string().min(1, "Kategori tidak boleh kosong"),
@@ -26,7 +27,7 @@ const itemSchema = z.object({
   safetyStok: z.number().int().min(0).default(5),
 });
 
-const updateItemSchema = itemSchema.omit({ tsCode: true }).partial();
+const updateItemSchema = itemSchema.omit({ itemCode: true }).partial();
 
 router.get("/items", authenticate, async (req, res) => {
   const pageParam = req.query.page as string | undefined;
@@ -44,6 +45,7 @@ router.get("/items", authenticate, async (req, res) => {
       conditions.push(
         or(
           ilike(itemsTable.nama, `%${search}%`),
+          ilike(itemsTable.itemCode, `%${search}%`),
           ilike(itemsTable.tsCode, `%${search}%`),
           ilike(itemsTable.msCode, `%${search}%`),
           ilike(itemsTable.binLoc, `%${search}%`),
@@ -98,14 +100,26 @@ router.post("/items", authenticate, authorize("admin", "kepala_gudang"), async (
     return;
   }
 
-  const existingTs = await db
+  const existingCode = await db
     .select()
     .from(itemsTable)
-    .where(sql`lower(${itemsTable.tsCode}) = lower(${parsed.data.tsCode})`)
+    .where(sql`lower(${itemsTable.itemCode}) = lower(${parsed.data.itemCode})`)
     .limit(1);
-  if (existingTs.length > 0) {
-    res.status(409).json({ message: "TS Code sudah terdaftar" });
+  if (existingCode.length > 0) {
+    res.status(409).json({ message: "Item Code sudah terdaftar" });
     return;
+  }
+
+  if (parsed.data.tsCode) {
+    const existingTs = await db
+      .select()
+      .from(itemsTable)
+      .where(sql`lower(${itemsTable.tsCode}) = lower(${parsed.data.tsCode})`)
+      .limit(1);
+    if (existingTs.length > 0) {
+      res.status(409).json({ message: "TS Code sudah terdaftar" });
+      return;
+    }
   }
 
   if (parsed.data.msCode) {
@@ -124,7 +138,8 @@ router.post("/items", authenticate, authorize("admin", "kepala_gudang"), async (
   const [row] = await db
     .insert(itemsTable)
     .values({
-      tsCode: parsed.data.tsCode,
+      itemCode: parsed.data.itemCode,
+      tsCode: parsed.data.tsCode ?? null,
       msCode: parsed.data.msCode ?? null,
       nama: parsed.data.nama,
       kategori: parsed.data.kategori,
@@ -136,12 +151,12 @@ router.post("/items", authenticate, authorize("admin", "kepala_gudang"), async (
     })
     .returning();
 
-  await logActivity(req.user!.userId, "CREATE_ITEM", `Tambah barang: ${row.tsCode} - ${row.nama}`, req);
+  await logActivity(req.user!.userId, "CREATE_ITEM", `Tambah barang: ${row.itemCode} - ${row.nama}`, req);
   res.status(201).json(row);
 });
 
-router.put("/items/:tsCode", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
-  const { tsCode } = req.params;
+router.put("/items/:itemCode", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
+  const { itemCode } = req.params;
 
   const parsed = updateItemSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -152,11 +167,28 @@ router.put("/items/:tsCode", authenticate, authorize("admin", "kepala_gudang"), 
   const [existing] = await db
     .select()
     .from(itemsTable)
-    .where(and(eq(itemsTable.tsCode, tsCode), eq(itemsTable.isActive, true)))
+    .where(and(eq(itemsTable.itemCode, itemCode), eq(itemsTable.isActive, true)))
     .limit(1);
   if (!existing) {
     res.status(404).json({ message: "Barang tidak ditemukan" });
     return;
+  }
+
+  if (parsed.data.tsCode) {
+    const existingTs = await db
+      .select()
+      .from(itemsTable)
+      .where(
+        and(
+          sql`lower(${itemsTable.tsCode}) = lower(${parsed.data.tsCode})`,
+          sql`lower(${itemsTable.itemCode}) != lower(${itemCode})`
+        )
+      )
+      .limit(1);
+    if (existingTs.length > 0) {
+      res.status(409).json({ message: "TS Code sudah dipakai barang lain" });
+      return;
+    }
   }
 
   if (parsed.data.msCode) {
@@ -166,7 +198,7 @@ router.put("/items/:tsCode", authenticate, authorize("admin", "kepala_gudang"), 
       .where(
         and(
           sql`lower(${itemsTable.msCode}) = lower(${parsed.data.msCode})`,
-          sql`lower(${itemsTable.tsCode}) != lower(${tsCode})`
+          sql`lower(${itemsTable.itemCode}) != lower(${itemCode})`
         )
       )
       .limit(1);
@@ -182,15 +214,15 @@ router.put("/items/:tsCode", authenticate, authorize("admin", "kepala_gudang"), 
   const [updated] = await db
     .update(itemsTable)
     .set({ ...parsed.data, status: computeStatus(newStok, newSafetyStok), updatedAt: new Date() })
-    .where(eq(itemsTable.tsCode, tsCode))
+    .where(eq(itemsTable.itemCode, itemCode))
     .returning();
 
-  await logActivity(req.user!.userId, "UPDATE_ITEM", `Edit barang: ${updated.tsCode}`, req);
+  await logActivity(req.user!.userId, "UPDATE_ITEM", `Edit barang: ${updated.itemCode}`, req);
   res.json(updated);
 });
 
-router.patch("/items/:tsCode/stok", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
-  const { tsCode } = req.params;
+router.patch("/items/:itemCode/stok", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
+  const { itemCode } = req.params;
   const parsed = z.object({ delta: z.number().int() }).safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ message: "delta harus berupa bilangan bulat" });
@@ -200,7 +232,7 @@ router.patch("/items/:tsCode/stok", authenticate, authorize("admin", "kepala_gud
   const [existing] = await db
     .select()
     .from(itemsTable)
-    .where(and(eq(itemsTable.tsCode, tsCode), eq(itemsTable.isActive, true)))
+    .where(and(eq(itemsTable.itemCode, itemCode), eq(itemsTable.isActive, true)))
     .limit(1);
   if (!existing) {
     res.status(404).json({ message: "Barang tidak ditemukan" });
@@ -216,7 +248,7 @@ router.patch("/items/:tsCode/stok", authenticate, authorize("admin", "kepala_gud
   const [updated] = await db
     .update(itemsTable)
     .set({ stok: newStok, status: computeStatus(newStok, existing.safetyStok), updatedAt: new Date() })
-    .where(eq(itemsTable.tsCode, tsCode))
+    .where(eq(itemsTable.itemCode, itemCode))
     .returning();
 
   res.json(updated);
@@ -224,7 +256,8 @@ router.patch("/items/:tsCode/stok", authenticate, authorize("admin", "kepala_gud
 
 router.post("/items/diff", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
   const rowSchema = z.object({
-    tsCode: z.string().min(1).max(50),
+    itemCode: z.string().min(1).max(50),
+    tsCode: z.string().optional(),
     msCode: z.string().optional(),
     nama: z.string().min(1).max(255),
     kategori: z.string().min(1),
@@ -242,10 +275,11 @@ router.post("/items/diff", authenticate, authorize("admin", "kepala_gudang"), as
   }
 
   const { items } = parsed.data;
-  const allTsCodes = items.map((i) => i.tsCode);
+  const allItemCodes = items.map((i) => i.itemCode);
 
   const existingRows = await db
     .select({
+      itemCode: itemsTable.itemCode,
       tsCode: itemsTable.tsCode,
       msCode: itemsTable.msCode,
       nama: itemsTable.nama,
@@ -256,18 +290,18 @@ router.post("/items/diff", authenticate, authorize("admin", "kepala_gudang"), as
       safetyStok: itemsTable.safetyStok,
     })
     .from(itemsTable)
-    .where(inArray(itemsTable.tsCode, allTsCodes));
+    .where(inArray(itemsTable.itemCode, allItemCodes));
 
-  const existingMap = new Map(existingRows.map((r) => [r.tsCode, r]));
+  const existingMap = new Map(existingRows.map((r) => [r.itemCode, r]));
 
   const FIELD_LABELS: Record<string, string> = {
     nama: "Nama", kategori: "Kategori", uom: "UOM",
-    stok: "Stok", safetyStok: "Safety Stok", msCode: "MS Code", binLoc: "BIN LOC",
+    stok: "Stok", safetyStok: "Safety Stok", tsCode: "TS Code", msCode: "MS Code", binLoc: "BIN LOC",
   };
 
   const result = items.map((item) => {
-    const existing = existingMap.get(item.tsCode);
-    if (!existing) return { tsCode: item.tsCode, status: "new" as const, changedFields: [] };
+    const existing = existingMap.get(item.itemCode);
+    if (!existing) return { itemCode: item.itemCode, status: "new" as const, changedFields: [] };
 
     const changedFields: string[] = [];
     if (item.nama !== existing.nama) changedFields.push(FIELD_LABELS.nama);
@@ -275,11 +309,12 @@ router.post("/items/diff", authenticate, authorize("admin", "kepala_gudang"), as
     if (item.uom !== existing.uom) changedFields.push(FIELD_LABELS.uom);
     if (item.stok !== existing.stok) changedFields.push(FIELD_LABELS.stok);
     if (item.safetyStok !== existing.safetyStok) changedFields.push(FIELD_LABELS.safetyStok);
+    if (item.tsCode != null && item.tsCode !== (existing.tsCode ?? "")) changedFields.push(FIELD_LABELS.tsCode);
     if (item.msCode != null && item.msCode !== (existing.msCode ?? "")) changedFields.push(FIELD_LABELS.msCode);
     if (item.binLoc != null && item.binLoc !== (existing.binLoc ?? "")) changedFields.push(FIELD_LABELS.binLoc);
 
     return {
-      tsCode: item.tsCode,
+      itemCode: item.itemCode,
       status: changedFields.length > 0 ? ("updated" as const) : ("unchanged" as const),
       changedFields,
     };
@@ -290,7 +325,8 @@ router.post("/items/diff", authenticate, authorize("admin", "kepala_gudang"), as
 
 router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
   const rowSchema = z.object({
-    tsCode: z.string().min(1).max(50),
+    itemCode: z.string().min(1).max(50),
+    tsCode: z.string().optional(),
     msCode: z.string().optional(),
     nama: z.string().min(1).max(255),
     kategori: z.string().min(1),
@@ -308,12 +344,13 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
   }
 
   const { items } = parsed.data;
-  const errors: { tsCode: string; reason: string }[] = [];
+  const errors: { itemCode: string; reason: string }[] = [];
 
   // 1. Ambil semua field item yang sudah ada di DB untuk perbandingan lengkap
-  const allTsCodes = items.map((i) => i.tsCode);
+  const allItemCodes = items.map((i) => i.itemCode);
   const existingRows = await db
     .select({
+      itemCode: itemsTable.itemCode,
       tsCode: itemsTable.tsCode,
       msCode: itemsTable.msCode,
       nama: itemsTable.nama,
@@ -324,12 +361,12 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
       safetyStok: itemsTable.safetyStok,
     })
     .from(itemsTable)
-    .where(inArray(itemsTable.tsCode, allTsCodes));
-  const existingMap = new Map(existingRows.map((r) => [r.tsCode, r]));
+    .where(inArray(itemsTable.itemCode, allItemCodes));
+  const existingMap = new Map(existingRows.map((r) => [r.itemCode, r]));
 
   // 2. Pisahkan item baru vs yang sudah ada
-  const newItems = items.filter((i) => !existingMap.has(i.tsCode));
-  const existingItems = items.filter((i) => existingMap.has(i.tsCode));
+  const newItems = items.filter((i) => !existingMap.has(i.itemCode));
+  const existingItems = items.filter((i) => existingMap.has(i.itemCode));
 
   // 3. Smart diff: hanya update jika ada field yang benar-benar berubah
   //    Field optional kosong di Excel → pertahankan nilai di DB (tidak dianggap perubahan)
@@ -340,12 +377,13 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
       incoming.uom !== existing.uom ||
       incoming.stok !== existing.stok ||
       incoming.safetyStok !== existing.safetyStok ||
+      (incoming.tsCode != null && incoming.tsCode !== (existing.tsCode ?? "")) ||
       (incoming.msCode != null && incoming.msCode !== (existing.msCode ?? "")) ||
       (incoming.binLoc != null && incoming.binLoc !== (existing.binLoc ?? ""))
     );
   }
 
-  const itemsToUpdate = existingItems.filter((i) => hasChanged(i, existingMap.get(i.tsCode)!));
+  const itemsToUpdate = existingItems.filter((i) => hasChanged(i, existingMap.get(i.itemCode)!));
   const unchanged = existingItems.length - itemsToUpdate.length;
 
   const CHUNK = 200;
@@ -358,7 +396,8 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
     try {
       await db.insert(itemsTable).values(
         chunk.map((item) => ({
-          tsCode: item.tsCode,
+          itemCode: item.itemCode,
+          tsCode: item.tsCode ?? null,
           msCode: item.msCode ?? null,
           nama: item.nama,
           kategori: item.kategori,
@@ -371,7 +410,7 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
       );
       inserted += chunk.length;
     } catch {
-      chunk.forEach((item) => errors.push({ tsCode: item.tsCode, reason: "Gagal disimpan" }));
+      chunk.forEach((item) => errors.push({ itemCode: item.itemCode, reason: "Gagal disimpan" }));
     }
   }
 
@@ -388,13 +427,14 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
           safetyStok: item.safetyStok,
           status: computeStatus(item.stok, item.safetyStok),
           updatedAt: new Date(),
+          ...(item.tsCode ? { tsCode: item.tsCode } : {}),
           ...(item.msCode ? { msCode: item.msCode } : {}),
           ...(item.binLoc ? { binLoc: item.binLoc } : {}),
         })
-        .where(eq(itemsTable.tsCode, item.tsCode));
+        .where(eq(itemsTable.itemCode, item.itemCode));
       updated++;
     } catch {
-      errors.push({ tsCode: item.tsCode, reason: "Gagal diupdate" });
+      errors.push({ itemCode: item.itemCode, reason: "Gagal diupdate" });
     }
   }
 
@@ -410,13 +450,13 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
   res.json({ inserted, updated, unchanged, errors });
 });
 
-router.delete("/items/:tsCode", authenticate, authorize("admin"), async (req, res) => {
-  const { tsCode } = req.params;
+router.delete("/items/:itemCode", authenticate, authorize("admin"), async (req, res) => {
+  const { itemCode } = req.params;
 
   const [existing] = await db
     .select()
     .from(itemsTable)
-    .where(and(eq(itemsTable.tsCode, tsCode), eq(itemsTable.isActive, true)))
+    .where(and(eq(itemsTable.itemCode, itemCode), eq(itemsTable.isActive, true)))
     .limit(1);
   if (!existing) {
     res.status(404).json({ message: "Barang tidak ditemukan" });
@@ -426,9 +466,9 @@ router.delete("/items/:tsCode", authenticate, authorize("admin"), async (req, re
   await db
     .update(itemsTable)
     .set({ isActive: false, updatedAt: new Date() })
-    .where(eq(itemsTable.tsCode, tsCode));
+    .where(eq(itemsTable.itemCode, itemCode));
 
-  await logActivity(req.user!.userId, "DELETE_ITEM", `Hapus barang: ${existing.tsCode} - ${existing.nama}`, req);
+  await logActivity(req.user!.userId, "DELETE_ITEM", `Hapus barang: ${existing.itemCode} - ${existing.nama}`, req);
   res.json({ message: "Barang berhasil dihapus" });
 });
 

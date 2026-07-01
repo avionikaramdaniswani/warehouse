@@ -27,7 +27,8 @@ interface TransaksiKeluar {
   tanggal: string;
   keterangan: string | null;
   createdAt: string;
-  tsCode: string;
+  itemCode: string;
+  tsCode: string | null;
   namaBarang: string;
   petugas: string;
 }
@@ -109,7 +110,8 @@ export default function BarangKeluar() {
       const q = searchItem.toLowerCase();
       return (
         item.nama.toLowerCase().includes(q) ||
-        item.tsCode.toLowerCase().includes(q) ||
+        item.itemCode.toLowerCase().includes(q) ||
+        (item.tsCode ?? '').toLowerCase().includes(q) ||
         (item.binLoc ?? '').toLowerCase().includes(q) ||
         item.kategori.toLowerCase().includes(q)
       );
@@ -153,10 +155,10 @@ export default function BarangKeluar() {
           setBinSelectOpen(true);
           return;
         }
-      } catch { /* tidak valid sebagai URL — lanjut ke pencarian TS Code */ }
+      } catch { /* tidak valid sebagai URL — lanjut ke pencarian Item Code */ }
     }
-    // Fallback: cari berdasarkan TS Code
-    const found = items.find((i) => i.tsCode === scanned);
+    // Fallback: cari berdasarkan Item Code
+    const found = items.find((i) => i.itemCode === scanned);
     if (!found) {
       toast.error(`Barang dengan kode "${scanned}" tidak ditemukan`);
       return;
@@ -191,7 +193,7 @@ export default function BarangKeluar() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          tsCode: selectedItem.tsCode,
+          itemCode: selectedItem.itemCode,
           jumlah: jumlahInt,
           keperluan: formData.keperluan,
           tujuan: formData.tujuan || undefined,
@@ -206,7 +208,7 @@ export default function BarangKeluar() {
       }
       const result = await res.json();
       setItems(items.map((item) =>
-        item.tsCode === selectedItem.tsCode
+        item.itemCode === selectedItem.itemCode
           ? { ...item, stok: result.stokBaru, status: result.status ?? item.status }
           : item
       ));
@@ -227,7 +229,7 @@ export default function BarangKeluar() {
     const matchSearch =
       search.length === 0 ||
       trx.namaBarang.toLowerCase().includes(search.toLowerCase()) ||
-      trx.tsCode.toLowerCase().includes(search.toLowerCase()) ||
+      trx.itemCode.toLowerCase().includes(search.toLowerCase()) ||
       (trx.tujuan ?? '').toLowerCase().includes(search.toLowerCase()) ||
       trx.nomor.toLowerCase().includes(search.toLowerCase());
     const matchKeperluan = filterKeperluan === 'Semua' || trx.keperluan === filterKeperluan;
@@ -315,7 +317,7 @@ export default function BarangKeluar() {
                 <TableRow className="bg-slate-50 border-b border-slate-100">
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-32">Nomor</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-36">Waktu</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">TS Code</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">Item Code</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500">Nama Barang</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 text-right w-24">Jumlah</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-36">Tujuan</TableHead>
@@ -337,7 +339,7 @@ export default function BarangKeluar() {
                     <TableRow key={trx.id} className="hover:bg-slate-50 transition-colors border-b border-slate-50">
                       <TableCell className="font-mono text-xs text-slate-500">{trx.nomor}</TableCell>
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">{formatWaktu(trx.createdAt)}</TableCell>
-                      <TableCell className="font-mono text-sm text-slate-600">{trx.tsCode}</TableCell>
+                      <TableCell className="font-mono text-sm text-slate-600">{trx.itemCode}</TableCell>
                       <TableCell className="font-medium text-sm text-slate-800">{trx.namaBarang}</TableCell>
                       <TableCell className="text-right">
                         <span className="font-bold text-primary bg-primary/5 border border-primary/20 px-2 py-0.5 rounded text-sm font-mono">-{trx.jumlah}</span>
@@ -383,7 +385,7 @@ export default function BarangKeluar() {
                 <div className="relative">
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Nama barang atau TS Code..."
+                    placeholder="Nama barang atau Item Code..."
                     className="pl-9"
                     value={searchItem}
                     onChange={(e) => { setSearchItem(e.target.value); setShowSuggestions(true); }}
@@ -394,14 +396,14 @@ export default function BarangKeluar() {
                   {showSuggestions && suggestions.length > 0 && (
                     <div className="absolute z-20 w-full mt-1 bg-white border rounded-lg shadow-xl overflow-hidden">
                       {suggestions.map((item) => (
-                        <button key={item.tsCode}
+                        <button key={item.itemCode}
                           disabled={item.stok === 0}
                           className={`w-full px-4 py-2.5 flex justify-between items-center border-b last:border-0 text-left transition-colors
                             ${item.stok === 0 ? 'opacity-50 cursor-not-allowed bg-slate-50' : 'hover:bg-slate-50'}`}
                           onMouseDown={() => item.stok > 0 && handleSelectItem(item)}>
                           <div>
                             <p className="font-medium text-sm">{item.nama}</p>
-                            <p className="text-xs font-mono text-slate-400">{item.tsCode} · {item.kategori}</p>
+                            <p className="text-xs font-mono text-slate-400">{item.itemCode} · {item.kategori}</p>
                           </div>
                           <span className={`text-xs px-2 py-0.5 rounded font-semibold shrink-0 ml-3 ${item.stok === 0 ? 'bg-red-50 text-red-600' : 'bg-slate-100'}`}>
                             Stok: {item.stok}
@@ -416,7 +418,7 @@ export default function BarangKeluar() {
                   <div className="min-w-0">
                     <p className="font-semibold text-sm text-slate-800 break-words">{selectedItem.nama}</p>
                     <p className="text-xs font-mono text-slate-500 mt-0.5 break-all">
-                      {selectedItem.tsCode} · Stok tersedia: <strong className="text-primary">{selectedItem.stok}</strong> {selectedItem.uom}
+                      {selectedItem.itemCode} · Stok tersedia: <strong className="text-primary">{selectedItem.stok}</strong> {selectedItem.uom}
                     </p>
                   </div>
                   <button className="text-xs text-slate-400 hover:text-red-500 shrink-0 transition-colors pt-0.5" onClick={() => setSelectedItem(null)}>Ganti</button>

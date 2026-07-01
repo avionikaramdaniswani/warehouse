@@ -8,7 +8,8 @@ import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle2, X, Loader
 
 interface ParsedRow {
   rowNum: number;
-  tsCode: string;
+  itemCode: string;
+  tsCode?: string;
   msCode?: string;
   nama: string;
   kategori: string;
@@ -22,7 +23,7 @@ interface ParsedRow {
 type DiffStatus = 'new' | 'updated' | 'unchanged';
 
 interface DiffEntry {
-  tsCode: string;
+  itemCode: string;
   status: DiffStatus;
   changedFields: string[];
 }
@@ -35,7 +36,8 @@ interface Props {
 }
 
 const COL_ALIASES: Record<string, string[]> = {
-  tsCode:     ['ts code', 'ts-code', 'tscode', 'kode ts', 'kode'],
+  itemCode:   ['item code', 'item-code', 'itemcode', 'kode item', 'kode barang', 'kode'],
+  tsCode:     ['ts code', 'ts-code', 'tscode', 'kode ts'],
   msCode:     ['ms code', 'ms-code', 'mscode', 'ms no', 'material no', 'material number', 'material'],
   nama:       ['nama barang', 'item', 'description', 'deskripsi', 'nama material', 'nama item', 'nama', 'item name', 'uraian', 'keterangan barang'],
   kategori:   ['kategori', 'category', 'grup', 'group', 'kat', 'material group'],
@@ -45,7 +47,7 @@ const COL_ALIASES: Record<string, string[]> = {
   safetyStok: ['safety stok', 'safety stock', 'safety', 'min stok', 'minimum stock', 'min stock', 'min qty'],
 };
 
-const ALL_COLS = ['TS Code', 'MS Code', 'Nama Barang', 'Kategori', 'Bin Loc', 'UOM', 'Stok', 'Safety Stok'];
+const ALL_COLS = ['Item Code', 'TS Code', 'MS Code', 'Nama Barang', 'Kategori', 'Bin Loc', 'UOM', 'Stok', 'Safety Stok'];
 
 const KATEGORI_NORMALIZE: Record<string, string> = {
   'civil': 'Civil',
@@ -127,13 +129,14 @@ function parseRows(sheet: XLSX.WorkSheet): { rows: ParsedRow[]; detectedHeaders:
     if (!row || row.every((c) => c == null || String(c).trim() === '')) continue;
 
     const errors: string[] = [];
-    const tsCode   = getStr(row, 'tsCode');
+    const itemCode = getStr(row, 'itemCode');
+    const tsRaw    = getStr(row, 'tsCode');
     const nama     = getStr(row, 'nama');
     const kategori = normalizeKategori(getStr(row, 'kategori'));
     const stok     = getNum(row, 'stok', 0);
     const safetyStok = getNum(row, 'safetyStok', 5);
 
-    if (!tsCode)   errors.push('TS Code kosong');
+    if (!itemCode) errors.push('Item Code kosong');
     if (!nama)     errors.push('Nama Barang kosong');
     if (!kategori) errors.push('Kategori kosong');
     if (isNaN(stok))      errors.push('Stok harus angka');
@@ -143,7 +146,8 @@ function parseRows(sheet: XLSX.WorkSheet): { rows: ParsedRow[]; detectedHeaders:
 
     rows.push({
       rowNum: i + 1,
-      tsCode,
+      itemCode,
+      tsCode: tsRaw || undefined,
       msCode: msRaw || undefined,
       nama,
       kategori,
@@ -160,10 +164,10 @@ function parseRows(sheet: XLSX.WorkSheet): { rows: ParsedRow[]; detectedHeaders:
 function downloadTemplate() {
   const ws = XLSX.utils.aoa_to_sheet([
     ALL_COLS,
-    ['10001', '123456', 'Baut M10 x 30mm', 'Mechanical Material', 'A-01-01', 'PCS', 100, 20],
-    ['10002', '123457', 'Oli Mesin SAE 40', 'Consumables', 'B-02-03', 'LTR', 50, 10],
+    ['ITM-10001', '10001', '123456', 'Baut M10 x 30mm', 'Mechanical Material', 'A-01-01', 'PCS', 100, 20],
+    ['ITM-10002', '10002', '123457', 'Oli Mesin SAE 40', 'Consumables', 'B-02-03', 'LTR', 50, 10],
   ]);
-  ws['!cols'] = ALL_COLS.map((_, i) => ({ wch: i === 2 ? 35 : 16 }));
+  ws['!cols'] = ALL_COLS.map((_, i) => ({ wch: i === 3 ? 35 : 16 }));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Template');
   XLSX.writeFile(wb, 'template_import_barang.xlsx');
@@ -174,7 +178,7 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
   const [fileName, setFileName] = useState('');
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
-  const [result, setResult] = useState<{ inserted: number; updated: number; unchanged: number; errors: { tsCode: string; reason: string }[] } | null>(null);
+  const [result, setResult] = useState<{ inserted: number; updated: number; unchanged: number; errors: { itemCode: string; reason: string }[] } | null>(null);
   const [diffMap, setDiffMap] = useState<Map<string, DiffEntry>>(new Map());
   const [diffLoading, setDiffLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -192,7 +196,7 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
         items: validRows.map((r) => ({
-          tsCode: r.tsCode, msCode: r.msCode, nama: r.nama,
+          itemCode: r.itemCode, tsCode: r.tsCode, msCode: r.msCode, nama: r.nama,
           kategori: r.kategori, binLoc: r.binLoc, uom: r.uom,
           stok: r.stok, safetyStok: r.safetyStok,
         })),
@@ -202,7 +206,7 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
       .then((data) => {
         if (cancelled || !data) return;
         const map = new Map<string, DiffEntry>();
-        for (const entry of data.diff as DiffEntry[]) map.set(entry.tsCode, entry);
+        for (const entry of data.diff as DiffEntry[]) map.set(entry.itemCode, entry);
         setDiffMap(map);
       })
       .catch(() => {})
@@ -270,7 +274,7 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           items: validRows.map((r) => ({
-            tsCode: r.tsCode, msCode: r.msCode, nama: r.nama,
+            itemCode: r.itemCode, tsCode: r.tsCode, msCode: r.msCode, nama: r.nama,
             kategori: r.kategori, binLoc: r.binLoc, uom: r.uom,
             stok: r.stok, safetyStok: r.safetyStok,
           })),
@@ -291,19 +295,19 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
   const diffCounts = { new: 0, updated: 0, unchanged: 0 };
   if (diffMap.size > 0) {
     for (const r of validRows) {
-      const d = diffMap.get(r.tsCode);
+      const d = diffMap.get(r.itemCode);
       if (d) diffCounts[d.status]++;
     }
   }
 
-  const DiffBadge = ({ tsCode, hasError }: { tsCode: string; hasError: boolean }) => {
+  const DiffBadge = ({ itemCode, hasError }: { itemCode: string; hasError: boolean }) => {
     if (hasError) return (
       <span className="text-red-600 font-medium flex items-center gap-1">
         <AlertCircle className="w-3 h-3 shrink-0" />Error
       </span>
     );
     if (diffLoading) return <span className="text-slate-400 text-xs">...</span>;
-    const d = diffMap.get(tsCode);
+    const d = diffMap.get(itemCode);
     if (!d) return <span className="text-slate-400 text-xs">—</span>;
     if (d.status === 'new') return (
       <span className="inline-flex items-center gap-1 rounded-full bg-green-100 text-green-700 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
@@ -427,6 +431,7 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
                   <thead className="bg-slate-100 sticky top-0">
                     <tr>
                       <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap">#</th>
+                      <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap">Item Code</th>
                       <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap">TS Code</th>
                       <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap min-w-[180px]">Nama Barang</th>
                       <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap">Kategori</th>
@@ -440,10 +445,10 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
                   <tbody className="divide-y">
                     {rows.filter((r) => {
                       if (diffMap.size === 0 || diffLoading) return true;
-                      const d = diffMap.get(r.tsCode);
+                      const d = diffMap.get(r.itemCode);
                       return r.errors.length > 0 || !d || d.status !== 'unchanged';
                     }).map((r) => {
-                      const diff = diffMap.get(r.tsCode);
+                      const diff = diffMap.get(r.itemCode);
                       const rowBg = r.errors.length > 0
                         ? 'bg-red-50'
                         : diff?.status === 'new' ? 'bg-green-50/40'
@@ -452,7 +457,8 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
                       return (
                         <tr key={r.rowNum} className={rowBg}>
                           <td className="px-2 py-1.5 text-muted-foreground">{r.rowNum}</td>
-                          <td className="px-2 py-1.5 font-mono font-medium">{r.tsCode || <span className="text-red-500 italic">kosong</span>}</td>
+                          <td className="px-2 py-1.5 font-mono font-medium">{r.itemCode || <span className="text-red-500 italic">kosong</span>}</td>
+                          <td className="px-2 py-1.5 font-mono">{r.tsCode ?? '—'}</td>
                           <td className="px-2 py-1.5 max-w-[220px] truncate">{r.nama || <span className="text-red-500 italic">kosong</span>}</td>
                           <td className="px-2 py-1.5 whitespace-nowrap">{r.kategori || <span className="text-red-500 italic">kosong</span>}</td>
                           <td className="px-2 py-1.5 whitespace-nowrap font-mono">{r.binLoc ?? '—'}</td>
@@ -460,7 +466,7 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
                           <td className={`px-2 py-1.5 text-right ${diff?.changedFields.includes('Stok') ? 'text-blue-700 font-semibold' : ''}`}>{r.stok}</td>
                           <td className={`px-2 py-1.5 text-right ${diff?.changedFields.includes('Safety Stok') ? 'text-blue-700 font-semibold' : ''}`}>{r.safetyStok}</td>
                           <td className="px-2 py-1.5">
-                            <DiffBadge tsCode={r.tsCode} hasError={r.errors.length > 0} />
+                            <DiffBadge itemCode={r.itemCode} hasError={r.errors.length > 0} />
                             {r.errors.length > 0 && (
                               <span className="block text-red-500 text-xs mt-0.5">{r.errors[0]}</span>
                             )}

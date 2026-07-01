@@ -49,7 +49,8 @@ interface KategoriOption { id: number; nama: string; }
 function mapRow(row: Record<string, unknown>): Item {
   return {
     id: row.id as number,
-    tsCode: (row.tsCode ?? row.ts_code) as string,
+    itemCode: (row.itemCode ?? row.item_code) as string,
+    tsCode: ((row.tsCode ?? row.ts_code) as string) ?? '',
     msCode: ((row.msCode ?? row.ms_code) as string) ?? '',
     nama: row.nama as string,
     kategori: (row.kategori as string) ?? '',
@@ -129,8 +130,8 @@ export default function MasterBarang() {
 
   const selectedBinLocs = useMemo(() => {
     const bins = new Set<string>();
-    for (const tsCode of selectedForPrint) {
-      const item = pageItems.find((i) => i.tsCode === tsCode);
+    for (const itemCode of selectedForPrint) {
+      const item = pageItems.find((i) => i.itemCode === itemCode);
       if (item?.binLoc) bins.add(item.binLoc);
     }
     return bins;
@@ -190,20 +191,20 @@ export default function MasterBarang() {
   };
 
   const allPageSelected =
-    pageItems.length > 0 && pageItems.every((i) => selectedForPrint.has(i.tsCode));
+    pageItems.length > 0 && pageItems.every((i) => selectedForPrint.has(i.itemCode));
 
-  const toggleSelect = (tsCode: string) =>
+  const toggleSelect = (itemCode: string) =>
     setSelectedForPrint((prev) => {
       const next = new Set(prev);
-      next.has(tsCode) ? next.delete(tsCode) : next.add(tsCode);
+      next.has(itemCode) ? next.delete(itemCode) : next.add(itemCode);
       return next;
     });
 
   const toggleSelectAll = () =>
     setSelectedForPrint((prev) => {
       const next = new Set(prev);
-      if (allPageSelected) pageItems.forEach((i) => next.delete(i.tsCode));
-      else pageItems.forEach((i) => next.add(i.tsCode));
+      if (allPageSelected) pageItems.forEach((i) => next.delete(i.itemCode));
+      else pageItems.forEach((i) => next.add(i.itemCode));
       return next;
     });
 
@@ -225,19 +226,19 @@ export default function MasterBarang() {
 
   const handleBatchPrint = async () => {
     // Use full items list — not pageItems — so selections from other pages/filters are included
-    const selected = items.filter((i) => selectedForPrint.has(i.tsCode));
+    const selected = items.filter((i) => selectedForPrint.has(i.itemCode));
     if (selected.length === 0) return;
     const logoDataUri = await fetchLogoBase64();
     const logoTag = logoDataUri ? `<img src="${logoDataUri}" class="logo" alt="TEL">` : '';
     const labelHtmls = selected.map((item) => {
       const nama = item.nama.length > 80 ? item.nama.slice(0, 80) + '…' : item.nama;
-      const safeId = item.tsCode.replace(/[^a-zA-Z0-9]/g, '_');
+      const safeId = item.itemCode.replace(/[^a-zA-Z0-9]/g, '_');
       return `<div class="label">
   <div class="hdr">${logoTag}<div class="hdr-text"><div class="co">PT TANJUNGENIM LESTARI PULP &amp; PAPER</div><div class="sub">TOWNSITE WAREHOUSE — MATERIALS MANAGEMENT</div></div></div>
   <div class="body">
-    <div class="qr" id="qr-${safeId}" data-qr="${item.tsCode}"></div>
+    <div class="qr" id="qr-${safeId}" data-qr="${item.itemCode}"></div>
     <div class="info">
-      <div class="ts">${item.tsCode}</div>
+      <div class="ts">${item.itemCode}</div>
       <div class="nama">${nama}</div>
       <div class="divider"></div>
       <div class="row"><span class="lbl">MS Code</span><span class="val">${item.msCode || '—'}</span></div>
@@ -285,8 +286,8 @@ window.onload=function(){
   const handleBinPrint = async () => {
     // Collect unique BIN LOCs from selected items
     const uniqueBins = new Set<string>();
-    for (const tsCode of selectedForPrint) {
-      const item = pageItems.find((i) => i.tsCode === tsCode) ?? items.find((i) => i.tsCode === tsCode);
+    for (const itemCode of selectedForPrint) {
+      const item = pageItems.find((i) => i.itemCode === itemCode) ?? items.find((i) => i.itemCode === itemCode);
       if (item?.binLoc) uniqueBins.add(item.binLoc);
     }
 
@@ -307,7 +308,7 @@ window.onload=function(){
       const safeId = binLoc.replace(/[^a-zA-Z0-9]/g, '_');
       const binUrl = `${window.location.origin}/bin/${encodeURIComponent(binLoc)}`;
       const itemRows = binItems.slice(0, 16).map(i =>
-        `<div class="item-row"><span class="item-ts">${i.tsCode}</span><span class="item-ms">${i.msCode || '—'}</span></div>`
+        `<div class="item-row"><span class="item-ts">${i.itemCode}</span><span class="item-ms">${i.msCode || '—'}</span></div>`
       ).join('');
       const more = binItems.length > 16 ? `<div class="item-more">+${binItems.length - 16} lainnya</div>` : '';
       return `<div class="label">
@@ -362,12 +363,12 @@ window.onload=function(){
   };
 
   const handleSaveEdit = async (data: Partial<Item>) => {
-    if (!data.tsCode) return;
-    const res = await fetch(`/api/items/${data.tsCode}`, {
+    if (!data.itemCode) return;
+    const res = await fetch(`/api/items/${data.itemCode}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
-        msCode: data.msCode, nama: data.nama, kategori: data.kategori,
+        tsCode: data.tsCode, msCode: data.msCode, nama: data.nama, kategori: data.kategori,
         binLoc: data.binLoc, uom: data.uom, stok: data.stok, safetyStok: data.safetyStok,
       }),
     });
@@ -383,15 +384,15 @@ window.onload=function(){
   };
 
   const handleSaveAdd = async (data: Partial<Item>) => {
-    if (!data.tsCode || !data.nama) {
-      toast.error('TS Code dan Nama Barang wajib diisi');
+    if (!data.itemCode || !data.nama) {
+      toast.error('Item Code dan Nama Barang wajib diisi');
       return;
     }
     const res = await fetch('/api/items', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
-        tsCode: data.tsCode, msCode: data.msCode, nama: data.nama, kategori: data.kategori,
+        itemCode: data.itemCode, tsCode: data.tsCode, msCode: data.msCode, nama: data.nama, kategori: data.kategori,
         binLoc: data.binLoc, uom: data.uom ?? 'EA', stok: data.stok ?? 0, safetyStok: data.safetyStok ?? 5,
       }),
     });
@@ -415,7 +416,7 @@ window.onload=function(){
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      const res = await fetch(`/api/items/${deleteTarget.tsCode}`, {
+      const res = await fetch(`/api/items/${deleteTarget.itemCode}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -440,9 +441,9 @@ window.onload=function(){
     const codes = Array.from(selectedForPrint);
     setBulkDeleting(true);
     let failed = 0;
-    for (const tsCode of codes) {
+    for (const itemCode of codes) {
       try {
-        const res = await fetch(`/api/items/${tsCode}`, {
+        const res = await fetch(`/api/items/${itemCode}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -470,9 +471,9 @@ window.onload=function(){
     <Layout title="Daftar Barang">
       {/* Hidden QR codes for batch print */}
       <div className="sr-only" aria-hidden>
-        {Array.from(selectedForPrint).map((tsCode) => (
-          <div key={tsCode} id={`qr-batch-${tsCode}`}>
-            <QRCodeSVG value={tsCode} size={160} />
+        {Array.from(selectedForPrint).map((itemCode) => (
+          <div key={itemCode} id={`qr-batch-${itemCode}`}>
+            <QRCodeSVG value={itemCode} size={160} />
           </div>
         ))}
         {Array.from(selectedBinLocs).map((binLoc) => (
@@ -592,9 +593,10 @@ window.onload=function(){
                       {isSelectMode && (
                         <Checkbox checked={allPageSelected} onCheckedChange={toggleSelectAll} aria-label="Pilih semua" />
                       )}
-                      TS Code
+                      Item Code
                     </div>
                   </TableHead>
+                  <TableHead className="min-w-[100px]">TS Code</TableHead>
                   <TableHead className="min-w-[110px]">MS Code</TableHead>
                   <TableHead className="min-w-[220px]">Nama Barang</TableHead>
                   <TableHead className="min-w-[130px]">Kategori</TableHead>
@@ -610,12 +612,12 @@ window.onload=function(){
                 {isLoading ? (
                   Array.from({ length: 8 }).map((_, i) => (
                     <TableRow key={i}>
-                      {Array.from({ length: 10 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}
+                      {Array.from({ length: 11 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}
                     </TableRow>
                   ))
                 ) : pageItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="h-64 text-center">
+                    <TableCell colSpan={11} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground">
                         <FileX className="h-12 w-12 mb-2 text-slate-300" />
                         <p className="text-lg font-medium text-slate-500">Tidak ada data ditemukan</p>
@@ -624,18 +626,19 @@ window.onload=function(){
                     </TableCell>
                   </TableRow>
                 ) : pageItems.map((item) => (
-                  <TableRow key={item.tsCode} className={rowBg(item)}>
+                  <TableRow key={item.itemCode} className={rowBg(item)}>
                     <TableCell className={`sticky left-0 z-10 font-mono font-medium text-slate-600 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.10)] ${stickyBg(item)}`}>
                       <div className="flex items-center gap-2 whitespace-nowrap">
                         {isSelectMode && (
                           <Checkbox
-                            checked={selectedForPrint.has(item.tsCode)}
-                            onCheckedChange={() => toggleSelect(item.tsCode)}
+                            checked={selectedForPrint.has(item.itemCode)}
+                            onCheckedChange={() => toggleSelect(item.itemCode)}
                           />
                         )}
-                        {item.tsCode}
+                        {item.itemCode}
                       </div>
                     </TableCell>
+                    <TableCell className="font-mono text-sm text-slate-500">{item.tsCode || <span className="text-slate-300">—</span>}</TableCell>
                     <TableCell className="font-mono text-sm text-slate-500">{item.msCode || <span className="text-slate-300">—</span>}</TableCell>
                     <TableCell className="font-semibold text-slate-800 max-w-[260px]">
                       <span className="block truncate" title={item.nama}>{item.nama}</span>

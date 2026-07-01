@@ -18,7 +18,7 @@ interface Props {
 }
 
 const emptyForm = (): Partial<Item> => ({
-  tsCode: '', msCode: '', nama: '', kategori: '' as any,
+  itemCode: '', tsCode: '', msCode: '', nama: '', kategori: '' as any,
   binLoc: '', uom: 'EA', stok: 0, safetyStok: 5, status: 'Normal',
 });
 
@@ -54,18 +54,26 @@ export function ItemFormModal({ mode, open, onClose, onSave, initialData, katego
           <DialogTitle>{mode === 'edit' ? 'Edit Data Barang' : 'Tambah Barang Baru'}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="itemCode">Item Code <span className="text-red-500">*</span></Label>
+            <Input
+              id="itemCode"
+              value={form.itemCode || ''}
+              onChange={(e) => set({ itemCode: e.target.value })}
+              disabled={mode === 'edit'}
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="tsCode">TS Code <span className="text-red-500">*</span></Label>
+              <Label htmlFor="tsCode">TS Code</Label>
               <Input
                 id="tsCode"
                 value={form.tsCode || ''}
                 onChange={(e) => set({ tsCode: e.target.value })}
-                disabled={mode === 'edit'}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="msCode">MS Code <span className="text-red-500">*</span></Label>
+              <Label htmlFor="msCode">MS Code</Label>
               <Input
                 id="msCode"
                 value={form.msCode || ''}

@@ -53,7 +53,8 @@ export default function LaporanBarang() {
     const q = search.toLowerCase();
     const matchSearch = !q ||
       item.nama.toLowerCase().includes(q) ||
-      item.tsCode.toLowerCase().includes(q) ||
+      item.itemCode.toLowerCase().includes(q) ||
+      (item.tsCode ?? '').toLowerCase().includes(q) ||
       (item.msCode ?? '').toLowerCase().includes(q) ||
       (item.binLoc ?? '').toLowerCase().includes(q) ||
       item.kategori.toLowerCase().includes(q);
@@ -83,7 +84,8 @@ export default function LaporanBarang() {
     if (filtered.length === 0) { toast.error('Tidak ada data untuk diekspor'); return; }
     const rows = filtered.map((item, idx) => ({
       'No': idx + 1,
-      'TS Code': item.tsCode,
+      'Item Code': item.itemCode,
+      'TS Code': item.tsCode ?? '',
       'MS Code': item.msCode ?? '',
       'Nama Barang': item.nama,
       'Kategori': item.kategori,
@@ -96,7 +98,7 @@ export default function LaporanBarang() {
     const tanggal = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'2-digit', year:'numeric' }).replace(/\//g, '-');
     exportStyledExcel({
       rows,
-      colWidths: [4, 10, 12, 55, 20, 12, 8, 8, 12, 10],
+      colWidths: [4, 12, 10, 12, 55, 20, 12, 8, 8, 12, 10],
       sheetName: 'Laporan Barang',
       fileName: `Laporan_Barang_${tanggal}.xlsx`,
     });
@@ -171,7 +173,7 @@ export default function LaporanBarang() {
           <div className="flex gap-2 items-center flex-1 min-w-0">
             <div className="relative flex-1 min-w-0">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Cari TS Code, nama, BIN LOC, kategori..." className="pl-9 bg-white" value={search} onChange={e => setSearch(e.target.value)} />
+              <Input placeholder="Cari Item Code, nama, BIN LOC, kategori..." className="pl-9 bg-white" value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <Button variant="outline" size="icon" onClick={handleExportExcel} className="sm:hidden shrink-0 h-9 w-9 text-green-700 border-green-200 hover:bg-green-50" title="Export Excel">
               <FileDown className="h-4 w-4" />
@@ -221,7 +223,8 @@ export default function LaporanBarang() {
               <TableHeader className="bg-slate-50">
                 <TableRow>
                   <TableHead className="w-8 text-center text-xs">#</TableHead>
-                  <TableHead className="whitespace-nowrap">TS Code</TableHead>
+                  <TableHead className="whitespace-nowrap">Item Code</TableHead>
+                  <TableHead>TS Code</TableHead>
                   <TableHead>MS Code</TableHead>
                   <TableHead className="min-w-[260px]">Nama Barang</TableHead>
                   <TableHead>Kategori</TableHead>
@@ -234,10 +237,10 @@ export default function LaporanBarang() {
               </TableHeader>
               <TableBody>
                 {isLoading ? Array.from({length:6}).map((_,i) => (
-                  <TableRow key={i}>{Array.from({length:10}).map((_,j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}</TableRow>
+                  <TableRow key={i}>{Array.from({length:11}).map((_,j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}</TableRow>
                 )) : pageItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="h-48 text-center">
+                    <TableCell colSpan={11} className="h-48 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground gap-2">
                         <FileX className="h-10 w-10 text-slate-300" />
                         <p className="text-slate-500">Tidak ada data ditemukan</p>
@@ -245,9 +248,10 @@ export default function LaporanBarang() {
                     </TableCell>
                   </TableRow>
                 ) : pageItems.map((item, idx) => (
-                  <TableRow key={item.tsCode} className={item.stok === 0 ? 'bg-red-50/40' : item.stok <= item.safetyStok ? 'bg-amber-50/40' : ''}>
+                  <TableRow key={item.itemCode} className={item.stok === 0 ? 'bg-red-50/40' : item.stok <= item.safetyStok ? 'bg-amber-50/40' : ''}>
                     <TableCell className="text-center text-xs text-muted-foreground">{startEntry + idx}</TableCell>
-                    <TableCell className="font-mono font-medium text-slate-600 whitespace-nowrap">{item.tsCode}</TableCell>
+                    <TableCell className="font-mono font-medium text-slate-600 whitespace-nowrap">{item.itemCode}</TableCell>
+                    <TableCell className="font-mono text-sm text-muted-foreground">{item.tsCode || '—'}</TableCell>
                     <TableCell className="font-mono text-sm text-muted-foreground">{item.msCode || '—'}</TableCell>
                     <TableCell className="font-medium text-slate-800">{item.nama}</TableCell>
                     <TableCell className="text-sm">{item.kategori}</TableCell>

@@ -20,6 +20,7 @@ router.get("/bin/:binLoc", async (req, res) => {
     .orderBy(asc(itemsTable.nama));
 
   const items = rows.map((r) => ({
+    itemCode: r.itemCode,
     tsCode: r.tsCode,
     msCode: r.msCode,
     nama: r.nama,

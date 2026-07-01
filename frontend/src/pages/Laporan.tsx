@@ -15,18 +15,18 @@ import { useAppContext } from '@/context/AppContext';
 interface TrxMasuk {
   id: number; nomor: string; jumlah: number; tanggal: string;
   noPo: string | null; keterangan: string | null; createdAt: string;
-  tsCode: string; msCode: string | null; namaBarang: string;
+  itemCode: string; tsCode: string | null; msCode: string | null; namaBarang: string;
   kategori: string; uom: string; binLoc: string | null; petugas: string;
 }
 interface TrxKeluar {
   id: number; nomor: string; jumlah: number; tanggal: string;
   keperluan: string; tujuan: string | null; keterangan: string | null; createdAt: string;
-  tsCode: string; msCode: string | null; namaBarang: string;
+  itemCode: string; tsCode: string | null; msCode: string | null; namaBarang: string;
   kategori: string; uom: string; binLoc: string | null; petugas: string;
 }
 interface CombinedRow {
   key: string; nomor: string; tanggal: string; createdAt: string;
-  tsCode: string; msCode: string | null; namaBarang: string;
+  itemCode: string; tsCode: string | null; msCode: string | null; namaBarang: string;
   kategori: string; uom: string; binLoc: string | null;
   jenis: 'Masuk' | 'Keluar';
   jumlah: number; ref: string; keterangan: string | null; petugas: string;
@@ -117,7 +117,7 @@ export default function Laporan() {
         setTrxKeluar(keluar);
         setKategoriList((katList as { nama: string }[]).map(k => k.nama));
         const map: Record<string, string> = {};
-        (itemList as { tsCode: string; kategori: string }[]).forEach(it => { map[it.tsCode] = it.kategori; });
+        (itemList as { itemCode: string; kategori: string }[]).forEach(it => { map[it.itemCode] = it.kategori; });
         setKategoriMap(map);
       })
       .catch(() => { if (mounted) toast.error('Gagal memuat data'); })
@@ -136,7 +136,7 @@ export default function Laporan() {
         if (applied.kategori !== 'Semua' && t.kategori !== applied.kategori) continue;
         rows.push({
           key: `M${t.id}`, nomor: t.nomor, tanggal: t.tanggal, createdAt: t.createdAt,
-          tsCode: t.tsCode, msCode: t.msCode, namaBarang: t.namaBarang,
+          itemCode: t.itemCode, tsCode: t.tsCode, msCode: t.msCode, namaBarang: t.namaBarang,
           kategori: t.kategori || '—', uom: t.uom, binLoc: t.binLoc,
           jenis: 'Masuk', jumlah: t.jumlah,
           ref: t.noPo ?? '—', keterangan: t.keterangan, petugas: t.petugas,
@@ -150,7 +150,7 @@ export default function Laporan() {
         if (applied.kategori !== 'Semua' && t.kategori !== applied.kategori) continue;
         rows.push({
           key: `K${t.id}`, nomor: t.nomor, tanggal: t.tanggal, createdAt: t.createdAt,
-          tsCode: t.tsCode, msCode: t.msCode, namaBarang: t.namaBarang,
+          itemCode: t.itemCode, tsCode: t.tsCode, msCode: t.msCode, namaBarang: t.namaBarang,
           kategori: t.kategori || '—', uom: t.uom, binLoc: t.binLoc,
           jenis: 'Keluar', jumlah: t.jumlah,
           ref: t.tujuan ? `${t.keperluan} · ${t.tujuan}` : t.keperluan,
@@ -170,8 +170,8 @@ export default function Laporan() {
       if (r.jenis === 'Masuk') masukUnit += r.jumlah;
       else {
         keluarUnit += r.jumlah;
-        if (!freq[r.tsCode]) freq[r.tsCode] = { nama: r.namaBarang, count: 0 };
-        freq[r.tsCode].count++;
+        if (!freq[r.itemCode]) freq[r.itemCode] = { nama: r.namaBarang, count: 0 };
+        freq[r.itemCode].count++;
       }
     }
     const topKeluar = Object.entries(freq).sort((a, b) => b[1].count - a[1].count)[0];
@@ -180,7 +180,7 @@ export default function Laporan() {
       totalTrx: combinedRows.length,
       masukCount: combinedRows.filter(r => r.jenis === 'Masuk').length,
       keluarCount: combinedRows.filter(r => r.jenis === 'Keluar').length,
-      itemSeringKeluar: topKeluar ? { ...topKeluar[1], tsCode: topKeluar[0] } : null,
+      itemSeringKeluar: topKeluar ? { ...topKeluar[1], itemCode: topKeluar[0] } : null,
     };
   }, [combinedRows]);
 
@@ -231,7 +231,8 @@ export default function Laporan() {
     if (!q) return combinedRows;
     return combinedRows.filter(r =>
       r.namaBarang.toLowerCase().includes(q) ||
-      r.tsCode.toLowerCase().includes(q) ||
+      r.itemCode.toLowerCase().includes(q) ||
+      (r.tsCode ?? '').toLowerCase().includes(q) ||
       r.nomor.toLowerCase().includes(q) ||
       r.petugas.toLowerCase().includes(q) ||
       r.ref.toLowerCase().includes(q)
@@ -263,7 +264,7 @@ export default function Laporan() {
     const wsData = [
       [
         'No.', 'Nomor Transaksi', 'Tanggal', 'Waktu Pencatatan',
-        'TS Code', 'MS Code', 'Nama Barang', 'Kategori', 'Satuan (UOM)', 'Bin Location',
+        'Item Code', 'TS Code', 'MS Code', 'Nama Barang', 'Kategori', 'Satuan (UOM)', 'Bin Location',
         'Jenis', 'Jumlah', 'Referensi / Keperluan', 'Keterangan', 'Petugas',
       ],
       ...searchedRows.map((r, i) => [
@@ -271,7 +272,8 @@ export default function Laporan() {
         r.nomor,
         fmtWithDay(r.tanggal),
         fmtTime(r.createdAt),
-        r.tsCode,
+        r.itemCode,
+        r.tsCode ?? '',
         r.msCode ?? '',
         r.namaBarang,
         r.kategori,
@@ -286,7 +288,7 @@ export default function Laporan() {
     ];
     exportStyledExcelAOA({
       data: wsData,
-      colWidths: [4, 22, 24, 14, 12, 14, 45, 18, 10, 14, 8, 8, 28, 30, 22],
+      colWidths: [4, 22, 24, 14, 12, 12, 14, 45, 18, 10, 14, 8, 8, 28, 30, 22],
       sheetName: 'Laporan Transaksi',
       fileName: `Laporan_${applied.from}_${applied.to}.xlsx`,
     });
@@ -480,7 +482,7 @@ export default function Laporan() {
                   <TableHeader className="bg-slate-50">
                     <TableRow>
                       <TableHead className="w-[105px]">Tanggal</TableHead>
-                      <TableHead>TS Code</TableHead>
+                      <TableHead>Item Code</TableHead>
                       <TableHead>Nama Barang</TableHead>
                       <TableHead>Kategori</TableHead>
                       <TableHead className="text-center w-[76px]">Jenis</TableHead>
@@ -493,7 +495,7 @@ export default function Laporan() {
                     {pageRows.map(row => (
                       <TableRow key={row.key}>
                         <TableCell className="text-sm whitespace-nowrap">{fmtWithDay(row.tanggal)}</TableCell>
-                        <TableCell className="font-mono text-sm">{row.tsCode}</TableCell>
+                        <TableCell className="font-mono text-sm">{row.itemCode}</TableCell>
                         <TableCell className="font-medium max-w-[180px] truncate" title={row.namaBarang}>{row.namaBarang}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{row.kategori}</TableCell>
                         <TableCell className="text-center">
