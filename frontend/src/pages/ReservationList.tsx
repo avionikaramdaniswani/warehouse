@@ -109,13 +109,10 @@ function printReservationList(d: PrintPayload) {
   @page { size: A4 landscape; margin: 8mm 12mm; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, Helvetica, sans-serif; font-size: 8.5pt; color: #111; }
-  .doc-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2.5px solid #1B3A2D; padding-bottom: 5px; margin-bottom: 7px; }
-  .co-block { display: flex; flex-direction: column; gap: 1px; }
-  .co-name { font-size: 9.5pt; font-weight: 700; color: #1B3A2D; }
-  .co-sub  { font-size: 7.5pt; color: #555; }
+  .doc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #1B3A2D; padding-bottom: 6px; margin-bottom: 7px; }
+  .co-name { font-size: 10pt; font-weight: 700; color: #1B3A2D; }
   .doc-title { text-align: center; }
   .doc-title h1 { font-size: 13pt; font-weight: 700; color: #1B3A2D; letter-spacing: .5px; }
-  .doc-title p  { font-size: 7.5pt; color: #666; margin-top: 2px; }
   .doc-meta  { text-align: right; font-size: 7.5pt; line-height: 1.7; }
   .doc-meta strong { color: #1B3A2D; }
   .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; border: 1px solid #c8d5cc; border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; background: #f9fcfa; }
@@ -139,13 +136,9 @@ function printReservationList(d: PrintPayload) {
 </head>
 <body>
 <div class="doc-header">
-  <div class="co-block">
-    <div class="co-name">PT TANJUNGENIM LESTARI PULP AND PAPER</div>
-    <div class="co-sub">Townsite Warehouse — Materials Management System</div>
-  </div>
+  <div class="co-name">PT TANJUNGENIM LESTARI PULP AND PAPER</div>
   <div class="doc-title">
     <h1>GOODS ISSUE / RESERVATION LIST</h1>
-    <p>Surat Pengeluaran Barang Gudang</p>
   </div>
   <div class="doc-meta">
     <strong>Tgl. Cetak</strong>: ${tglCetak} ${jamCetak}<br>
@@ -288,13 +281,17 @@ function ItemRow({
 
   return (
     <div className="flex gap-2 items-start p-3 bg-slate-50 rounded-lg border border-slate-100">
-      <span className="text-xs font-bold text-muted-foreground bg-white border border-slate-200 rounded w-6 h-6 flex items-center justify-center shrink-0 mt-1">{index + 1}</span>
+      {/* Nomor baris */}
+      <span className="text-xs font-bold text-muted-foreground bg-white border border-slate-200 rounded w-6 h-6 flex items-center justify-center shrink-0 mt-1.5">
+        {index + 1}
+      </span>
 
-      <div className="flex-1 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-2 items-start">
-        {/* Barang search / selected */}
-        <div className="relative">
-          {!line.selectedItem ? (
-            <>
+      {/* Konten utama */}
+      <div className="flex-1 flex flex-col gap-2">
+        {/* Baris 1: pilih barang */}
+        {!line.selectedItem ? (
+          <div className="flex gap-2">
+            <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
               <Input
                 placeholder="Cari nama atau Item Code..."
@@ -327,50 +324,57 @@ function ItemRow({
                   ))}
                 </div>
               )}
-            </>
-          ) : (
-            <div className="flex items-center gap-2 bg-white border border-primary/20 rounded-md px-3 py-1.5 h-9">
+            </div>
+            <Button type="button" variant="outline" size="icon" className="h-9 w-9 shrink-0" title="Scan QR" onClick={onQrScan}>
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h3v-3M17 17v3"/>
+              </svg>
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-2 items-center">
+            {/* Item card */}
+            <div className="flex-1 bg-white border border-primary/20 rounded-md px-3 py-1.5 min-h-9 flex items-center gap-2">
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-xs truncate">{line.selectedItem.nama}</p>
-                <p className="text-[10px] font-mono text-slate-400">{line.selectedItem.itemCode} · Stok: {line.selectedItem.stok} {line.selectedItem.uom}</p>
+                <p className="text-[10px] font-mono text-slate-400">
+                  {line.selectedItem.itemCode} · Stok: {line.selectedItem.stok} {line.selectedItem.uom}
+                </p>
               </div>
-              <button className="text-[10px] text-slate-300 hover:text-red-400 transition-colors shrink-0" onClick={() => onUpdate({ selectedItem: null })}>✕</button>
+              <button
+                className="text-[10px] text-slate-300 hover:text-red-400 transition-colors shrink-0"
+                onClick={() => onUpdate({ selectedItem: null })}
+                title="Ganti barang"
+              >✕</button>
             </div>
-          )}
-        </div>
-
-        {/* Jumlah */}
-        <div className="flex gap-1.5 items-center">
-          <div className="relative">
-            <Input
-              type="number" min="1" max={line.selectedItem?.stok}
-              placeholder="Qty"
-              className={`w-20 h-9 text-sm font-bold text-center ${isOver ? 'border-red-400' : ''}`}
-              value={line.jumlah}
-              onChange={(e) => onUpdate({ jumlah: e.target.value })}
-            />
-            {isOver && (
-              <div className="absolute -bottom-4 left-0 text-[10px] text-red-500 flex items-center gap-0.5 whitespace-nowrap">
-                <AlertTriangle className="h-2.5 w-2.5" />Max {line.selectedItem?.stok}
-              </div>
-            )}
+            {/* Qty */}
+            <div className="flex flex-col gap-0.5 shrink-0">
+              <Input
+                type="number" min="1" max={line.selectedItem?.stok}
+                placeholder="Qty"
+                className={`w-20 h-9 text-sm font-bold text-center ${isOver ? 'border-red-400' : ''}`}
+                value={line.jumlah}
+                onChange={(e) => onUpdate({ jumlah: e.target.value })}
+              />
+              {isOver && (
+                <p className="text-[10px] text-red-500 flex items-center gap-0.5 whitespace-nowrap">
+                  <AlertTriangle className="h-2.5 w-2.5" />Max {line.selectedItem?.stok}
+                </p>
+              )}
+            </div>
+            <span className="text-xs text-muted-foreground w-8 shrink-0">{line.selectedItem?.uom || '—'}</span>
           </div>
-          <span className="text-xs text-muted-foreground w-8 shrink-0">{line.selectedItem?.uom || '—'}</span>
-        </div>
-
-        {/* Scan QR */}
-        <Button type="button" variant="outline" size="icon" className="h-9 w-9 shrink-0" title="Scan QR" onClick={onQrScan}>
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-            <rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h3v-3M17 17v3"/>
-          </svg>
-        </Button>
+        )}
       </div>
 
-      {canRemove && (
-        <button onClick={onRemove} className="text-slate-300 hover:text-red-400 transition-colors mt-2 shrink-0">
+      {/* Tombol hapus baris */}
+      {canRemove ? (
+        <button onClick={onRemove} className="text-slate-300 hover:text-red-400 transition-colors shrink-0 mt-2" title="Hapus baris">
           <Trash2 className="h-4 w-4" />
         </button>
+      ) : (
+        <div className="w-4 shrink-0" />
       )}
     </div>
   );
