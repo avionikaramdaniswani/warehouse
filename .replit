@@ -67,6 +67,7 @@ PORT = "5000"
 BACKEND_PORT = "8082"
 LOG_LEVEL = "info"
 NODE_ENV = "development"
+JWT_SECRET = "2005f865a304e590d6cd3681bc320d314af0719d87dfb54a7f30d5546dfa7f3a6bf684c9f53bd181672dc005c54e0abc"
 
 [nix]
 channel = "stable-25_05"
