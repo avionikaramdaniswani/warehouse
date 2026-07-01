@@ -73,8 +73,9 @@ export default function Dashboard() {
 
   const isLoading = itemsLoading || statsLoading;
   const totalItems = items.length;
-  const warningItems = items.filter(item => item.stok > 0 && item.stok <= item.safetyStok);
   const criticalItems = items.filter(item => item.stok === 0);
+  const warningItems = items.filter(item => item.stok > 0 && item.stok <= item.safetyStok);
+  const lowStockItems = [...criticalItems, ...warningItems];
   const barHasData = barData.some(d => d.masuk > 0 || d.keluar > 0);
 
   return (
