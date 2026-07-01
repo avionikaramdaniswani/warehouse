@@ -304,7 +304,7 @@ export function ItemQRModal({ open, onClose, item, canPrint = true }: Props) {
                 </Button>
               </div>
               <p className="text-center text-[10px] text-slate-400">
-                <strong>Label Item</strong> = QR TS Code · <strong>Label BIN</strong> = QR slot rak
+                <strong>Label Item</strong> = QR Item Code · <strong>Label BIN</strong> = QR slot rak
               </p>
             </>
           )}

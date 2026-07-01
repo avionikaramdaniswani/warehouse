@@ -36,6 +36,7 @@ CREATE TABLE users (
   seksi          TEXT,
   status         user_status NOT NULL DEFAULT 'active',
   dibuat_oleh    INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+  permissions    JSONB       NOT NULL DEFAULT '{}',  -- { transaksi_masuk?: bool, transaksi_keluar?: bool }
   tanggal_gabung TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   login_terakhir TIMESTAMPTZ,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -78,30 +79,64 @@ CREATE TABLE kategori (
 -- ---------------------------------------------------------------------------
 CREATE TABLE items (
   id           SERIAL      PRIMARY KEY,
-  ts_code      TEXT        NOT NULL UNIQUE,   -- kode internal, e.g. TS-001
-  ms_code      TEXT,                          -- kode MS dari sistem lama (angka, tanpa prefix)
+  item_code    TEXT        NOT NULL UNIQUE,          -- identifier utama, e.g. TS-001
+  ts_code      TEXT,                                 -- kode TS opsional (bisa sama dengan item_code)
+  ms_code      TEXT,                                 -- kode MS dari sistem lama (angka, tanpa prefix)
   nama         TEXT        NOT NULL,
   kategori     TEXT        NOT NULL DEFAULT '',
-  bin_loc      TEXT,                          -- lokasi rak/bin, e.g. TS-D.10
+  bin_loc      TEXT,                                 -- lokasi rak/bin, e.g. TS-D.10
   uom          TEXT        NOT NULL DEFAULT 'EA',
   stok         INTEGER     NOT NULL DEFAULT 0,
   safety_stok  INTEGER     NOT NULL DEFAULT 5,
-  status       TEXT        NOT NULL DEFAULT 'Normal', -- 'Normal' | 'Low Stock'
+  status       TEXT        NOT NULL DEFAULT 'Normal', -- 'Normal' | 'Warning' | 'Critical'
   is_active    BOOLEAN     NOT NULL DEFAULT true,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- ---------------------------------------------------------------------------
+-- TABEL: transaksi_masuk
+--    Penerimaan barang masuk ke gudang
+-- ---------------------------------------------------------------------------
+CREATE TABLE transaksi_masuk (
+  id         SERIAL      PRIMARY KEY,
+  nomor      TEXT        NOT NULL UNIQUE,            -- e.g. TRIN-2026-00001
+  item_id    INTEGER     NOT NULL REFERENCES items(id),
+  user_id    INTEGER     NOT NULL REFERENCES users(id),
+  jumlah     INTEGER     NOT NULL,
+  tanggal    DATE        NOT NULL,
+  no_po      TEXT,
+  keterangan TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ---------------------------------------------------------------------------
+-- TABEL: transaksi_keluar
+--    Pengeluaran barang dari gudang
+-- ---------------------------------------------------------------------------
+CREATE TABLE transaksi_keluar (
+  id         SERIAL      PRIMARY KEY,
+  nomor      TEXT        NOT NULL UNIQUE,            -- e.g. TREK-2026-00001
+  item_id    INTEGER     NOT NULL REFERENCES items(id),
+  user_id    INTEGER     NOT NULL REFERENCES users(id),
+  jumlah     INTEGER     NOT NULL,
+  keperluan  TEXT        NOT NULL DEFAULT 'Perbaikan',
+  tujuan     TEXT,
+  tanggal    DATE        NOT NULL,
+  keterangan TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ---------------------------------------------------------------------------
 -- INDEXES
 -- ---------------------------------------------------------------------------
-CREATE INDEX idx_users_role       ON users(role);
-CREATE INDEX idx_users_status     ON users(status);
-CREATE INDEX idx_activity_user    ON activity_logs(user_id);
-CREATE INDEX idx_activity_created ON activity_logs(created_at DESC);
-CREATE INDEX idx_items_kategori   ON items(kategori);
-CREATE INDEX idx_items_status     ON items(status);
-CREATE INDEX idx_items_ts_code    ON items(ts_code);
+CREATE INDEX idx_users_role         ON users(role);
+CREATE INDEX idx_users_status       ON users(status);
+CREATE INDEX idx_activity_user      ON activity_logs(user_id);
+CREATE INDEX idx_activity_created   ON activity_logs(created_at DESC);
+CREATE INDEX idx_items_item_code    ON items(item_code);
+CREATE INDEX idx_items_kategori     ON items(kategori);
+CREATE INDEX idx_items_status       ON items(status);
 
 -- ---------------------------------------------------------------------------
 -- SEED DATA — lihat scripts/seed.sql
@@ -110,6 +145,7 @@ CREATE INDEX idx_items_ts_code    ON items(ts_code);
 --
 -- Berisi:
 --   - 1 akun admin  (admin@telgudang.com / Admin@12345)
---   - 5 kategori    (Civil, Civil Material, Consumables, Mechanical Material, GH Consumable)
+--   - 8 kategori    (Civil, Civil Material, Consumables, Mechanical Material,
+--                    GH Consumable, Electrical Material, Furniture Material, Asset Tool)
 --   - 15 item awal  (TS-001 s/d TS-015, data real dari Materials_2026.xlsx)
 -- ---------------------------------------------------------------------------
