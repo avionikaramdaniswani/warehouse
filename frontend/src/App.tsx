@@ -21,6 +21,7 @@ import LaporanPengguna from "@/pages/LaporanPengguna";
 import RiwayatAktivitas from "@/pages/RiwayatAktivitas";
 import ManajemenUser from "@/pages/ManajemenUser";
 import Pengaturan from "@/pages/Pengaturan";
+import ReservationList from "@/pages/ReservationList";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ function Router() {
       <Route path="/barang" component={() => <ProtectedRoute component={MasterBarang} />} />
       <Route path="/barang-masuk" component={() => <ProtectedRoute component={BarangMasuk} />} />
       <Route path="/barang-keluar" component={() => <ProtectedRoute component={BarangKeluar} />} />
+      <Route path="/reservation-list" component={() => <ProtectedRoute component={ReservationList} />} />
       <Route path="/laporan" component={() => <AdminOrKepalaRoute component={Laporan} />} />
       <Route path="/laporan/barang" component={() => <AdminOrKepalaRoute component={LaporanBarang} />} />
       <Route path="/laporan/barang-masuk" component={() => <AdminOrKepalaRoute component={LaporanBarangMasuk} />} />
