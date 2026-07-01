@@ -1,0 +1,122 @@
+update apalagi yah? aku pengen untuk barang keluar tuhada pdf nya, soalnya kalo di bilangin sama perusahaannya kek ada reservation list gitu untuk barang keluar paham ga kamu kira kira. kasih aku konsepnya dulu dong
+
+37 minutes ago
+
+Show less
+
+Planning "Barang Keluar" PDF concept (12 seconds)
+Paham — ini konsep umum yang sering dipakai di pabrik/gudang. Berikut konsepnya:
+
+Konsep: Surat Pengeluaran Barang (Reservation List PDF)
+Apa itu?
+Dokumen resmi yang dicetak/dikirim setiap ada pengeluaran barang dari gudang. Fungsinya sebagai bukti serah terima antara gudang ↔ pemohon, sekaligus rekam jejak audit.
+
+Struktur PDF yang saya usulkan:
+┌─────────────────────────────────────────────────────────────┐
+│  [Logo TelL]   SURAT PENGELUARAN BARANG          No: TREK-  │
+│                PT Tanjungenim Lestari Pulp & Paper  2026-001 │
+│                Townsite Warehouse                 Tgl: 01/07 │
+├─────────────────────────────────────────────────────────────┤
+│  Keperluan  : Perbaikan Maintenance                          │
+│  Tujuan     : Dept. Mekanikal / Ahmad Fauzi                 │
+│  Dikeluarkan: Administrator (Kepala Gudang)                 │
+│  Keterangan : Untuk perbaikan AC unit blok C                │
+├────┬──────────┬─────────────────────────┬────────┬──────┬───┤
+│ No │Item Code │ Nama Barang             │BIN LOC │ Qty  │Sat│
+├────┼──────────┼─────────────────────────┼────────┼──────┼───┤
+│  1 │ TS-005   │ AIR CONDITIONER, NON... │TS-E.06 │  1   │ EA│
+│  2 │ TS-009   │ ANCHOR, PLASTIC...      │TS-J.17 │  5   │ EA│
+└────┴──────────┴─────────────────────────┴────────┴──────┴───┘
+│  Total Item: 2 jenis barang                                  │
+├─────────────────────────────────────────────────────────────┤
+│   Dikeluarkan Oleh    │   Diterima Oleh    │   Mengetahui   │
+│                       │                    │                │
+│   _______________     │   ____________     │   __________   │
+│   (Petugas Gudang)    │   (Pemohon)        │  (Kep.Gudang)  │
+└─────────────────────────────────────────────────────────────┘
+
+Dua opsi trigger cetak PDF:
+Opsi	Kapan	Dari mana
+A. Langsung setelah simpan	Setelah input pengeluaran berhasil, ada tombol "Cetak Surat"	Pop-up sukses di form
+B. Dari halaman laporan	Klik baris transaksi → cetak	Tabel di Laporan Barang Keluar
+Saya rekomendasikan: keduanya
+Setelah simpan transaksi muncul toast + tombol "Cetak Surat Pengeluaran"
+Di tabel laporan ada kolom aksi dengan ikon print per baris
+Teknologi:
+Tidak perlu library baru — pakai window.open + HTML print (seperti QR label yang sudah ada), jadi tidak perlu install jsPDF atau pdfmake.
+
+Mau saya langsung implementasikan dengan kedua trigger (cetak langsung + dari laporan), atau cukup salah satu dulu?
+
+di surat itu tapi pake landscape, nanti ada reservation no, requested, maintenance order, movement type, functional location, equipment, order type, maintenance activity type.
+
+nah itu tadi utnuk diatas, kalau di kolom tabelnya tuh ada
+nomor, itemcode, nama, uom, qty onhand,qty reserved,qty issued, location, valuation type, stock indicator, serial number, department, last issue/quantity
+
+ttd, requested by, approved by, received by
+
+nah kalau aku lihat print mereka kek gitu, jadi onsep kita gimna nih? ngerti ga kamu? aku kurang ngerti soalnya
+
+33 minutes ago
+
+Show less
+
+Analyzing warehouse document structure (15 seconds)
+Ngerti! Itu format SAP PM/MM Reservation List — dokumen resmi yang perusahaan pakai untuk minta barang dari gudang untuk keperluan maintenance. Kita bisa buat versi digital-nya. Izinkan saya jelaskan konsep yang cocok:
+
+Konsep Reservation List PDF (Landscape)
+Masalah utama: Ada field yang ada di database kita, ada yang tidak
+Field di dokumen	Dari mana?	Status
+Reservation No	Auto-generate (TREK-2026-xxx)	✅ Sudah ada
+Requested (by/date)	User login + tanggal	✅ Sudah ada
+Item Code, Nama, UOM, Location, Qty On Hand, Qty Issued	Database items	✅ Sudah ada
+Maintenance Order	Diisi manual saat input	➕ Perlu ditambah ke form
+Movement Type	Diisi manual (biasanya 261/281)	➕ Perlu ditambah ke form
+Functional Location	Diisi manual (kode lokasi mesin)	➕ Perlu ditambah ke form
+Equipment	Diisi manual (kode equipment SAP)	➕ Perlu ditambah ke form
+Order Type	Dropdown (PM01/PM02/dll)	➕ Perlu ditambah ke form
+Maintenance Activity Type	Dropdown (misal: Corrective/Preventive)	➕ Perlu ditambah ke form
+Qty Reserved	= Qty yang diminta	✅ Dari jumlah
+Qty Issued	= Qty yang dikeluarkan aktual	✅ Dari jumlah
+Valuation Type, Stock Indicator, Serial No	SAP-specific, beda per perusahaan	⬜ Kosong, diisi manual
+Department	Dari tujuan/pemohon	✅ Dari field "Tujuan"
+Approved By, Requested By, Received By	Tanda tangan manual	⬜ Baris kosong
+Rencana implementasi:
+1. Tambah field di form Barang Keluar (opsional, bisa dikosongi):
+
+Maintenance Order No : [__________]
+Functional Location  : [__________]
+Equipment No         : [__________]
+Movement Type        : [261 ▼] (dropdown)
+Order Type           : [PM01 ▼] (dropdown)
+Activity Type        : [Corrective ▼]
+
+2. PDF Landscape — layout seperti ini:
+
+[Logo]  GOODS ISSUE / RESERVATION LIST          Hal 1/1
+        PT Tanjungenim Lestari - Townsite Warehouse
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Reservation No : TREK-2026-00001  | Movement Type : 261
+Requested      : 01/07/2026       | Order Type    : PM01
+Maint. Order   : MO-2026-001      | Activity Type : Corrective
+Funct. Location: TL-AREA-C        | Equipment     : EQ-001
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+No│Item Code│Nama        │UOM│QtyOnHand│QtyReserved│
+  │        │             │   │QtyIssued│Location  │Dept
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1 │TS-005  │AIR COND..  │EA │   5     │     1     │
+  │        │             │   │    1    │TS-CONT.E  │Mekanikal
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Requested By: ___________  Approved By: ___________  Received By: ___________
+
+3. Trigger cetak:
+
+Langsung setelah simpan transaksi → tombol "Cetak Reservation List"
+Dari halaman Laporan Barang Keluar → ikon print per baris
+Yang perlu kamu tentukan:
+Karena kita perlu tambah field baru di form Barang Keluar, ada dua pilihan:
+
+Opsi A — Form lebih lengkap → Tambah 6 field SAP ke form input (user isi saat input transaksi)
+
+Opsi B — Field kosong di PDF → Tidak ubah form, field SAP dibiarkan kosong di PDF untuk diisi tangan
+
+Saya rekomendasikan Opsi A — lebih profesional dan datanya tersimpan. Mana yang kamu pilih?
