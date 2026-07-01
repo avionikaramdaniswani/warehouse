@@ -7,7 +7,7 @@ import {
   BarChart, Bar, PieChart, Pie,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer,
 } from 'recharts';
-import { Package, PackageMinus, PackagePlus, TrendingDown, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Package, PackageMinus, PackagePlus, TrendingDown, RefreshCw, AlertTriangle, AlertOctagon } from 'lucide-react';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -73,7 +73,8 @@ export default function Dashboard() {
 
   const isLoading = itemsLoading || statsLoading;
   const totalItems = items.length;
-  const lowStockItems = items.filter(item => item.stok <= item.safetyStok);
+  const warningItems = items.filter(item => item.stok > 0 && item.stok <= item.safetyStok);
+  const criticalItems = items.filter(item => item.stok === 0);
   const barHasData = barData.some(d => d.masuk > 0 || d.keluar > 0);
 
   return (
@@ -106,69 +107,91 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-        <Card>
-          <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
-            <div>
+      {/* Stat Cards — 5 kartu, 1 baris, scroll horizontal di mobile */}
+      <div className="flex gap-3 mb-6 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory">
+        {/* Total Item */}
+        <Card className="min-w-[140px] flex-1 snap-start shrink-0">
+          <CardContent className="p-3 sm:p-5 flex items-center justify-between gap-2">
+            <div className="min-w-0">
               {isLoading ? <StatSkeleton /> : (
                 <>
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Total Item</p>
+                  <p className="text-[11px] sm:text-sm font-medium text-muted-foreground mb-1 whitespace-nowrap">Total Item</p>
                   <h3 className="text-2xl sm:text-3xl font-bold">{totalItems}</h3>
                 </>
               )}
             </div>
             <div className="p-2 sm:p-3 bg-blue-100 text-blue-600 rounded-full shrink-0">
-              <Package className="h-5 w-5 sm:h-6 sm:w-6" />
+              <Package className="h-4 w-4 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-red-200 shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-1.5 h-full bg-red-500" />
-          <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
-            <div>
+        {/* Warning Stock */}
+        <Card className="min-w-[140px] flex-1 snap-start shrink-0 border-amber-200 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-1.5 h-full bg-amber-400" />
+          <CardContent className="p-3 sm:p-5 flex items-center justify-between gap-2">
+            <div className="min-w-0">
               {isLoading ? <StatSkeleton /> : (
                 <>
-                  <p className="text-xs sm:text-sm font-medium text-red-600 mb-1">Warning Stock</p>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-red-700">{lowStockItems.length}</h3>
+                  <p className="text-[11px] sm:text-sm font-medium text-amber-600 mb-1 whitespace-nowrap">Warning Stock</p>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-amber-700">{warningItems.length}</h3>
+                </>
+              )}
+            </div>
+            <div className="p-2 sm:p-3 bg-amber-100 text-amber-600 rounded-full shrink-0">
+              <PackageMinus className="h-4 w-4 sm:h-6 sm:w-6" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Critical Stock */}
+        <Card className="min-w-[140px] flex-1 snap-start shrink-0 border-red-200 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-1.5 h-full bg-red-500" />
+          <CardContent className="p-3 sm:p-5 flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              {isLoading ? <StatSkeleton /> : (
+                <>
+                  <p className="text-[11px] sm:text-sm font-medium text-red-600 mb-1 whitespace-nowrap">Critical Stock</p>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-red-700">{criticalItems.length}</h3>
                 </>
               )}
             </div>
             <div className="p-2 sm:p-3 bg-red-100 text-red-600 rounded-full shrink-0">
-              <PackageMinus className="h-5 w-5 sm:h-6 sm:w-6" />
+              <AlertOctagon className="h-4 w-4 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
-            <div>
+        {/* Masuk Hari Ini */}
+        <Card className="min-w-[140px] flex-1 snap-start shrink-0">
+          <CardContent className="p-3 sm:p-5 flex items-center justify-between gap-2">
+            <div className="min-w-0">
               {isLoading ? <StatSkeleton /> : (
                 <>
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Masuk Hari Ini</p>
+                  <p className="text-[11px] sm:text-sm font-medium text-muted-foreground mb-1 whitespace-nowrap">Masuk Hari Ini</p>
                   <h3 className="text-2xl sm:text-3xl font-bold text-emerald-700">{todayMasuk}</h3>
                 </>
               )}
             </div>
             <div className="p-2 sm:p-3 bg-emerald-100 text-emerald-600 rounded-full shrink-0">
-              <PackagePlus className="h-5 w-5 sm:h-6 sm:w-6" />
+              <PackagePlus className="h-4 w-4 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4 sm:p-6 flex items-center justify-between gap-2">
-            <div>
+        {/* Keluar Hari Ini */}
+        <Card className="min-w-[140px] flex-1 snap-start shrink-0">
+          <CardContent className="p-3 sm:p-5 flex items-center justify-between gap-2">
+            <div className="min-w-0">
               {isLoading ? <StatSkeleton /> : (
                 <>
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Keluar Hari Ini</p>
+                  <p className="text-[11px] sm:text-sm font-medium text-muted-foreground mb-1 whitespace-nowrap">Keluar Hari Ini</p>
                   <h3 className="text-2xl sm:text-3xl font-bold text-orange-600">{todayKeluar}</h3>
                 </>
               )}
             </div>
             <div className="p-2 sm:p-3 bg-orange-100 text-orange-600 rounded-full shrink-0">
-              <TrendingDown className="h-5 w-5 sm:h-6 sm:w-6" />
+              <TrendingDown className="h-4 w-4 sm:h-6 sm:w-6" />
             </div>
           </CardContent>
         </Card>
