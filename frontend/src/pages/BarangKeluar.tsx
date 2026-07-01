@@ -370,7 +370,7 @@ export default function BarangKeluar() {
 
       {/* Form Dialog */}
       <Dialog open={formOpen} onOpenChange={(o) => { setFormOpen(o); if (!o) resetForm(); }}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base">
               <PackageMinus className="h-5 w-5 text-primary" />
@@ -394,34 +394,53 @@ export default function BarangKeluar() {
                     autoFocus
                   />
                   {showSuggestions && suggestions.length > 0 && (
-                    <div className="absolute z-20 w-full mt-1 bg-white border rounded-lg shadow-xl overflow-hidden">
+                    <div className="absolute z-20 w-full mt-1 bg-white border rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto">
                       {suggestions.map((item) => (
                         <button key={item.itemCode}
                           disabled={item.stok === 0}
                           className={`w-full px-4 py-2.5 flex justify-between items-center border-b last:border-0 text-left transition-colors
                             ${item.stok === 0 ? 'opacity-50 cursor-not-allowed bg-slate-50' : 'hover:bg-slate-50'}`}
                           onMouseDown={() => item.stok > 0 && handleSelectItem(item)}>
-                          <div>
-                            <p className="font-medium text-sm">{item.nama}</p>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm truncate">{item.nama}</p>
                             <p className="text-xs font-mono text-slate-400">{item.itemCode} · {item.kategori}</p>
                           </div>
-                          <span className={`text-xs px-2 py-0.5 rounded font-semibold shrink-0 ml-3 ${item.stok === 0 ? 'bg-red-50 text-red-600' : 'bg-slate-100'}`}>
-                            Stok: {item.stok}
-                          </span>
+                          <div className="flex items-center gap-2 shrink-0 ml-3">
+                            {item.binLoc && (
+                              <span className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded font-mono">{item.binLoc}</span>
+                            )}
+                            <span className={`text-xs px-2 py-0.5 rounded font-semibold ${item.stok === 0 ? 'bg-red-50 text-red-600' : 'bg-slate-100'}`}>
+                              Stok: {item.stok}
+                            </span>
+                          </div>
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="bg-primary/5 border border-primary/20 rounded-lg px-4 py-3 flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-sm text-slate-800 break-words">{selectedItem.nama}</p>
-                    <p className="text-xs font-mono text-slate-500 mt-0.5 break-all">
-                      {selectedItem.itemCode} · Stok tersedia: <strong className="text-primary">{selectedItem.stok}</strong> {selectedItem.uom}
-                    </p>
+                <div className="bg-primary/5 border border-primary/20 rounded-lg px-4 py-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-sm text-slate-800 break-words">{selectedItem.nama}</p>
+                      <p className="text-xs font-mono text-slate-500 mt-0.5">{selectedItem.itemCode} · {selectedItem.kategori}</p>
+                    </div>
+                    <button className="text-xs text-slate-400 hover:text-red-500 shrink-0 transition-colors pt-0.5" onClick={() => setSelectedItem(null)}>Ganti</button>
                   </div>
-                  <button className="text-xs text-slate-400 hover:text-red-500 shrink-0 transition-colors pt-0.5" onClick={() => setSelectedItem(null)}>Ganti</button>
+                  <div className="flex flex-wrap gap-2 mt-2.5">
+                    <span className="inline-flex items-center gap-1 text-xs bg-white border border-primary/20 rounded px-2 py-1 font-medium text-primary">
+                      Stok tersedia: <strong>{selectedItem.stok} {selectedItem.uom}</strong>
+                    </span>
+                    {selectedItem.binLoc ? (
+                      <span className="inline-flex items-center gap-1 text-xs bg-blue-50 border border-blue-200 rounded px-2 py-1 font-mono font-semibold text-blue-700">
+                        📍 BIN LOC: {selectedItem.binLoc}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-400 italic">
+                        BIN LOC belum diset
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

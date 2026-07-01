@@ -356,7 +356,7 @@ export default function BarangMasuk() {
 
       {/* Form Dialog */}
       <Dialog open={formOpen} onOpenChange={(o) => { setFormOpen(o); if (!o) resetForm(); }}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base">
               <PackagePlus className="h-5 w-5 text-emerald-600" />
@@ -380,27 +380,48 @@ export default function BarangMasuk() {
                     autoFocus
                   />
                   {showSuggestions && suggestions.length > 0 && (
-                    <div className="absolute z-20 w-full mt-1 bg-white border rounded-lg shadow-xl overflow-hidden">
+                    <div className="absolute z-20 w-full mt-1 bg-white border rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto">
                       {suggestions.map((item) => (
                         <button key={item.itemCode} className="w-full px-4 py-2.5 hover:bg-slate-50 flex justify-between items-center border-b last:border-0 text-left"
                           onMouseDown={() => handleSelectItem(item)}>
-                          <div>
-                            <p className="font-medium text-sm">{item.nama}</p>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm truncate">{item.nama}</p>
                             <p className="text-xs font-mono text-slate-400">{item.itemCode} · {item.kategori}</p>
                           </div>
-                          <span className="text-xs bg-slate-100 px-2 py-0.5 rounded font-semibold shrink-0 ml-3">Stok: {item.stok}</span>
+                          <div className="flex items-center gap-2 shrink-0 ml-3">
+                            {item.binLoc && (
+                              <span className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded font-mono">{item.binLoc}</span>
+                            )}
+                            <span className="text-xs bg-slate-100 px-2 py-0.5 rounded font-semibold">Stok: {item.stok}</span>
+                          </div>
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3 flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-sm text-slate-800 break-words">{selectedItem.nama}</p>
-                    <p className="text-xs font-mono text-slate-500 mt-0.5 break-all">{selectedItem.itemCode} · Stok: {selectedItem.stok} {selectedItem.uom}</p>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-sm text-slate-800 break-words">{selectedItem.nama}</p>
+                      <p className="text-xs font-mono text-slate-500 mt-0.5">{selectedItem.itemCode} · {selectedItem.kategori}</p>
+                    </div>
+                    <button className="text-xs text-slate-400 hover:text-red-500 shrink-0 transition-colors pt-0.5" onClick={() => setSelectedItem(null)}>Ganti</button>
                   </div>
-                  <button className="text-xs text-slate-400 hover:text-red-500 shrink-0 transition-colors pt-0.5" onClick={() => setSelectedItem(null)}>Ganti</button>
+                  <div className="flex flex-wrap gap-2 mt-2.5">
+                    <span className="inline-flex items-center gap-1 text-xs bg-white border border-emerald-200 rounded px-2 py-1 font-medium text-emerald-700">
+                      Stok saat ini: <strong>{selectedItem.stok} {selectedItem.uom}</strong>
+                    </span>
+                    {selectedItem.binLoc ? (
+                      <span className="inline-flex items-center gap-1 text-xs bg-blue-50 border border-blue-200 rounded px-2 py-1 font-mono font-semibold text-blue-700">
+                        📍 BIN LOC: {selectedItem.binLoc}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-400 italic">
+                        BIN LOC belum diset
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
