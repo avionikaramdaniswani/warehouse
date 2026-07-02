@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Search, Plus, Printer, FileX, CalendarDays, MapPin,
+  Search, Plus, Printer, FileX, CalendarDays,
   Loader2, AlertTriangle, Wrench, Settings2, ClipboardList,
   ArrowLeft, Trash2, PackagePlus, Package,
 } from 'lucide-react';
@@ -24,10 +24,7 @@ interface TransaksiKeluar {
   nomor: string;
   groupId: string | null;
   jumlah: number;
-  keperluan: string | null;
-  tujuan: string | null;
   tanggal: string;
-  keterangan: string | null;
   maintenanceOrder: string | null;
   functionalLocation: string | null;
   equipment: string | null;
@@ -47,9 +44,6 @@ interface ReservationGroup {
   groupId: string;
   nomor: string;
   tanggal: string;
-  keperluan: string | null;
-  tujuan: string | null;
-  keterangan: string | null;
   maintenanceOrder: string | null;
   functionalLocation: string | null;
   equipment: string | null;
@@ -84,9 +78,6 @@ interface PrintPayload {
   tanggal: string;
   petugasNama: string;
   petugasNik: string;
-  keperluan: string;
-  tujuan?: string;
-  keterangan?: string;
   maintenanceOrder?: string;
   functionalLocation?: string;
   equipment?: string;
@@ -116,9 +107,6 @@ function groupTransaksi(rows: TransaksiKeluar[]): ReservationGroup[] {
         groupId: key,
         nomor: row.nomor,
         tanggal: row.tanggal,
-        keperluan: row.keperluan,
-        tujuan: row.tujuan,
-        keterangan: row.keterangan,
         maintenanceOrder: row.maintenanceOrder,
         functionalLocation: row.functionalLocation,
         equipment: row.equipment,
@@ -155,7 +143,7 @@ function printReservationList(d: PrintPayload) {
       <td class="center">${item.qtyIssued}</td>
       <td class="center mono">${item.binLoc || '—'}</td>
       <td></td><td></td><td></td>
-      <td>${d.tujuan || ''}</td>
+      <td></td>
       <td></td>
     </tr>
   `).join('');
@@ -216,10 +204,10 @@ function printReservationList(d: PrintPayload) {
 <div class="info-grid">
   ${infoRow('Reservation No', d.reservationNo)}
   ${infoRow('Movement Type', d.movementType || '')}
-  ${infoRow('Requested Date', tglDoc)}
+  ${infoRow('Date', tglDoc)}
   ${infoRow('Order Type', d.orderType || '')}
   ${infoRow('Maintenance Order', d.maintenanceOrder || '')}
-  ${infoRow('Maint. Activity Type', d.activityType || '')}
+  ${infoRow('Activity Type', d.activityType || '')}
   ${infoRow('Functional Location', d.functionalLocation || '')}
   ${infoRow('Equipment', d.equipment || '')}
 </div>
@@ -298,14 +286,6 @@ function printReservationList(d: PrintPayload) {
 }
 
 /* ─── Constants ─── */
-const KEPERLUAN_OPTIONS = ['Perbaikan', 'Penggantian', 'Proyek Baru', 'Peminjaman', 'Lainnya'];
-const keperluanBadge: Record<string, string> = {
-  'Perbaikan':   'bg-amber-50 text-amber-700 border-amber-200',
-  'Penggantian': 'bg-sky-50 text-sky-700 border-sky-200',
-  'Proyek Baru': 'bg-blue-50 text-blue-700 border-blue-200',
-  'Peminjaman':  'bg-purple-50 text-purple-700 border-purple-200',
-  'Lainnya':     'bg-slate-50 text-slate-600 border-slate-200',
-};
 
 function formatTgl(s: string) {
   return new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -321,9 +301,6 @@ const newLineItem = (): LineItem => ({
 
 const defaultShared = () => ({
   tanggal: new Date().toISOString().split('T')[0],
-  keperluan: 'Perbaikan',
-  tujuan: '',
-  keterangan: '',
   maintenanceOrder: '',
   functionalLocation: '',
   equipment: '',
@@ -543,10 +520,7 @@ export default function ReservationList() {
           body: JSON.stringify({
             itemCode: line.selectedItem!.itemCode,
             jumlah: parseInt(line.jumlah),
-            keperluan: shared.keperluan,
-            tujuan: shared.tujuan || undefined,
             tanggal: shared.tanggal,
-            keterangan: shared.keterangan || undefined,
             maintenanceOrder: shared.maintenanceOrder || undefined,
             functionalLocation: shared.functionalLocation || undefined,
             equipment: shared.equipment || undefined,
@@ -579,9 +553,6 @@ export default function ReservationList() {
         tanggal: shared.tanggal,
         petugasNama: currentUser?.namaLengkap ?? currentUser?.email ?? '',
         petugasNik: currentUser?.nik ?? '',
-        keperluan: shared.keperluan,
-        tujuan: shared.tujuan || undefined,
-        keterangan: shared.keterangan || undefined,
         maintenanceOrder: shared.maintenanceOrder || undefined,
         functionalLocation: shared.functionalLocation || undefined,
         equipment: shared.equipment || undefined,
@@ -619,7 +590,6 @@ export default function ReservationList() {
     return (
       g.nomor.toLowerCase().includes(q) ||
       g.items.some((i) => i.namaBarang.toLowerCase().includes(q) || i.itemCode.toLowerCase().includes(q)) ||
-      (g.tujuan ?? '').toLowerCase().includes(q) ||
       (g.maintenanceOrder ?? '').toLowerCase().includes(q)
     );
   });
@@ -630,9 +600,6 @@ export default function ReservationList() {
       tanggal: g.tanggal,
       petugasNama: g.petugas,
       petugasNik: g.petugasNik,
-      keperluan: g.keperluan ?? '',
-      tujuan: g.tujuan ?? undefined,
-      keterangan: g.keterangan ?? undefined,
       maintenanceOrder: g.maintenanceOrder ?? undefined,
       functionalLocation: g.functionalLocation ?? undefined,
       equipment: g.equipment ?? undefined,
@@ -684,32 +651,13 @@ export default function ReservationList() {
           {/* Info Umum + SAP dalam satu card grid 2 kolom */}
           <Card className="border-slate-100 shadow-sm">
             <CardContent className="pt-5 space-y-5">
-              {/* Baris 1: Tanggal, Keperluan, Tujuan, Keterangan */}
+              {/* Baris 1: Tanggal */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-sm font-medium flex items-center gap-1">
                     <CalendarDays className="h-3.5 w-3.5" />Tanggal <span className="text-red-500">*</span>
                   </Label>
                   <Input type="date" value={shared.tanggal} onChange={(e) => setShared({ ...shared, tanggal: e.target.value })} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-medium">Keperluan <span className="text-red-500">*</span></Label>
-                  <Select value={shared.keperluan} onValueChange={(v) => setShared({ ...shared, keperluan: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {KEPERLUAN_OPTIONS.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-medium flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5" />Tujuan / Department
-                  </Label>
-                  <Input placeholder="Nama atau area/dept" value={shared.tujuan} onChange={(e) => setShared({ ...shared, tujuan: e.target.value })} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-medium">Keterangan</Label>
-                  <Input placeholder="Catatan tambahan..." value={shared.keterangan} onChange={(e) => setShared({ ...shared, keterangan: e.target.value })} />
                 </div>
               </div>
 
@@ -847,8 +795,6 @@ export default function ReservationList() {
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-24">Qty Total</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-32">MO No.</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">Order Type</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">Keperluan</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">Tujuan</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">Petugas</TableHead>
                   <TableHead className="w-12 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Cetak</TableHead>
                 </TableRow>
@@ -864,7 +810,7 @@ export default function ReservationList() {
                   ))
                 ) : filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="h-56 text-center">
+                    <TableCell colSpan={8} className="h-56 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground gap-2">
                         <FileX className="h-10 w-10 text-slate-200" />
                         <p className="font-medium text-slate-500">Belum ada Reservation List</p>
@@ -912,12 +858,6 @@ export default function ReservationList() {
                           ? <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-mono">{group.orderType}</span>
                           : <span className="text-slate-300 text-xs">—</span>}
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={`text-xs ${keperluanBadge[group.keperluan ?? ''] || ''}`}>
-                          {group.keperluan}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{group.tujuan || '—'}</TableCell>
                       <TableCell className="text-sm">{group.petugas}</TableCell>
                       <TableCell className="text-center">
                         <Button variant="ghost" size="icon"

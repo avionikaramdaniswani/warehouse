@@ -26,10 +26,7 @@ async function generateNomor(): Promise<string> {
 const createSchema = z.object({
   itemCode: z.string().min(1),
   jumlah: z.number().int().positive("Jumlah harus lebih dari 0"),
-  keperluan: z.enum(["Perbaikan", "Penggantian", "Proyek Baru", "Peminjaman", "Lainnya"]).default("Perbaikan"),
-  tujuan: z.string().optional(),
   tanggal: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format tanggal YYYY-MM-DD"),
-  keterangan: z.string().optional(),
   maintenanceOrder: z.string().optional(),
   functionalLocation: z.string().optional(),
   equipment: z.string().optional(),
@@ -40,7 +37,7 @@ const createSchema = z.object({
 });
 
 router.get("/transaksi-keluar", authenticate, async (req, res) => {
-  const { search, keperluan, tanggal, itemCode: itemCodeFilter } = req.query as Record<string, string>;
+  const { search, tanggal, itemCode: itemCodeFilter } = req.query as Record<string, string>;
 
   const rows = await db
     .select({
@@ -48,10 +45,7 @@ router.get("/transaksi-keluar", authenticate, async (req, res) => {
       nomor: transaksiKeluarTable.nomor,
       groupId: transaksiKeluarTable.groupId,
       jumlah: transaksiKeluarTable.jumlah,
-      keperluan: transaksiKeluarTable.keperluan,
-      tujuan: transaksiKeluarTable.tujuan,
       tanggal: transaksiKeluarTable.tanggal,
-      keterangan: transaksiKeluarTable.keterangan,
       maintenanceOrder: transaksiKeluarTable.maintenanceOrder,
       functionalLocation: transaksiKeluarTable.functionalLocation,
       equipment: transaksiKeluarTable.equipment,
@@ -82,14 +76,11 @@ router.get("/transaksi-keluar", authenticate, async (req, res) => {
       (r: Row) =>
         r.namaBarang.toLowerCase().includes(q) ||
         r.itemCode.toLowerCase().includes(q) ||
-        (r.tujuan ?? "").toLowerCase().includes(q)
+        (r.maintenanceOrder ?? "").toLowerCase().includes(q)
     );
   }
   if (itemCodeFilter) {
     result = result.filter((r: Row) => r.itemCode === itemCodeFilter);
-  }
-  if (keperluan && keperluan !== "Semua") {
-    result = result.filter((r: Row) => r.keperluan === keperluan);
   }
   if (tanggal) {
     result = result.filter((r: Row) => r.tanggal === tanggal);
@@ -105,7 +96,7 @@ router.post("/transaksi-keluar", authenticate, authorize("admin", "kepala_gudang
     return;
   }
 
-  const { itemCode, jumlah, keperluan, tujuan, tanggal, keterangan,
+  const { itemCode, jumlah, tanggal,
           maintenanceOrder, functionalLocation, equipment, movementType, orderType, activityType, groupId } = parsed.data;
 
   const [item] = await db
@@ -139,10 +130,7 @@ router.post("/transaksi-keluar", authenticate, authorize("admin", "kepala_gudang
       itemId: item.id,
       userId: req.user!.userId,
       jumlah,
-      keperluan,
-      tujuan: tujuan || null,
       tanggal,
-      keterangan: keterangan || null,
       maintenanceOrder: maintenanceOrder || null,
       functionalLocation: functionalLocation || null,
       equipment: equipment || null,
