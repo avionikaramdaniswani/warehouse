@@ -169,9 +169,8 @@ function printReservationList(d: PrintPayload) {
   .co-block { display: flex; align-items: center; gap: 8px; }
   .co-logo  { height: 38px; width: auto; display: block; }
   .co-name  { font-size: 9.5pt; font-weight: 700; color: #1B3A2D; }
-  .doc-title h1 { font-size: 13pt; font-weight: 700; color: #1B3A2D; letter-spacing: .5px; text-align: center; }
+  .doc-title h1 { font-size: 14pt; font-weight: 700; color: #1B3A2D; letter-spacing: .5px; text-align: center; text-transform: uppercase; }
   .doc-meta  { text-align: right; font-size: 7.5pt; line-height: 1.7; min-width: 130px; }
-  .doc-meta strong { color: #1B3A2D; }
   .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; border: 1px solid #c8d5cc; border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; background: #f9fcfa; }
   .info-row  { display: flex; gap: 0; font-size: 8pt; line-height: 1.6; }
   .lbl  { min-width: 138px; font-weight: 600; color: #333; }
@@ -198,12 +197,9 @@ function printReservationList(d: PrintPayload) {
     <div class="co-name">PT TANJUNGENIM LESTARI PULP AND PAPER</div>
   </div>
   <div class="doc-title">
-    <h1>GOODS ISSUE / RESERVATION LIST</h1>
+    <h1>Reservation List</h1>
   </div>
-  <div class="doc-meta">
-    <strong>Tgl. Cetak</strong>: ${tglCetak} ${jamCetak}<br>
-    <strong>Halaman</strong>: 1 / 1
-  </div>
+  <div style="min-width:130px"></div>
 </div>
 
 <div class="info-grid">
