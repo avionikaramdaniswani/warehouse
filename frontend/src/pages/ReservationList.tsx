@@ -171,7 +171,7 @@ function printReservationList(d: PrintPayload) {
   body { font-family: Arial, Helvetica, sans-serif; font-size: 8.5pt; color: #111; }
   .doc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #1B3A2D; padding-bottom: 6px; margin-bottom: 7px; }
   .co-block { display: flex; align-items: center; gap: 8px; }
-  .co-logo  { height: 56px; width: auto; display: block; }
+  .co-logo  { height: 32px; width: auto; display: block; }
   .co-name  { font-size: 9.5pt; font-weight: 700; color: #1B3A2D; }
   .doc-title h1 { font-size: 14pt; font-weight: 700; color: #1B3A2D; letter-spacing: .5px; text-align: center; text-transform: uppercase; }
   .doc-meta  { text-align: right; font-size: 7.5pt; line-height: 1.7; min-width: 130px; }
@@ -188,12 +188,14 @@ function printReservationList(d: PrintPayload) {
   .center { text-align: center; }
   .mono { font-family: Courier New, monospace; }
   .sigs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 4px; }
-  .sig  { border: 1px solid #b0bfb8; border-radius: 4px; padding: 8px 10px; }
-  .sig-title { font-weight: 700; font-size: 8.5pt; color: #1B3A2D; margin-bottom: 52px; }
-  .sig-area  { border-top: 1px solid #555; margin-top: 0; }
-  .sig-info  { padding-top: 5px; font-size: 7.5pt; color: #333; line-height: 1.8; }
-  .sig-info .sig-row { display: flex; gap: 0; }
-  .sig-info .sig-lbl { min-width: 40px; font-weight: 600; color: #555; }
+  .sig  { border: 1px solid #b0bfb8; border-radius: 4px; padding: 8px 10px; display: flex; flex-direction: column; }
+  .sig-title { font-size: 8pt; font-weight: 700; color: #1B3A2D; margin-bottom: 4px; }
+  .sig-space { flex: 1; min-height: 54px; }
+  .sig-area  { border-top: 1px solid #555; }
+  .sig-info  { padding-top: 5px; font-size: 7.5pt; color: #333; line-height: 1.9; }
+  .sig-info .sig-row { display: flex; gap: 0; align-items: baseline; }
+  .sig-info .sig-lbl { min-width: 44px; font-weight: 600; color: #555; }
+  .sig-info .sig-colon { margin: 0 3px; color: #666; }
   .sig-info .sig-val { color: #111; border-bottom: 1px solid #bbb; flex: 1; min-height: 10px; padding-left: 4px; }
   .footer { margin-top: 8px; font-size: 7pt; color: #888; border-top: 1px solid #ddd; padding-top: 3px; text-align: right; }
 </style>
@@ -251,30 +253,33 @@ function printReservationList(d: PrintPayload) {
 
 <div class="sigs">
   <div class="sig">
-    <div class="sig-title">Requested By</div>
+    <div class="sig-title">Requested by:</div>
+    <div class="sig-space"></div>
     <div class="sig-area"></div>
     <div class="sig-info">
-      <div class="sig-row"><span class="sig-lbl">Name</span><span class="sig-val">${d.petugasNama}</span></div>
-      <div class="sig-row"><span class="sig-lbl">NIK</span><span class="sig-val">${d.petugasNik}</span></div>
-      <div class="sig-row"><span class="sig-lbl">Date</span><span class="sig-val">${tglDoc}</span></div>
+      <div class="sig-row"><span class="sig-lbl">Name</span><span class="sig-colon">:</span><span class="sig-val">${d.petugasNama}</span></div>
+      <div class="sig-row"><span class="sig-lbl">NIK</span><span class="sig-colon">:</span><span class="sig-val">${d.petugasNik}</span></div>
+      <div class="sig-row"><span class="sig-lbl">Date</span><span class="sig-colon">:</span><span class="sig-val">${tglDoc}</span></div>
     </div>
   </div>
   <div class="sig">
-    <div class="sig-title">Approved By</div>
+    <div class="sig-title">Approved by:</div>
+    <div class="sig-space"></div>
     <div class="sig-area"></div>
     <div class="sig-info">
-      <div class="sig-row"><span class="sig-lbl">Name</span><span class="sig-val"></span></div>
-      <div class="sig-row"><span class="sig-lbl">NIK</span><span class="sig-val"></span></div>
-      <div class="sig-row"><span class="sig-lbl">Date</span><span class="sig-val"></span></div>
+      <div class="sig-row"><span class="sig-lbl">Name</span><span class="sig-colon">:</span><span class="sig-val"></span></div>
+      <div class="sig-row"><span class="sig-lbl">NIK</span><span class="sig-colon">:</span><span class="sig-val"></span></div>
+      <div class="sig-row"><span class="sig-lbl">Date</span><span class="sig-colon">:</span><span class="sig-val"></span></div>
     </div>
   </div>
   <div class="sig">
-    <div class="sig-title">Received By</div>
+    <div class="sig-title">Received by:</div>
+    <div class="sig-space"></div>
     <div class="sig-area"></div>
     <div class="sig-info">
-      <div class="sig-row"><span class="sig-lbl">Name</span><span class="sig-val"></span></div>
-      <div class="sig-row"><span class="sig-lbl">NIK</span><span class="sig-val"></span></div>
-      <div class="sig-row"><span class="sig-lbl">Date</span><span class="sig-val"></span></div>
+      <div class="sig-row"><span class="sig-lbl">Name</span><span class="sig-colon">:</span><span class="sig-val"></span></div>
+      <div class="sig-row"><span class="sig-lbl">NIK</span><span class="sig-colon">:</span><span class="sig-val"></span></div>
+      <div class="sig-row"><span class="sig-lbl">Date</span><span class="sig-colon">:</span><span class="sig-val"></span></div>
     </div>
   </div>
 </div>
