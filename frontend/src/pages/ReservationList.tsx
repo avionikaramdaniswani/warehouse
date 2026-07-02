@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Search, Plus, Printer, FileX, CalendarDays,
+  Search, Plus, Printer, FileX,
   Loader2, AlertTriangle, Wrench, Settings2, ClipboardList,
   ArrowLeft, Trash2, PackagePlus, Package,
 } from 'lucide-react';
@@ -651,18 +651,8 @@ export default function ReservationList() {
           {/* Info Umum + SAP dalam satu card grid 2 kolom */}
           <Card className="border-slate-100 shadow-sm">
             <CardContent className="pt-5 space-y-5">
-              {/* Baris 1: Tanggal */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-medium flex items-center gap-1">
-                    <CalendarDays className="h-3.5 w-3.5" />Tanggal <span className="text-red-500">*</span>
-                  </Label>
-                  <Input type="date" value={shared.tanggal} onChange={(e) => setShared({ ...shared, tanggal: e.target.value })} />
-                </div>
-              </div>
-
               {/* SAP Fields */}
-              <div className="border-t pt-4 space-y-3">
+              <div className="space-y-3">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <Wrench className="h-3.5 w-3.5" />Info SAP / Maintenance
                 </p>
