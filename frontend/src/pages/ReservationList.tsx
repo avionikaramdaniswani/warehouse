@@ -187,17 +187,16 @@ function printReservationList(d: PrintPayload) {
   tbody tr:nth-child(even) td { background: #f4f8f5; }
   .center { text-align: center; }
   .mono { font-family: Courier New, monospace; }
-  .sigs { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 4px; border: 1px solid #b0bfb8; border-radius: 4px; overflow: hidden; }
-  .sig  { padding: 8px 10px; display: flex; flex-direction: column; border-right: 1px solid #b0bfb8; }
-  .sig:last-child { border-right: none; }
-  .sig-title { font-size: 8pt; font-weight: 700; color: #1B3A2D; margin-bottom: 4px; }
-  .sig-space { flex: 1; min-height: 54px; }
-  .sig-area  { border-top: 1px solid #555; }
-  .sig-info  { padding-top: 5px; font-size: 7.5pt; color: #333; line-height: 1.9; }
+  .sigs { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 8px; gap: 0; }
+  .sig  { padding: 4px 12px 4px 0; display: flex; flex-direction: column; }
+  .sig-title { font-size: 8pt; font-weight: 700; color: #111; margin-bottom: 2px; }
+  .sig-space { min-height: 58px; }
+  .sig-area  { display: none; }
+  .sig-info  { font-size: 7.8pt; color: #111; line-height: 2.1; }
   .sig-info .sig-row { display: flex; gap: 0; align-items: baseline; }
-  .sig-info .sig-lbl { min-width: 44px; font-weight: 600; color: #555; }
-  .sig-info .sig-colon { margin: 0 3px; color: #666; }
-  .sig-info .sig-val { color: #111; border-bottom: 1px solid #bbb; flex: 1; min-height: 10px; padding-left: 4px; }
+  .sig-info .sig-lbl { min-width: 40px; color: #111; }
+  .sig-info .sig-colon { margin: 0 3px; }
+  .sig-info .sig-val { border-bottom: 1px solid #555; flex: 1; min-height: 11px; padding-left: 2px; }
   .footer { margin-top: 8px; font-size: 7pt; color: #888; border-top: 1px solid #ddd; padding-top: 3px; text-align: right; }
 </style>
 </head>
