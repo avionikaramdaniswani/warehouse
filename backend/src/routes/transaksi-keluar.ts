@@ -67,6 +67,7 @@ router.get("/transaksi-keluar", authenticate, async (req, res) => {
       uom: itemsTable.uom,
       binLoc: itemsTable.binLoc,
       petugas: usersTable.namaLengkap,
+      petugasNik: usersTable.nik,
     })
     .from(transaksiKeluarTable)
     .innerJoin(itemsTable, eq(transaksiKeluarTable.itemId, itemsTable.id))
