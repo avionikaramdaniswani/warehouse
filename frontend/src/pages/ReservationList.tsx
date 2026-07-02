@@ -187,8 +187,9 @@ function printReservationList(d: PrintPayload) {
   tbody tr:nth-child(even) td { background: #f4f8f5; }
   .center { text-align: center; }
   .mono { font-family: Courier New, monospace; }
-  .sigs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 4px; }
-  .sig  { border: 1px solid #b0bfb8; border-radius: 4px; padding: 8px 10px; display: flex; flex-direction: column; }
+  .sigs { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 4px; border: 1px solid #b0bfb8; border-radius: 4px; overflow: hidden; }
+  .sig  { padding: 8px 10px; display: flex; flex-direction: column; border-right: 1px solid #b0bfb8; }
+  .sig:last-child { border-right: none; }
   .sig-title { font-size: 8pt; font-weight: 700; color: #1B3A2D; margin-bottom: 4px; }
   .sig-space { flex: 1; min-height: 54px; }
   .sig-area  { border-top: 1px solid #555; }
