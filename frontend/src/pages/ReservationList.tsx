@@ -175,7 +175,8 @@ function printReservationList(d: PrintPayload) {
   .co-name  { font-size: 9.5pt; font-weight: 700; color: #1B3A2D; }
   .doc-title h1 { font-size: 14pt; font-weight: 700; color: #1B3A2D; letter-spacing: .5px; text-align: center; text-transform: uppercase; }
   .doc-meta  { text-align: right; font-size: 7.5pt; line-height: 1.7; min-width: 130px; }
-  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; border: 1px solid #c8d5cc; border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; background: #f9fcfa; }
+  .doc-body  { border: 1px solid #b0bfb8; border-radius: 4px; padding: 8px 10px; margin-bottom: 6px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; margin-bottom: 8px; }
   .info-row  { display: flex; gap: 0; font-size: 8pt; line-height: 1.6; }
   .lbl  { min-width: 138px; font-weight: 600; color: #333; }
   .colon{ margin: 0 4px; color: #666; }
@@ -187,7 +188,7 @@ function printReservationList(d: PrintPayload) {
   tbody tr:nth-child(even) td { background: #f4f8f5; }
   .center { text-align: center; }
   .mono { font-family: Courier New, monospace; }
-  .sigs { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 8px; gap: 0; }
+  .sigs { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 6px; gap: 0; }
   .sig  { padding: 4px 12px 4px 0; display: flex; flex-direction: column; }
   .sig-title { font-size: 8pt; font-weight: 700; color: #111; margin-bottom: 2px; }
   .sig-space { min-height: 58px; }
@@ -212,6 +213,7 @@ function printReservationList(d: PrintPayload) {
   <div style="min-width:130px"></div>
 </div>
 
+<div class="doc-body">
 <div class="info-grid">
   ${infoRow('Reservation No', d.reservationNo)}
   ${infoRow('Movement Type', d.movementType || '')}
@@ -282,6 +284,7 @@ function printReservationList(d: PrintPayload) {
       <div class="sig-row"><span class="sig-lbl">Date</span><span class="sig-colon">:</span><span class="sig-val"></span></div>
     </div>
   </div>
+</div>
 </div>
 
 <div class="footer">Dicetak: ${tglCetak} ${jamCetak} &nbsp;|&nbsp; Petugas: ${d.petugasNama}</div>
