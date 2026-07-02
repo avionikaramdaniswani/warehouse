@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { itemsTable } from "@workspace/db/schema";
 import { eq, and, asc } from "drizzle-orm";
+import { authenticate } from "../middlewares/authenticate.js";
 
 const router = Router();
 
@@ -11,8 +12,8 @@ function computeStatus(stok: number, safetyStok: number): string {
   return "Normal";
 }
 
-router.get("/bin/:binLoc", async (req, res) => {
-  const binLoc = decodeURIComponent(req.params.binLoc);
+router.get("/bin/:binLoc", authenticate, async (req, res) => {
+  const binLoc = decodeURIComponent(req.params.binLoc as string);
   const rows = await db
     .select()
     .from(itemsTable)

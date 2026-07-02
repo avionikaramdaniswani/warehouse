@@ -156,7 +156,7 @@ router.post("/items", authenticate, authorize("admin", "kepala_gudang"), async (
 });
 
 router.put("/items/:itemCode", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
-  const { itemCode } = req.params;
+  const itemCode = req.params.itemCode as string;
 
   const parsed = updateItemSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -222,7 +222,7 @@ router.put("/items/:itemCode", authenticate, authorize("admin", "kepala_gudang")
 });
 
 router.patch("/items/:itemCode/stok", authenticate, authorize("admin", "kepala_gudang"), async (req, res) => {
-  const { itemCode } = req.params;
+  const itemCode = req.params.itemCode as string;
   const parsed = z.object({ delta: z.number().int() }).safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ message: "delta harus berupa bilangan bulat" });
@@ -451,7 +451,7 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
 });
 
 router.delete("/items/:itemCode", authenticate, authorize("admin"), async (req, res) => {
-  const { itemCode } = req.params;
+  const itemCode = req.params.itemCode as string;
 
   const [existing] = await db
     .select()

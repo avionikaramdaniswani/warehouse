@@ -74,9 +74,12 @@ router.post("/users", authenticate, authorize("admin"), async (req, res) => {
   const data = parsed.data;
   const hashedPassword = await hashPassword(data.password);
 
+  const { tanggalGabung: tanggalGabungStr, ...restData } = data;
+  const tanggalGabung = tanggalGabungStr ? new Date(tanggalGabungStr) : undefined;
+
   const [inserted] = await db
     .insert(usersTable)
-    .values({ ...data, password: hashedPassword, dibuatOleh: req.user!.userId, permissions: {} })
+    .values({ ...restData, password: hashedPassword, dibuatOleh: req.user!.userId, permissions: {}, ...(tanggalGabung ? { tanggalGabung } : {}) })
     .returning({ id: usersTable.id });
 
   const [newUser] = await db
@@ -109,9 +112,12 @@ router.put("/users/:id", authenticate, authorize("admin"), async (req, res) => {
     return;
   }
 
+  const { tanggalGabung: tanggalGabungStr, ...restUpdate } = parsed.data;
+  const tanggalGabung = tanggalGabungStr ? new Date(tanggalGabungStr) : undefined;
+
   await db
     .update(usersTable)
-    .set({ ...parsed.data, updatedAt: new Date() })
+    .set({ ...restUpdate, ...(tanggalGabung ? { tanggalGabung } : {}), updatedAt: new Date() })
     .where(eq(usersTable.id, id));
 
   const [updated] = await db
