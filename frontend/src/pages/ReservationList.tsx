@@ -391,15 +391,18 @@ function ItemRow({
             </div>
             <div className="flex flex-col gap-0.5 shrink-0">
               <Input
-                type="number" min="1" max={line.selectedItem?.stok}
+                type="number" min="1"
                 placeholder="Qty"
-                className={`w-20 h-9 text-sm font-bold text-center ${isOver ? 'border-red-400' : ''}`}
+                className={`w-24 h-9 text-sm font-bold text-center ${isOver ? 'border-red-400 focus-visible:ring-red-300' : ''}`}
                 value={line.jumlah}
-                onChange={(e) => onUpdate({ jumlah: e.target.value })}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/[^0-9]/g, '');
+                  onUpdate({ jumlah: v });
+                }}
               />
               {isOver && (
                 <p className="text-[10px] text-red-500 flex items-center gap-0.5 whitespace-nowrap">
-                  <AlertTriangle className="h-2.5 w-2.5" />Max {line.selectedItem?.stok}
+                  <AlertTriangle className="h-2.5 w-2.5" />Maks {line.selectedItem?.stok}
                 </p>
               )}
             </div>
@@ -626,12 +629,24 @@ export default function ReservationList() {
   if (view === 'form') {
     return (
       <Layout title="Reservation List">
-        <div className="max-w-2xl mx-auto flex flex-col gap-5">
-          <button onClick={cancelForm}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-slate-800 transition-colors w-fit">
-            <ArrowLeft className="h-4 w-4" />Kembali ke daftar
-          </button>
+        <div className="flex flex-col gap-5">
+          {/* Header baris */}
+          <div className="flex items-center justify-between">
+            <button onClick={cancelForm}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-slate-800 transition-colors">
+              <ArrowLeft className="h-4 w-4" />Kembali ke daftar
+            </button>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={cancelForm} disabled={saving}>Batal</Button>
+              <Button onClick={handleSimpan} disabled={saving}>
+                {saving
+                  ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Menyimpan...</>
+                  : <><Printer className="h-4 w-4 mr-1.5" />Simpan &amp; Cetak PDF</>}
+              </Button>
+            </div>
+          </div>
 
+          {/* Judul */}
           <div>
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <ClipboardList className="h-5 w-5 text-primary" />Buat Reservation List Baru
@@ -639,10 +654,11 @@ export default function ReservationList() {
             <p className="text-sm text-muted-foreground mt-0.5">Isi data di bawah lalu simpan — PDF akan dicetak otomatis</p>
           </div>
 
+          {/* Info Umum + SAP dalam satu card grid 2 kolom */}
           <Card className="border-slate-100 shadow-sm">
             <CardContent className="pt-5 space-y-5">
-              {/* Tanggal + Keperluan */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Baris 1: Tanggal, Keperluan, Tujuan, Keterangan */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-sm font-medium flex items-center gap-1">
                     <CalendarDays className="h-3.5 w-3.5" />Tanggal <span className="text-red-500">*</span>
@@ -658,10 +674,6 @@ export default function ReservationList() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-
-              {/* Tujuan + Keterangan */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-sm font-medium flex items-center gap-1">
                     <MapPin className="h-3.5 w-3.5" />Tujuan / Department
@@ -675,11 +687,11 @@ export default function ReservationList() {
               </div>
 
               {/* SAP Fields */}
-              <div className="border-t pt-4 space-y-4">
+              <div className="border-t pt-4 space-y-3">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <Wrench className="h-3.5 w-3.5" />Info SAP / Maintenance
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
                   <div className="space-y-1.5">
                     <Label className="text-xs font-medium text-muted-foreground">Movement Type</Label>
                     <Select value={shared.movementType} onValueChange={(v) => setShared({ ...shared, movementType: v })}>
@@ -716,8 +728,6 @@ export default function ReservationList() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
                     <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                       <Settings2 className="h-3 w-3" />Maintenance Order No
@@ -763,6 +773,7 @@ export default function ReservationList() {
             </CardContent>
           </Card>
 
+          {/* Footer tombol */}
           <div className="flex gap-3 justify-end pb-6">
             <Button variant="outline" onClick={cancelForm} disabled={saving}>Batal</Button>
             <Button onClick={handleSimpan} disabled={saving}>
