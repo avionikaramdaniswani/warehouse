@@ -438,7 +438,7 @@ export default function ReservationList() {
   const [binSelectLoc, setBinSelectLoc] = useState('');
   const [binSelectItems, setBinSelectItems] = useState<Item[]>([]);
 
-  const logoUrl = `${window.location.origin}/tel-logo-transparent.png`;
+  const logoUrl = `${window.location.origin}/tel-logo.png`;
 
   const fetchData = useCallback(async () => {
     if (!token) return;
