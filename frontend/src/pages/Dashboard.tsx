@@ -7,7 +7,7 @@ import {
   BarChart, Bar, PieChart, Pie,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer,
 } from 'recharts';
-import { Package, PackageMinus, PackagePlus, TrendingDown, RefreshCw, AlertTriangle, AlertOctagon } from 'lucide-react';
+import { Package, PackageMinus, PackagePlus, TrendingDown, RefreshCw, AlertTriangle, AlertOctagon, CheckCircle2 } from 'lucide-react';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
