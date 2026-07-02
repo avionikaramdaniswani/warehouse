@@ -42,6 +42,7 @@ export const transaksiMasukTable = pgTable("transaksi_masuk", {
 export const transaksiKeluarTable = pgTable("transaksi_keluar", {
   id: serial("id").primaryKey(),
   nomor: text("nomor").notNull().unique(),
+  groupId: text("group_id"),
   itemId: integer("item_id").notNull().references(() => itemsTable.id),
   userId: integer("user_id").notNull().references(() => usersTable.id),
   jumlah: integer("jumlah").notNull(),

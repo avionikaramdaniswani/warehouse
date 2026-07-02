@@ -7,21 +7,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Search, Plus, Printer, FileX, CalendarDays, MapPin,
   Loader2, AlertTriangle, Wrench, Settings2, ClipboardList,
-  ArrowLeft, Trash2, PackagePlus,
+  ArrowLeft, Trash2, PackagePlus, Package,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { QrScannerDialog } from '@/components/QrScannerDialog';
 import { BinItemSelectDialog } from '@/components/BinItemSelectDialog';
 
+/* ─── Types ─── */
 interface TransaksiKeluar {
   id: number;
   nomor: string;
+  groupId: string | null;
   jumlah: number;
   keperluan: string | null;
   tujuan: string | null;
@@ -41,6 +42,23 @@ interface TransaksiKeluar {
   petugas: string;
 }
 
+interface ReservationGroup {
+  groupId: string;
+  nomor: string;
+  tanggal: string;
+  keperluan: string | null;
+  tujuan: string | null;
+  keterangan: string | null;
+  maintenanceOrder: string | null;
+  functionalLocation: string | null;
+  equipment: string | null;
+  movementType: string | null;
+  orderType: string | null;
+  activityType: string | null;
+  petugas: string;
+  items: TransaksiKeluar[];
+}
+
 interface LineItem {
   id: string;
   selectedItem: Item | null;
@@ -57,7 +75,6 @@ interface PrintLineItem {
   binLoc?: string | null;
   qtyOnHand: number;
   qtyIssued: number;
-  tujuan?: string;
 }
 
 interface PrintPayload {
@@ -74,14 +91,53 @@ interface PrintPayload {
   orderType?: string;
   activityType?: string;
   lineItems: PrintLineItem[];
+  logoUrl: string;
 }
 
+/* ─── UUID generator ─── */
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+/* ─── Group flat rows by groupId ─── */
+function groupTransaksi(rows: TransaksiKeluar[]): ReservationGroup[] {
+  const map = new Map<string, ReservationGroup>();
+  for (const row of rows) {
+    const key = row.groupId ?? row.nomor;
+    if (!map.has(key)) {
+      map.set(key, {
+        groupId: key,
+        nomor: row.nomor,
+        tanggal: row.tanggal,
+        keperluan: row.keperluan,
+        tujuan: row.tujuan,
+        keterangan: row.keterangan,
+        maintenanceOrder: row.maintenanceOrder,
+        functionalLocation: row.functionalLocation,
+        equipment: row.equipment,
+        movementType: row.movementType,
+        orderType: row.orderType,
+        activityType: row.activityType,
+        petugas: row.petugas,
+        items: [],
+      });
+    }
+    map.get(key)!.items.push(row);
+  }
+  return Array.from(map.values());
+}
+
+/* ─── PDF printer ─── */
 function printReservationList(d: PrintPayload) {
   const tglCetak = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const jamCetak = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
   const tglDoc = new Date(d.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-  const row = (label: string, value: string) =>
+  const infoRow = (label: string, value: string) =>
     `<div class="info-row"><span class="lbl">${label}</span><span class="colon">:</span><span class="val">${value || '—'}</span></div>`;
 
   const tableRows = d.lineItems.map((item) => `
@@ -95,7 +151,7 @@ function printReservationList(d: PrintPayload) {
       <td class="center">${item.qtyIssued}</td>
       <td class="center mono">${item.binLoc || '—'}</td>
       <td></td><td></td><td></td>
-      <td>${item.tujuan || ''}</td>
+      <td>${d.tujuan || ''}</td>
       <td></td>
     </tr>
   `).join('');
@@ -110,10 +166,11 @@ function printReservationList(d: PrintPayload) {
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, Helvetica, sans-serif; font-size: 8.5pt; color: #111; }
   .doc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #1B3A2D; padding-bottom: 6px; margin-bottom: 7px; }
-  .co-name { font-size: 10pt; font-weight: 700; color: #1B3A2D; }
-  .doc-title { text-align: center; }
-  .doc-title h1 { font-size: 13pt; font-weight: 700; color: #1B3A2D; letter-spacing: .5px; }
-  .doc-meta  { text-align: right; font-size: 7.5pt; line-height: 1.7; }
+  .co-block { display: flex; align-items: center; gap: 8px; }
+  .co-logo  { height: 38px; width: auto; display: block; }
+  .co-name  { font-size: 9.5pt; font-weight: 700; color: #1B3A2D; }
+  .doc-title h1 { font-size: 13pt; font-weight: 700; color: #1B3A2D; letter-spacing: .5px; text-align: center; }
+  .doc-meta  { text-align: right; font-size: 7.5pt; line-height: 1.7; min-width: 130px; }
   .doc-meta strong { color: #1B3A2D; }
   .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; border: 1px solid #c8d5cc; border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; background: #f9fcfa; }
   .info-row  { display: flex; gap: 0; font-size: 8pt; line-height: 1.6; }
@@ -136,7 +193,10 @@ function printReservationList(d: PrintPayload) {
 </head>
 <body>
 <div class="doc-header">
-  <div class="co-name">PT TANJUNGENIM LESTARI PULP AND PAPER</div>
+  <div class="co-block">
+    <img class="co-logo" src="${d.logoUrl}" alt="TeL Logo" onerror="this.style.display='none'" />
+    <div class="co-name">PT TANJUNGENIM LESTARI PULP AND PAPER</div>
+  </div>
   <div class="doc-title">
     <h1>GOODS ISSUE / RESERVATION LIST</h1>
   </div>
@@ -147,18 +207,18 @@ function printReservationList(d: PrintPayload) {
 </div>
 
 <div class="info-grid">
-  ${row('Reservation No', d.reservationNo)}
-  ${row('Movement Type', d.movementType || '')}
-  ${row('Requested Date', tglDoc)}
-  ${row('Order Type', d.orderType || '')}
-  ${row('Requested By', d.petugasNama)}
-  ${row('Maint. Activity Type', d.activityType || '')}
-  ${row('Maintenance Order', d.maintenanceOrder || '')}
-  ${row('Functional Location', d.functionalLocation || '')}
-  ${row('Keperluan', d.keperluan)}
-  ${row('Equipment', d.equipment || '')}
-  ${row('Department / Tujuan', d.tujuan || '')}
-  ${row('Keterangan', d.keterangan || '')}
+  ${infoRow('Reservation No', d.reservationNo)}
+  ${infoRow('Movement Type', d.movementType || '')}
+  ${infoRow('Requested Date', tglDoc)}
+  ${infoRow('Order Type', d.orderType || '')}
+  ${infoRow('Requested By', d.petugasNama)}
+  ${infoRow('Maint. Activity Type', d.activityType || '')}
+  ${infoRow('Maintenance Order', d.maintenanceOrder || '')}
+  ${infoRow('Functional Location', d.functionalLocation || '')}
+  ${infoRow('Keperluan', d.keperluan)}
+  ${infoRow('Equipment', d.equipment || '')}
+  ${infoRow('Department / Tujuan', d.tujuan || '')}
+  ${infoRow('Keterangan', d.keterangan || '')}
 </div>
 
 <table>
@@ -249,21 +309,11 @@ const defaultShared = () => ({
 
 /* ─── Item Row Component ─── */
 function ItemRow({
-  line,
-  index,
-  allItems,
-  onUpdate,
-  onRemove,
-  canRemove,
-  onQrScan,
+  line, index, allItems, onUpdate, onRemove, canRemove, onQrScan,
 }: {
-  line: LineItem;
-  index: number;
-  allItems: Item[];
+  line: LineItem; index: number; allItems: Item[];
   onUpdate: (patch: Partial<LineItem>) => void;
-  onRemove: () => void;
-  canRemove: boolean;
-  onQrScan: () => void;
+  onRemove: () => void; canRemove: boolean; onQrScan: () => void;
 }) {
   const suggestions = allItems.filter((item) => {
     if (line.searchText.length < 2) return false;
@@ -281,14 +331,11 @@ function ItemRow({
 
   return (
     <div className="flex gap-2 items-start p-3 bg-slate-50 rounded-lg border border-slate-100">
-      {/* Nomor baris */}
       <span className="text-xs font-bold text-muted-foreground bg-white border border-slate-200 rounded w-6 h-6 flex items-center justify-center shrink-0 mt-1.5">
         {index + 1}
       </span>
 
-      {/* Konten utama */}
       <div className="flex-1 flex flex-col gap-2">
-        {/* Baris 1: pilih barang */}
         {!line.selectedItem ? (
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -316,9 +363,7 @@ function ItemRow({
                       </div>
                       <div className="flex items-center gap-2 shrink-0 ml-2">
                         {item.binLoc && <span className="text-xs bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-mono">{item.binLoc}</span>}
-                        <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${item.stok === 0 ? 'bg-red-50 text-red-600' : 'bg-slate-100'}`}>
-                          {item.stok}
-                        </span>
+                        <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${item.stok === 0 ? 'bg-red-50 text-red-600' : 'bg-slate-100'}`}>{item.stok}</span>
                       </div>
                     </button>
                   ))}
@@ -334,7 +379,6 @@ function ItemRow({
           </div>
         ) : (
           <div className="flex gap-2 items-center">
-            {/* Item card */}
             <div className="flex-1 bg-white border border-primary/20 rounded-md px-3 py-1.5 min-h-9 flex items-center gap-2">
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-xs truncate">{line.selectedItem.nama}</p>
@@ -342,13 +386,9 @@ function ItemRow({
                   {line.selectedItem.itemCode} · Stok: {line.selectedItem.stok} {line.selectedItem.uom}
                 </p>
               </div>
-              <button
-                className="text-[10px] text-slate-300 hover:text-red-400 transition-colors shrink-0"
-                onClick={() => onUpdate({ selectedItem: null })}
-                title="Ganti barang"
-              >✕</button>
+              <button className="text-[10px] text-slate-300 hover:text-red-400 transition-colors shrink-0"
+                onClick={() => onUpdate({ selectedItem: null })} title="Ganti barang">✕</button>
             </div>
-            {/* Qty */}
             <div className="flex flex-col gap-0.5 shrink-0">
               <Input
                 type="number" min="1" max={line.selectedItem?.stok}
@@ -368,7 +408,6 @@ function ItemRow({
         )}
       </div>
 
-      {/* Tombol hapus baris */}
       {canRemove ? (
         <button onClick={onRemove} className="text-slate-300 hover:text-red-400 transition-colors shrink-0 mt-2" title="Hapus baris">
           <Trash2 className="h-4 w-4" />
@@ -400,6 +439,8 @@ export default function ReservationList() {
   const [binSelectLoc, setBinSelectLoc] = useState('');
   const [binSelectItems, setBinSelectItems] = useState<Item[]>([]);
 
+  const logoUrl = `${window.location.origin}/tel-logo-transparent.png`;
+
   const fetchData = useCallback(async () => {
     if (!token) return;
     setLoading(true);
@@ -412,25 +453,18 @@ export default function ReservationList() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const updateLine = (id: string, patch: Partial<LineItem>) => {
+  const updateLine = (id: string, patch: Partial<LineItem>) =>
     setLineItems((prev) => prev.map((l) => l.id === id ? { ...l, ...patch } : l));
-  };
-
   const addLine = () => setLineItems((prev) => [...prev, newLineItem()]);
   const removeLine = (id: string) => setLineItems((prev) => prev.filter((l) => l.id !== id));
 
-  const resetForm = () => {
-    setShared(defaultShared());
-    setLineItems([newLineItem()]);
-  };
-
+  const resetForm = () => { setShared(defaultShared()); setLineItems([newLineItem()]); };
   const openForm = () => { resetForm(); setView('form'); };
   const cancelForm = () => { resetForm(); setView('list'); };
 
   const handleQrScan = (scanned: string) => {
     let resolvedItem: Item | null = null;
     let resolvedBinLoc: string | null = null;
-
     if (scanned.includes('/bin/')) {
       try {
         const pathPart = scanned.includes('://') ? new URL(scanned).pathname : scanned;
@@ -443,12 +477,10 @@ export default function ReservationList() {
         }
       } catch { /* lanjut */ }
     }
-
     if (!resolvedItem) {
       resolvedItem = items.find((i) => i.itemCode === scanned) ?? null;
       if (!resolvedItem) { toast.error(`Barang "${scanned}" tidak ditemukan`); return; }
     }
-
     setQrOpen(false);
     if (activeLineId) {
       updateLine(activeLineId, { selectedItem: resolvedItem, searchText: '', showSuggestions: false });
@@ -466,17 +498,13 @@ export default function ReservationList() {
 
   const handleSimpan = async () => {
     const validLines = lineItems.filter((l) => l.selectedItem && parseInt(l.jumlah) > 0);
-    if (validLines.length === 0) {
-      toast.error('Tambahkan minimal 1 item dengan jumlah yang valid');
-      return;
-    }
+    if (validLines.length === 0) { toast.error('Tambahkan minimal 1 item dengan jumlah yang valid'); return; }
     const overStok = validLines.find((l) => parseInt(l.jumlah) > (l.selectedItem?.stok ?? 0));
-    if (overStok) {
-      toast.error(`Stok ${overStok.selectedItem?.nama} tidak mencukupi`);
-      return;
-    }
+    if (overStok) { toast.error(`Stok ${overStok.selectedItem?.nama} tidak mencukupi`); return; }
 
     setSaving(true);
+    const groupId = generateUUID();
+
     try {
       const results: { nomor: string; stokBaru: number; itemCode: string; status: string }[] = [];
 
@@ -497,6 +525,7 @@ export default function ReservationList() {
             movementType: shared.movementType || undefined,
             orderType: shared.orderType || undefined,
             activityType: shared.activityType || undefined,
+            groupId,
           }),
         });
         if (!res.ok) {
@@ -512,12 +541,12 @@ export default function ReservationList() {
       const updatedItems = [...items];
       for (let i = 0; i < validLines.length; i++) {
         const idx = updatedItems.findIndex((it) => it.itemCode === validLines[i].selectedItem!.itemCode);
-        if (idx >= 0) updatedItems[idx] = { ...updatedItems[idx], stok: results[i].stokBaru, status: results[i].status ?? updatedItems[idx].status };
+        if (idx >= 0) updatedItems[idx] = { ...updatedItems[idx], stok: results[i].stokBaru };
       }
       setItems(updatedItems);
 
-      // Build print payload
-      const printPayload: PrintPayload = {
+      // Cetak PDF
+      printReservationList({
         reservationNo: results[0].nomor,
         tanggal: shared.tanggal,
         petugasNama: currentUser?.namaLengkap ?? currentUser?.email ?? '',
@@ -530,6 +559,7 @@ export default function ReservationList() {
         movementType: shared.movementType || undefined,
         orderType: shared.orderType || undefined,
         activityType: shared.activityType || undefined,
+        logoUrl,
         lineItems: validLines.map((line, i) => ({
           no: i + 1,
           itemCode: line.selectedItem!.itemCode,
@@ -538,14 +568,12 @@ export default function ReservationList() {
           binLoc: line.selectedItem!.binLoc,
           qtyOnHand: results[i].stokBaru + parseInt(line.jumlah),
           qtyIssued: parseInt(line.jumlah),
-          tujuan: shared.tujuan || undefined,
         })),
-      };
+      });
 
       resetForm();
       setView('list');
       await fetchData();
-      printReservationList(printPayload);
       toast.success(`${validLines.length} item disimpan & dicetak`);
     } catch {
       toast.error('Gagal terhubung ke server');
@@ -554,42 +582,66 @@ export default function ReservationList() {
     }
   };
 
-  const filtered = data.filter((trx) => {
+  /* ─── Grouping & filtering ─── */
+  const groups = groupTransaksi(data);
+  const filtered = groups.filter((g) => {
     if (!search) return true;
     const q = search.toLowerCase();
     return (
-      trx.nomor.toLowerCase().includes(q) ||
-      trx.namaBarang.toLowerCase().includes(q) ||
-      trx.itemCode.toLowerCase().includes(q) ||
-      (trx.tujuan ?? '').toLowerCase().includes(q) ||
-      (trx.maintenanceOrder ?? '').toLowerCase().includes(q)
+      g.nomor.toLowerCase().includes(q) ||
+      g.items.some((i) => i.namaBarang.toLowerCase().includes(q) || i.itemCode.toLowerCase().includes(q)) ||
+      (g.tujuan ?? '').toLowerCase().includes(q) ||
+      (g.maintenanceOrder ?? '').toLowerCase().includes(q)
     );
   });
+
+  const printGroup = (g: ReservationGroup) => {
+    printReservationList({
+      reservationNo: g.nomor,
+      tanggal: g.tanggal,
+      petugasNama: g.petugas,
+      keperluan: g.keperluan ?? '',
+      tujuan: g.tujuan ?? undefined,
+      keterangan: g.keterangan ?? undefined,
+      maintenanceOrder: g.maintenanceOrder ?? undefined,
+      functionalLocation: g.functionalLocation ?? undefined,
+      equipment: g.equipment ?? undefined,
+      movementType: g.movementType ?? undefined,
+      orderType: g.orderType ?? undefined,
+      activityType: g.activityType ?? undefined,
+      logoUrl,
+      lineItems: g.items.map((item, i) => ({
+        no: i + 1,
+        itemCode: item.itemCode,
+        namaBarang: item.namaBarang,
+        uom: item.uom,
+        binLoc: item.binLoc,
+        qtyOnHand: 0,
+        qtyIssued: item.jumlah,
+      })),
+    });
+  };
 
   /* ─── FORM VIEW ─── */
   if (view === 'form') {
     return (
       <Layout title="Reservation List">
         <div className="max-w-2xl mx-auto flex flex-col gap-5">
-
           <button onClick={cancelForm}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-slate-800 transition-colors w-fit">
-            <ArrowLeft className="h-4 w-4" />
-            Kembali ke daftar
+            <ArrowLeft className="h-4 w-4" />Kembali ke daftar
           </button>
 
           <div>
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              <ClipboardList className="h-5 w-5 text-primary" />
-              Buat Reservation List Baru
+              <ClipboardList className="h-5 w-5 text-primary" />Buat Reservation List Baru
             </h2>
             <p className="text-sm text-muted-foreground mt-0.5">Isi data di bawah lalu simpan — PDF akan dicetak otomatis</p>
           </div>
 
           <Card className="border-slate-100 shadow-sm">
             <CardContent className="pt-5 space-y-5">
-
-              {/* Header info */}
+              {/* Tanggal + Keperluan */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-sm font-medium flex items-center gap-1">
@@ -608,6 +660,7 @@ export default function ReservationList() {
                 </div>
               </div>
 
+              {/* Tujuan + Keterangan */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-sm font-medium flex items-center gap-1">
@@ -688,15 +741,13 @@ export default function ReservationList() {
               {/* Line Items */}
               <div className="border-t pt-4 space-y-3">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <PackagePlus className="h-3.5 w-3.5" />Daftar Barang <span className="font-normal normal-case text-slate-400">({lineItems.length} item)</span>
+                  <PackagePlus className="h-3.5 w-3.5" />Daftar Barang
+                  <span className="font-normal normal-case text-slate-400">({lineItems.length} item)</span>
                 </p>
                 <div className="space-y-2">
                   {lineItems.map((line, index) => (
                     <ItemRow
-                      key={line.id}
-                      line={line}
-                      index={index}
-                      allItems={items}
+                      key={line.id} line={line} index={index} allItems={items}
                       onUpdate={(patch) => updateLine(line.id, patch)}
                       onRemove={() => removeLine(line.id)}
                       canRemove={lineItems.length > 1}
@@ -704,7 +755,8 @@ export default function ReservationList() {
                     />
                   ))}
                 </div>
-                <Button type="button" variant="outline" size="sm" className="w-full border-dashed text-muted-foreground h-9" onClick={addLine}>
+                <Button type="button" variant="outline" size="sm"
+                  className="w-full border-dashed text-muted-foreground h-9" onClick={addLine}>
                   <Plus className="h-3.5 w-3.5 mr-1.5" />Tambah Item
                 </Button>
               </div>
@@ -724,8 +776,7 @@ export default function ReservationList() {
         <QrScannerDialog open={qrOpen} onOpenChange={setQrOpen} onScan={handleQrScan} title="Scan QR" />
         <BinItemSelectDialog
           open={binSelectOpen} binLoc={binSelectLoc} items={binSelectItems}
-          onSelect={handleBinSelect} onClose={() => setBinSelectOpen(false)}
-        />
+          onSelect={handleBinSelect} onClose={() => setBinSelectOpen(false)} />
       </Layout>
     );
   }
@@ -754,9 +805,8 @@ export default function ReservationList() {
                 <TableRow className="bg-slate-50 border-b border-slate-100">
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-36">Nomor</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">Tanggal</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">Item Code</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500">Nama Barang</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 text-right w-20">Qty</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500">Barang</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-24">Qty Total</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-32">MO No.</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">Order Type</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-500 w-28">Keperluan</TableHead>
@@ -769,14 +819,14 @@ export default function ReservationList() {
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
-                      {Array.from({ length: 11 }).map((_, j) => (
+                      {Array.from({ length: 10 }).map((_, j) => (
                         <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="h-56 text-center">
+                    <TableCell colSpan={10} className="h-56 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground gap-2">
                         <FileX className="h-10 w-10 text-slate-200" />
                         <p className="font-medium text-slate-500">Belum ada Reservation List</p>
@@ -785,58 +835,57 @@ export default function ReservationList() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filtered.map((trx) => (
-                    <TableRow key={trx.id} className="hover:bg-slate-50 border-b border-slate-50">
-                      <TableCell className="font-mono text-xs text-slate-600">{trx.nomor}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">{formatTgl(trx.tanggal)}</TableCell>
-                      <TableCell className="font-mono text-sm text-slate-600">{trx.itemCode}</TableCell>
-                      <TableCell className="font-medium text-sm text-slate-800">{trx.namaBarang}</TableCell>
-                      <TableCell className="text-right">
-                        <span className="font-bold text-primary bg-primary/5 border border-primary/20 px-2 py-0.5 rounded text-sm font-mono">
-                          {trx.jumlah} {trx.uom}
-                        </span>
-                      </TableCell>
-                      <TableCell className="font-mono text-xs text-slate-500">{trx.maintenanceOrder || '—'}</TableCell>
+                  filtered.map((group) => (
+                    <TableRow key={group.groupId} className="hover:bg-slate-50 border-b border-slate-50">
+                      <TableCell className="font-mono text-xs text-slate-600">{group.nomor}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">{formatTgl(group.tanggal)}</TableCell>
                       <TableCell>
-                        {trx.orderType
-                          ? <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-mono">{trx.orderType}</span>
+                        {group.items.length === 1 ? (
+                          <div>
+                            <p className="font-medium text-sm text-slate-800 truncate max-w-xs">{group.items[0].namaBarang}</p>
+                            <p className="text-xs font-mono text-slate-400">{group.items[0].itemCode}</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-1">
+                            {group.items.map((item) => (
+                              <div key={item.id} className="flex items-center gap-2">
+                                <Package className="h-3 w-3 text-slate-400 shrink-0" />
+                                <span className="text-xs text-slate-700 truncate max-w-[220px]">{item.namaBarang}</span>
+                                <span className="text-[10px] font-mono text-slate-400 shrink-0">{item.jumlah} {item.uom}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {group.items.length === 1 ? (
+                          <span className="font-bold text-primary bg-primary/5 border border-primary/20 px-2 py-0.5 rounded text-sm font-mono">
+                            {group.items[0].jumlah} {group.items[0].uom}
+                          </span>
+                        ) : (
+                          <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600 border-slate-200">
+                            {group.items.length} item
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-mono text-xs text-slate-500">{group.maintenanceOrder || '—'}</TableCell>
+                      <TableCell>
+                        {group.orderType
+                          ? <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-mono">{group.orderType}</span>
                           : <span className="text-slate-300 text-xs">—</span>}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={`text-xs ${keperluanBadge[trx.keperluan ?? ''] || ''}`}>
-                          {trx.keperluan}
+                        <Badge variant="outline" className={`text-xs ${keperluanBadge[group.keperluan ?? ''] || ''}`}>
+                          {group.keperluan}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{trx.tujuan || '—'}</TableCell>
-                      <TableCell className="text-sm">{trx.petugas}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{group.tujuan || '—'}</TableCell>
+                      <TableCell className="text-sm">{group.petugas}</TableCell>
                       <TableCell className="text-center">
                         <Button variant="ghost" size="icon"
                           className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
                           title="Cetak Reservation List"
-                          onClick={() => printReservationList({
-                            reservationNo: trx.nomor,
-                            tanggal: trx.tanggal,
-                            petugasNama: trx.petugas,
-                            keperluan: trx.keperluan ?? '',
-                            tujuan: trx.tujuan ?? undefined,
-                            keterangan: trx.keterangan ?? undefined,
-                            maintenanceOrder: trx.maintenanceOrder ?? undefined,
-                            functionalLocation: trx.functionalLocation ?? undefined,
-                            equipment: trx.equipment ?? undefined,
-                            movementType: trx.movementType ?? undefined,
-                            orderType: trx.orderType ?? undefined,
-                            activityType: trx.activityType ?? undefined,
-                            lineItems: [{
-                              no: 1,
-                              itemCode: trx.itemCode,
-                              namaBarang: trx.namaBarang,
-                              uom: trx.uom,
-                              binLoc: trx.binLoc,
-                              qtyOnHand: 0,
-                              qtyIssued: trx.jumlah,
-                              tujuan: trx.tujuan ?? undefined,
-                            }],
-                          })}>
+                          onClick={() => printGroup(group)}>
                           <Printer className="h-4 w-4" />
                         </Button>
                       </TableCell>

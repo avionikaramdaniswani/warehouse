@@ -36,6 +36,7 @@ const createSchema = z.object({
   movementType: z.string().optional(),
   orderType: z.string().optional(),
   activityType: z.string().optional(),
+  groupId: z.string().optional(),
 });
 
 router.get("/transaksi-keluar", authenticate, async (req, res) => {
@@ -45,6 +46,7 @@ router.get("/transaksi-keluar", authenticate, async (req, res) => {
     .select({
       id: transaksiKeluarTable.id,
       nomor: transaksiKeluarTable.nomor,
+      groupId: transaksiKeluarTable.groupId,
       jumlah: transaksiKeluarTable.jumlah,
       keperluan: transaksiKeluarTable.keperluan,
       tujuan: transaksiKeluarTable.tujuan,
@@ -103,7 +105,7 @@ router.post("/transaksi-keluar", authenticate, authorize("admin", "kepala_gudang
   }
 
   const { itemCode, jumlah, keperluan, tujuan, tanggal, keterangan,
-          maintenanceOrder, functionalLocation, equipment, movementType, orderType, activityType } = parsed.data;
+          maintenanceOrder, functionalLocation, equipment, movementType, orderType, activityType, groupId } = parsed.data;
 
   const [item] = await db
     .select()
@@ -132,6 +134,7 @@ router.post("/transaksi-keluar", authenticate, authorize("admin", "kepala_gudang
     .insert(transaksiKeluarTable)
     .values({
       nomor,
+      groupId: groupId || null,
       itemId: item.id,
       userId: req.user!.userId,
       jumlah,
