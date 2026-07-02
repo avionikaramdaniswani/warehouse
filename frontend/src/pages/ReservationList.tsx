@@ -169,12 +169,14 @@ function printReservationList(d: PrintPayload) {
   @page { size: A4 landscape; margin: 8mm 12mm; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, Helvetica, sans-serif; font-size: 8.5pt; color: #111; }
-  .doc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #1B3A2D; padding-bottom: 6px; margin-bottom: 7px; }
+  .doc-body  { border: 1px solid #999; border-radius: 4px; padding: 0; margin-bottom: 6px; overflow: hidden; }
+  .doc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #999; padding: 7px 10px; }
   .co-block { display: flex; align-items: center; gap: 8px; }
   .co-logo  { height: 32px; width: auto; display: block; }
   .co-name  { font-size: 9.5pt; font-weight: 700; color: #1B3A2D; }
-  .doc-body  { border: 1px solid #999; border-radius: 4px; padding: 8px 10px; margin-bottom: 6px; }
-  .doc-body-title { font-size: 13pt; font-weight: 700; color: #1B3A2D; text-align: center; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 7px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+  .doc-body-title { font-size: 13pt; font-weight: 700; color: #1B3A2D; text-align: center; text-transform: uppercase; letter-spacing: .5px; }
+  .doc-inner { padding: 8px 10px; }
+  .doc-footer-row { border-top: 1px solid #999; padding: 4px 10px; font-size: 7pt; color: #888; }
   .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; margin-bottom: 8px; }
   .info-row  { display: flex; gap: 0; font-size: 8pt; line-height: 1.6; }
   .lbl  { min-width: 138px; font-weight: 600; color: #333; }
@@ -187,7 +189,7 @@ function printReservationList(d: PrintPayload) {
   tbody tr:nth-child(even) td { background: #f4f8f5; }
   .center { text-align: center; }
   .mono { font-family: Courier New, monospace; }
-  .sigs { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 6px; gap: 0; }
+  .sigs { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 16px; gap: 0; }
   .sig  { padding: 4px 12px 4px 0; display: flex; flex-direction: column; }
   .sig-title { font-size: 8pt; font-weight: 700; color: #111; margin-bottom: 2px; }
   .sig-space { min-height: 58px; }
@@ -197,19 +199,20 @@ function printReservationList(d: PrintPayload) {
   .sig-info .sig-lbl { min-width: 40px; color: #111; }
   .sig-info .sig-colon { margin: 0 3px; }
   .sig-info .sig-val { border-bottom: 1px solid #555; flex: 1; min-height: 11px; padding-left: 2px; }
-  .footer { margin-top: 8px; font-size: 7pt; color: #888; border-top: 1px solid #ddd; padding-top: 3px; text-align: left; }
+  .footer { display: none; }
 </style>
 </head>
 <body>
+<div class="doc-body">
 <div class="doc-header">
   <div class="co-block">
     <img class="co-logo" src="${d.logoUrl}" alt="TeL Logo" onerror="this.style.display='none'" />
     <div class="co-name">PT TANJUNGENIM LESTARI PULP AND PAPER</div>
   </div>
+  <div class="doc-body-title">Reservation List</div>
+  <div style="min-width:180px"></div>
 </div>
-
-<div class="doc-body">
-<div class="doc-body-title">Reservation List</div>
+<div class="doc-inner">
 <div class="info-grid">
   ${infoRow('Reservation No', d.reservationNo)}
   ${infoRow('Movement Type', d.movementType || '')}
@@ -278,8 +281,11 @@ function printReservationList(d: PrintPayload) {
   </div>
 </div>
 </div>
+</div>
+<div class="doc-footer-row">Dicetak: ${tglCetak} ${jamCetak} &nbsp;|&nbsp; Petugas: ${d.petugasNama}</div>
+</div>
 
-<div class="footer">Dicetak: ${tglCetak} ${jamCetak} &nbsp;|&nbsp; Petugas: ${d.petugasNama}</div>
+<div class="footer"></div>
 
 <script>window.onload = () => { window.print(); window.onafterprint = () => window.close(); };</script>
 </body>
