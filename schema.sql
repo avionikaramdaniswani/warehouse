@@ -115,16 +115,20 @@ CREATE TABLE transaksi_masuk (
 --    Pengeluaran barang dari gudang
 -- ---------------------------------------------------------------------------
 CREATE TABLE transaksi_keluar (
-  id         SERIAL      PRIMARY KEY,
-  nomor      TEXT        NOT NULL UNIQUE,            -- e.g. TREK-2026-00001
-  item_id    INTEGER     NOT NULL REFERENCES items(id),
-  user_id    INTEGER     NOT NULL REFERENCES users(id),
-  jumlah     INTEGER     NOT NULL,
-  keperluan  TEXT        NOT NULL DEFAULT 'Perbaikan',
-  tujuan     TEXT,
-  tanggal    DATE        NOT NULL,
-  keterangan TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id                   SERIAL      PRIMARY KEY,
+  nomor                TEXT        NOT NULL UNIQUE,  -- e.g. TREK-2026-00001
+  group_id             TEXT,                         -- ID grup untuk keluar massal
+  item_id              INTEGER     NOT NULL REFERENCES items(id),
+  user_id              INTEGER     NOT NULL REFERENCES users(id),
+  jumlah               INTEGER     NOT NULL,
+  tanggal              DATE        NOT NULL,
+  maintenance_order    TEXT,                         -- nomor MO SAP
+  functional_location  TEXT,                         -- functional location SAP
+  equipment            TEXT,                         -- equipment SAP
+  movement_type        TEXT,                         -- movement type SAP
+  order_type           TEXT,                         -- order type SAP
+  activity_type        TEXT,                         -- activity type SAP
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- ---------------------------------------------------------------------------
