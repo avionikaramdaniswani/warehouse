@@ -16,14 +16,8 @@ app.use(
   helmet({
     frameguard: false,
     crossOriginResourcePolicy: { policy: "cross-origin" },
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:"],
-      },
-    },
+    // CSP dinonaktifkan — app internal perusahaan, semua asset dari origin yang sama
+    contentSecurityPolicy: false,
   }),
 );
 
