@@ -208,7 +208,8 @@ if (process.env.NODE_ENV === "production") {
   // Heroku: serve frontend build dan handle SPA routing
   const staticPath = path.resolve(process.cwd(), "frontend/dist/public");
   app.use(express.static(staticPath));
-  app.get("*", (_req, res) => {
+  // Express 5 tidak support "*" — pakai regex sebagai SPA fallback
+  app.get(/.*/, (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
   });
 } else {
