@@ -8,7 +8,9 @@ const __dirname = path.dirname(__filename);
 
 loadEnv({ path: path.resolve(__dirname, "../../.env"), quiet: true });
 
-if (!process.env.DATABASE_URL) {
+const dbUrl = process.env.SUPABASE_DATABASE_URL ?? process.env.DATABASE_URL;
+
+if (!dbUrl) {
   throw new Error("DATABASE_URL, ensure the database is provisioned");
 }
 
@@ -16,6 +18,6 @@ export default defineConfig({
   schema: "./src/schema/index.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL,
+    url: dbUrl,
   },
 });
