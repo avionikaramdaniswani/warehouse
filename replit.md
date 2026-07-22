@@ -62,6 +62,22 @@ Data awal (dari Materials_2026.xlsx):
 - `schema.sql` hanya dokumentasi — schema dikelola Drizzle ORM via `db push`
 - MS Code disimpan sebagai teks angka saja (tanpa prefix), sesuai format asli sistem
 
+## Heroku Deployment
+
+Build & start sudah dikonfigurasi untuk Heroku:
+- `Procfile` → `web: node backend/dist/index.mjs`
+- `heroku-postbuild` → build frontend (Vite) + backend (esbuild)
+- Backend serve frontend static files (`frontend/dist/public`) di production
+- Supabase dipakai sebagai database production (transaction pooler)
+
+**Config Vars yang wajib di-set di Heroku:**
+| Key | Nilai |
+|-----|-------|
+| `DATABASE_URL` | Supabase transaction pooler URL |
+| `JWT_SECRET` | (sama dengan yang di sini) |
+| `NODE_ENV` | `production` |
+| `ENABLE_EXPERIMENTAL_COREPACK` | `1` |
+
 ## User preferences
 
 - 1 service / 1 workflow saja (frontend + backend digabung)

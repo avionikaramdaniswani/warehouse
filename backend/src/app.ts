@@ -2,6 +2,7 @@ import express, { type Express } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import pinoHttp from "pino-http";
+import path from "path";
 import router from "./routes/index.js";
 import { logger } from "./lib/logger.js";
 import { globalLimiter } from "./middlewares/rateLimiter.js";
@@ -201,8 +202,19 @@ app.get("/diagram/use-case", (_req, res) => {
 });
 
 app.use("/api", router);
+app.use("/api", notFoundHandler); // 404 untuk route /api/* yang tidak ditemukan
 
-app.use(notFoundHandler);
+if (process.env.NODE_ENV === "production") {
+  // Heroku: serve frontend build dan handle SPA routing
+  const staticPath = path.resolve(process.cwd(), "frontend/dist/public");
+  app.use(express.static(staticPath));
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(staticPath, "index.html"));
+  });
+} else {
+  app.use(notFoundHandler);
+}
+
 app.use(errorHandler);
 
 export default app;
