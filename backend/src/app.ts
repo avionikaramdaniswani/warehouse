@@ -28,6 +28,8 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(staticPath));
 }
 
+// Di production, frontend & backend satu server (same origin) — allow semua.
+// Di development, tetap strict supaya tidak ada akses dari origin lain.
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
   : [];
@@ -35,14 +37,11 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) {
+      if (!origin || process.env.NODE_ENV === "production") {
         callback(null, true);
         return;
       }
-      if (
-        process.env.NODE_ENV !== "production" ||
-        allowedOrigins.includes(origin)
-      ) {
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Akses CORS ditolak"));
