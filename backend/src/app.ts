@@ -16,10 +16,17 @@ app.use(
   helmet({
     frameguard: false,
     crossOriginResourcePolicy: { policy: "cross-origin" },
-    // CSP dinonaktifkan — app internal perusahaan, semua asset dari origin yang sama
     contentSecurityPolicy: false,
   }),
 );
+
+// Static files HARUS di sini — sebelum CORS — supaya asset (JS/CSS) tidak
+// melewati pengecekan CORS. Vite build menghasilkan <script crossorigin> yang
+// membuat browser kirim header Origin, dan CORS middleware akan menolaknya.
+if (process.env.NODE_ENV === "production") {
+  const staticPath = path.resolve(process.cwd(), "frontend/dist/public");
+  app.use(express.static(staticPath));
+}
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
@@ -199,10 +206,8 @@ app.use("/api", router);
 app.use("/api", notFoundHandler); // 404 untuk route /api/* yang tidak ditemukan
 
 if (process.env.NODE_ENV === "production") {
-  // Heroku: serve frontend build dan handle SPA routing
+  // SPA fallback — semua route non-API dan non-static dikembalikan ke index.html
   const staticPath = path.resolve(process.cwd(), "frontend/dist/public");
-  app.use(express.static(staticPath));
-  // Express 5 tidak support "*" — pakai regex sebagai SPA fallback
   app.get(/.*/, (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
   });
