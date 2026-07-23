@@ -36,9 +36,10 @@ interface Props {
 }
 
 const COL_ALIASES: Record<string, string[]> = {
-  itemCode:   ['item code', 'item-code', 'itemcode', 'kode item', 'kode barang', 'kode'],
+  // msCode juga menangkap kolom 'item code' — karena item_code = ms_code
+  msCode:     ['ms code', 'ms-code', 'mscode', 'ms no', 'material no', 'material number', 'material',
+               'item code', 'item-code', 'itemcode', 'kode item', 'kode barang', 'kode'],
   tsCode:     ['ts code', 'ts-code', 'tscode', 'kode ts'],
-  msCode:     ['ms code', 'ms-code', 'mscode', 'ms no', 'material no', 'material number', 'material'],
   nama:       ['nama barang', 'item', 'description', 'deskripsi', 'nama material', 'nama item', 'nama', 'item name', 'uraian', 'keterangan barang'],
   kategori:   ['kategori', 'category', 'grup', 'group', 'kat', 'material group'],
   binLoc:     ['bin loc', 'binloc', 'bin location', 'lokasi', 'bin', 'location', 'storage loc'],
@@ -47,7 +48,8 @@ const COL_ALIASES: Record<string, string[]> = {
   safetyStok: ['safety stok', 'safety stock', 'safety', 'min stok', 'minimum stock', 'min stock', 'min qty'],
 };
 
-const ALL_COLS = ['Item Code', 'TS Code', 'MS Code', 'Nama Barang', 'Kategori', 'Bin Loc', 'UOM', 'Stok', 'Safety Stok'];
+// Item Code = MS Code (nilai sama, satu kolom cukup)
+const ALL_COLS = ['MS Code', 'TS Code', 'Nama Barang', 'Kategori', 'Bin Loc', 'UOM', 'Stok', 'Safety Stok'];
 
 const KATEGORI_NORMALIZE: Record<string, string> = {
   'civil': 'Civil',
@@ -129,26 +131,26 @@ function parseRows(sheet: XLSX.WorkSheet): { rows: ParsedRow[]; detectedHeaders:
     if (!row || row.every((c) => c == null || String(c).trim() === '')) continue;
 
     const errors: string[] = [];
-    const itemCode = getStr(row, 'itemCode');
-    const tsRaw    = getStr(row, 'tsCode');
+    // item_code = ms_code: MS Code kolom utama, dipakai sebagai item_code sekaligus
+    const msRaw  = getStr(row, 'msCode');
+    const itemCode = msRaw; // item_code selalu sama dengan ms_code
+    const tsRaw  = getStr(row, 'tsCode');
     const nama     = getStr(row, 'nama');
     const kategori = normalizeKategori(getStr(row, 'kategori'));
     const stok     = getNum(row, 'stok', 0);
     const safetyStok = getNum(row, 'safetyStok', 5);
 
-    if (!itemCode) errors.push('Item Code kosong');
+    if (!itemCode) errors.push('MS Code kosong');
     if (!nama)     errors.push('Nama Barang kosong');
     if (!kategori) errors.push('Kategori kosong');
     if (isNaN(stok))      errors.push('Stok harus angka');
     if (isNaN(safetyStok)) errors.push('Safety Stok harus angka');
 
-    const msRaw = getStr(row, 'msCode');
-
     rows.push({
       rowNum: i + 1,
       itemCode,
       tsCode: tsRaw || undefined,
-      msCode: msRaw || undefined,
+      msCode: msRaw || undefined, // same value as itemCode
       nama,
       kategori,
       binLoc: getStr(row, 'binLoc') || undefined,
@@ -162,10 +164,11 @@ function parseRows(sheet: XLSX.WorkSheet): { rows: ParsedRow[]; detectedHeaders:
 }
 
 function downloadTemplate() {
+  // MS Code = Item Code (nilai sama), TS Code opsional
   const ws = XLSX.utils.aoa_to_sheet([
     ALL_COLS,
-    ['ITM-10001', '10001', '123456', 'Baut M10 x 30mm', 'Mechanical Material', 'A-01-01', 'PCS', 100, 20],
-    ['ITM-10002', '10002', '123457', 'Oli Mesin SAE 40', 'Consumables', 'B-02-03', 'LTR', 50, 10],
+    ['123456', '10001', 'Baut M10 x 30mm', 'Mechanical Material', 'A-01-01', 'PCS', 100, 20],
+    ['123457', '10002', 'Oli Mesin SAE 40', 'Consumables', 'B-02-03', 'LTR', 50, 10],
   ]);
   ws['!cols'] = ALL_COLS.map((_, i) => ({ wch: i === 3 ? 35 : 16 }));
   const wb = XLSX.utils.book_new();
@@ -431,7 +434,7 @@ export function ImportExcelModal({ open, onClose, token, onImported }: Props) {
                   <thead className="bg-slate-100 sticky top-0">
                     <tr>
                       <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap">#</th>
-                      <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap">Item Code</th>
+                      <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap">MS Code</th>
                       <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap">TS Code</th>
                       <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap min-w-[180px]">Nama Barang</th>
                       <th className="px-2 py-2 text-left font-semibold text-slate-600 whitespace-nowrap">Kategori</th>

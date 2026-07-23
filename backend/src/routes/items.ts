@@ -292,7 +292,11 @@ router.post("/items/diff", authenticate, authorize("admin", "kepala_gudang"), as
     return;
   }
 
-  const { items } = parsed.data;
+  // Normalkan: item_code = ms_code (selalu sama)
+  const items = parsed.data.items.map((i) => ({
+    ...i,
+    msCode: i.msCode ?? i.itemCode,
+  }));
   const allItemCodes = items.map((i) => i.itemCode);
 
   const existingRows = await db
@@ -361,7 +365,11 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
     return;
   }
 
-  const { items } = parsed.data;
+  // Normalkan: item_code = ms_code (selalu sama)
+  const items = parsed.data.items.map((i) => ({
+    ...i,
+    msCode: i.msCode ?? i.itemCode,
+  }));
   const errors: { itemCode: string; reason: string }[] = [];
 
   // 1. Ambil semua field item yang sudah ada di DB untuk perbandingan lengkap
