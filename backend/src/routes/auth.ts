@@ -51,7 +51,9 @@ router.post("/auth/login", loginLimiter, async (req, res) => {
     .set({ loginTerakhir: new Date() })
     .where(eq(usersTable.id, user.id));
 
-  await logActivity(user.id, "LOGIN", "Login berhasil", req);
+  await logActivity(user.id, "LOGIN", "Login berhasil", req, {
+    email: user.email, namaLengkap: user.namaLengkap, role: user.role,
+  });
 
   const token = signToken({ userId: user.id, role: user.role, nik: user.nik });
 
@@ -113,7 +115,11 @@ router.patch("/auth/profile", authenticate, async (req, res) => {
       loginTerakhir: usersTable.loginTerakhir,
     });
 
-  await logActivity(userId, "UPDATE_PROFILE", "Perbarui profil", req);
+  await logActivity(userId, "UPDATE_PROFILE", "Perbarui profil", req, {
+    fieldDiubah: Object.keys(parsed.data),
+    sesudah: { namaLengkap: updated.namaLengkap, email: updated.email,
+      noHp: updated.noHp, departemen: updated.departemen, jabatan: updated.jabatan, seksi: updated.seksi },
+  });
   res.json(updated);
 });
 
@@ -160,7 +166,7 @@ router.post("/auth/change-password", authenticate, async (req, res) => {
     .set({ password: hashed, updatedAt: new Date() })
     .where(eq(usersTable.id, user.id));
 
-  await logActivity(user.id, "CHANGE_PASSWORD", "Ubah password", req);
+  await logActivity(user.id, "CHANGE_PASSWORD", "Ubah password sendiri", req, { changedBy: "self" });
   res.json({ message: "Password berhasil diubah" });
 });
 
@@ -247,7 +253,7 @@ router.post("/auth/reset-password", async (req, res) => {
     .set({ password: hashed, updatedAt: new Date() })
     .where(eq(usersTable.id, userId));
 
-  await logActivity(userId, "RESET_PASSWORD", "Reset password via lupa password", req);
+  await logActivity(userId, "RESET_PASSWORD", "Reset password via lupa password", req, { changedBy: "self", method: "forgot_password" });
   res.json({ message: "Password berhasil direset. Silakan login dengan password baru." });
 });
 

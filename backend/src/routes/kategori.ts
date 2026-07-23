@@ -59,7 +59,8 @@ router.post("/kategori", authenticate, authorize("admin"), async (req, res) => {
     })
     .returning();
 
-  await logActivity(req.user!.userId, "CREATE_KATEGORI", `Tambah kategori: ${row.nama}`, req);
+  await logActivity(req.user!.userId, "CREATE_KATEGORI", `Tambah kategori: ${row.nama}`, req,
+    { id: row.id, nama: row.nama, keterangan: row.keterangan });
   res.status(201).json(row);
 });
 
@@ -105,7 +106,8 @@ router.put("/kategori/:id", authenticate, authorize("admin"), async (req, res) =
     .where(eq(kategoriTable.id, id))
     .returning();
 
-  await logActivity(req.user!.userId, "UPDATE_KATEGORI", `Edit kategori: ${updated.nama}`, req);
+  await logActivity(req.user!.userId, "UPDATE_KATEGORI", `Edit kategori: ${existing.nama} → ${updated.nama}`, req,
+    { id, sebelum: { nama: existing.nama, keterangan: existing.keterangan }, sesudah: { nama: updated.nama, keterangan: updated.keterangan } });
   res.json(updated);
 });
 
@@ -132,7 +134,8 @@ router.delete("/kategori/:id", authenticate, authorize("admin"), async (req, res
     .set({ isActive: false, updatedAt: new Date() })
     .where(eq(kategoriTable.id, id));
 
-  await logActivity(req.user!.userId, "DELETE_KATEGORI", `Nonaktifkan kategori: ${existing.nama}`, req);
+  await logActivity(req.user!.userId, "DELETE_KATEGORI", `Nonaktifkan kategori: ${existing.nama}`, req,
+    { id, nama: existing.nama, keterangan: existing.keterangan });
   res.json({ message: "Kategori berhasil dihapus" });
 });
 

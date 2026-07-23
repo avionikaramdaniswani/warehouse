@@ -151,7 +151,11 @@ router.post("/items", authenticate, authorize("admin", "kepala_gudang"), async (
     })
     .returning();
 
-  await logActivity(req.user!.userId, "CREATE_ITEM", `Tambah barang: ${row.itemCode} - ${row.nama}`, req);
+  await logActivity(req.user!.userId, "CREATE_ITEM", `Tambah barang: ${row.itemCode} - ${row.nama}`, req, {
+    itemCode: row.itemCode, tsCode: row.tsCode, msCode: row.msCode,
+    nama: row.nama, kategori: row.kategori, binLoc: row.binLoc,
+    uom: row.uom, stok: row.stok, safetyStok: row.safetyStok,
+  });
   res.status(201).json(row);
 });
 
@@ -217,7 +221,17 @@ router.put("/items/:itemCode", authenticate, authorize("admin", "kepala_gudang")
     .where(eq(itemsTable.itemCode, itemCode))
     .returning();
 
-  await logActivity(req.user!.userId, "UPDATE_ITEM", `Edit barang: ${updated.itemCode}`, req);
+  // Hitung field apa saja yang berubah
+  const changedFields: Record<string, { sebelum: unknown; sesudah: unknown }> = {};
+  const watchFields = ["nama","kategori","binLoc","uom","stok","safetyStok","tsCode","msCode"] as const;
+  for (const f of watchFields) {
+    const before = existing[f] ?? null;
+    const after = (updated as Record<string, unknown>)[f] ?? null;
+    if (String(before) !== String(after)) changedFields[f] = { sebelum: before, sesudah: after };
+  }
+  await logActivity(req.user!.userId, "UPDATE_ITEM", `Edit barang: ${updated.itemCode} - ${updated.nama}`, req, {
+    itemCode: updated.itemCode, nama: updated.nama, perubahanField: changedFields,
+  });
   res.json(updated);
 });
 
@@ -251,6 +265,10 @@ router.patch("/items/:itemCode/stok", authenticate, authorize("admin", "kepala_g
     .where(eq(itemsTable.itemCode, itemCode))
     .returning();
 
+  await logActivity(req.user!.userId, "UPDATE_STOK", `Update stok manual: ${existing.itemCode} - ${existing.nama} (${existing.stok > newStok ? '-' : '+'}${Math.abs(parsed.data.delta)})`, req, {
+    itemCode: existing.itemCode, nama: existing.nama, uom: existing.uom,
+    stokSebelum: existing.stok, stokSesudah: newStok, delta: parsed.data.delta,
+  });
   res.json(updated);
 });
 
@@ -443,7 +461,8 @@ router.post("/items/import", authenticate, authorize("admin", "kepala_gudang"), 
       req.user!.userId,
       "IMPORT_ITEMS",
       `Import barang: ${inserted} ditambahkan, ${updated} diperbarui, ${unchanged} tidak berubah, ${errors.length} gagal`,
-      req
+      req,
+      { inserted, updated, unchanged, gagal: errors.length, totalDiproses: items.length },
     );
   }
 
@@ -468,7 +487,10 @@ router.delete("/items/:itemCode", authenticate, authorize("admin"), async (req, 
     .set({ isActive: false, updatedAt: new Date() })
     .where(eq(itemsTable.itemCode, itemCode));
 
-  await logActivity(req.user!.userId, "DELETE_ITEM", `Hapus barang: ${existing.itemCode} - ${existing.nama}`, req);
+  await logActivity(req.user!.userId, "DELETE_ITEM", `Hapus barang: ${existing.itemCode} - ${existing.nama}`, req, {
+    itemCode: existing.itemCode, nama: existing.nama, kategori: existing.kategori,
+    stokTerakhir: existing.stok, uom: existing.uom, binLoc: existing.binLoc,
+  });
   res.json({ message: "Barang berhasil dihapus" });
 });
 

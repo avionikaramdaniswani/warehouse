@@ -140,7 +140,17 @@ router.post("/transaksi-keluar", authenticate, authorize("admin", "kepala_gudang
     })
     .returning();
 
-  await logActivity(req.user!.userId, "BARANG_KELUAR", `${nomor}: ${item.itemCode} -${jumlah}`, req);
+  await logActivity(req.user!.userId, "BARANG_KELUAR", `${nomor}: ${item.itemCode} - ${item.nama} -${jumlah} ${item.uom}`, req, {
+    nomor, itemCode: item.itemCode, namaBarang: item.nama, kategori: item.kategori,
+    jumlah, uom: item.uom, binLoc: item.binLoc, tanggal,
+    maintenanceOrder: maintenanceOrder ?? null,
+    functionalLocation: functionalLocation ?? null,
+    equipment: equipment ?? null,
+    movementType: movementType ?? null,
+    orderType: orderType ?? null,
+    activityType: activityType ?? null,
+    stokSebelum: item.stok, stokSesudah: newStok,
+  });
   res.status(201).json({ ...trx, itemCode: item.itemCode, tsCode: item.tsCode, namaBarang: item.nama, stokBaru: newStok });
 });
 

@@ -94,6 +94,8 @@ router.post("/users", authenticate, authorize("admin"), async (req, res) => {
     "CREATE_USER",
     `Membuat pengguna baru: ${newUser.namaLengkap} (${newUser.nik})`,
     req,
+    { nik: newUser.nik, namaLengkap: newUser.namaLengkap, email: newUser.email,
+      role: newUser.role, departemen: newUser.departemen, jabatan: newUser.jabatan, seksi: newUser.seksi },
   );
 
   res.status(201).json(newUser);
@@ -137,6 +139,9 @@ router.put("/users/:id", authenticate, authorize("admin"), async (req, res) => {
     "UPDATE_USER",
     `Memperbarui pengguna: ${updated.namaLengkap} (${updated.nik})`,
     req,
+    { targetId: id, nik: updated.nik, namaLengkap: updated.namaLengkap,
+      role: updated.role, departemen: updated.departemen, jabatan: updated.jabatan,
+      seksi: updated.seksi, status: updated.status },
   );
 
   res.json(updated);
@@ -177,6 +182,7 @@ router.patch("/users/:id/password", authenticate, authorize("admin"), async (req
     "CHANGE_PASSWORD",
     `Mengubah password pengguna NIK: ${updated.nik}`,
     req,
+    { targetId: id, targetNik: updated.nik, changedBy: req.user!.userId },
   );
 
   res.json({ message: "Password berhasil diubah" });
@@ -200,7 +206,8 @@ router.patch("/users/:id/permissions", authenticate, authorize("admin"), async (
 
   await db.update(usersTable).set({ permissions: parsed.data, updatedAt: new Date() }).where(eq(usersTable.id, id));
 
-  await logActivity(req.user!.userId, "UPDATE_PERMISSIONS", `Ubah akses petugas NIK: ${user.nik} → masuk:${parsed.data.transaksi_masuk} keluar:${parsed.data.transaksi_keluar}`, req);
+  await logActivity(req.user!.userId, "UPDATE_PERMISSIONS", `Ubah akses petugas NIK: ${user.nik} → masuk:${parsed.data.transaksi_masuk} keluar:${parsed.data.transaksi_keluar}`, req,
+    { targetId: id, targetNik: user.nik, sesudah: { transaksi_masuk: parsed.data.transaksi_masuk, transaksi_keluar: parsed.data.transaksi_keluar } });
 
   res.json({ message: "Akses berhasil diperbarui", permissions: parsed.data });
 });
@@ -232,6 +239,7 @@ router.delete("/users/:id", authenticate, authorize("admin"), async (req, res) =
     "DELETE_USER",
     `Menghapus pengguna: ${deleted.namaLengkap} (${deleted.nik})`,
     req,
+    { targetId: id, nik: deleted.nik, namaLengkap: deleted.namaLengkap },
   );
 
   res.json({ message: "Pengguna berhasil dihapus" });

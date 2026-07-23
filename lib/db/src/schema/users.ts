@@ -48,6 +48,7 @@ export const activityLogsTable = pgTable("activity_logs", {
     .references(() => usersTable.id, { onDelete: "cascade" }),
   aksi: text("aksi").notNull(),
   detail: text("detail"),
+  metadata: jsonb("metadata").$type<Record<string, unknown>>(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -111,6 +112,7 @@ export const insertActivityLogSchema = z.object({
   userId: z.number(),
   aksi: z.string(),
   detail: z.string().nullable().optional(),
+  metadata: z.record(z.unknown()).nullable().optional(),
   ipAddress: z.string().nullable().optional(),
   userAgent: z.string().nullable().optional(),
 });
