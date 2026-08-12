@@ -546,14 +546,11 @@ router.get("/items/:id/riwayat", authenticate, async (req, res) => {
       tanggal: transaksiKeluarTable.tanggal,
       createdAt: transaksiKeluarTable.createdAt,
       petugas: usersTable.namaLengkap,
-      keterangan: transaksiKeluarTable.keterangan,
-      keperluan: transaksiKeluarTable.keperluan,
-      tujuan: transaksiKeluarTable.tujuan,
     })
       .from(transaksiKeluarTable)
       .innerJoin(usersTable, eq(transaksiKeluarTable.userId, usersTable.id))
       .where(eq(transaksiKeluarTable.itemId, id));
-    combined.push(...keluar.map(r => ({ ...r, jenis: "Keluar" as const, noPo: null })));
+    combined.push(...keluar.map(r => ({ ...r, jenis: "Keluar" as const, noPo: null, keterangan: null, keperluan: null, tujuan: null })));
   }
 
   combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

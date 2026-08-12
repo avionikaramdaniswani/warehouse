@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 interface TeLLogoProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 }
 
@@ -10,6 +10,7 @@ export function TeLLogo({ size = 'md', className }: TeLLogoProps) {
     sm: 'h-9 w-auto',
     md: 'h-12 w-auto',
     lg: 'h-20 w-auto',
+    xl: 'h-28 w-auto',
   }[size];
 
   return (
